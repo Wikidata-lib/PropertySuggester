@@ -1,5 +1,9 @@
 <?php
 
+use Wikibase\EntityId;
+use Wikibase\Item;
+use Wikibase\WikiPageEntityLookup;
+
 class SpecialSuggester extends SpecialPage {
 	
 	/**
@@ -21,7 +25,23 @@ class SpecialSuggester extends SpecialPage {
 		$out->addModules( 'ext.Suggester' );
 
 		$out->addWikiMsg( 'suggester-intro' );
-		$out->addHTML( "hihihihihihi" );
+		$out->addHTML( "hihihihihihi <br/> <br/> " );
 
-	}
+                $id = new EntityId( Item::ENTITY_TYPE, 3 );
+                //kramberechnen
+                $schnittstelle = new WikiPageEntityLookup();
+                $serialisiertes = $schnittstelle->getEntity($id);
+                
+                $claims = $serialisiertes->getAllSnaks();
+                for($i = 0; $i < count($claims); $i++)
+                {
+                    $out->addHTML("Atrribut ". $i .": " . 
+                            $claims[$i]->getPropertyId() . "<br/> Typ: type" . 
+                            $claims[$i]->getDataValue()->getType() . "<br/> value: " .
+                            $claims[$i]->getDataValue()->getValue() . "<br/><br/>"); //wir wollen die property id id
+                }
+                
+                $out->addHTML("<br/> <br/> \n\n liste: " . $serialisiertes->serialize());
+        }
+        
 }
