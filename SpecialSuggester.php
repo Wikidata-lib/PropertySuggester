@@ -1,5 +1,8 @@
 <?php
 
+include '/Suggesters/SimplePHPSuggester.php';
+
+use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
@@ -43,6 +46,7 @@ class SpecialSuggester extends SpecialPage {
 
 		$out->addHTML("<br/> <br/> \n\n liste: " . $serialisiertes->serialize());*/
 
+		
 		$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$entityPerPage = StoreFactory::getStore( 'sqlstore' )->newEntityPerPage();
 		$entityIterator = $entityPerPage->getEntities(Item::ENTITY_TYPE);//WithoutTerm(\Wikibase\Term::TYPE_DESCRIPTION, 'en', Item::ENTITY_TYPE, 100, 0);
@@ -104,6 +108,21 @@ class SpecialSuggester extends SpecialPage {
 			$out->addHTML("</tr>");
 		}
 		$out->addHTML("</tbody></table>");
+		$out->addHTML("Correlation values for all Attributes regarding item Q2 'Moritz Finke': <br />");
+		
+		//Suggestor testen:
+		$suggestor = new SimplePHPSuggester();
+		$suggestor->computeTable();
+		
+		$schnittstelle = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$id = new EntityId( Item::ENTITY_TYPE, 2 );
+		$entity = $schnittstelle->getEntity($id);
+		
+		$results = $suggestor->suggestionsByEntity($entity, 10);
+		foreach($results as $rank => $correlation)
+		{
+			$out->addHTML($rank+1 . ". " . $correlation['id'] . ":  " . $correlation['correlation'] . "<br />");
+		}
 	}
 	
 	function incrementOrInit()
