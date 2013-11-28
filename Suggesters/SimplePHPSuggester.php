@@ -13,6 +13,11 @@ function compare_pairs($a, $b){
 class SimplePHPSuggester implements Suggester {
 	private $propertyRelations = array();
 	
+	public function getPropertyRelations()
+	{
+		return $this->propertyRelations;
+	}
+	
 	public function suggestionsByAttributes( $attributeValuePairs, $resultSize ) {
 		$numberOfAVP = count($attributeValuePairs);
 		$result = array();
@@ -65,7 +70,10 @@ class SimplePHPSuggester implements Suggester {
 					{
 						$this->propertyRelations[$propertyId1][$propertyId2] = 0; //init
 					}
-					$this->propertyRelations[$propertyId1][$propertyId2]++;
+					if(!($propertyId1 === $propertyId2))
+					{
+						$this->propertyRelations[$propertyId1][$propertyId2]++;
+					}
 				}
 			}
 		}
