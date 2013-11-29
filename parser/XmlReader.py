@@ -6,6 +6,8 @@ p_n is a property
 d_n is a datatype
 v_n is a value
 """
+import argparse
+from distutils.spawn import _nt_quote_args
 
 import gzip
 import json
@@ -61,6 +63,15 @@ def _process_json(json_string):
     return claims
 
 if __name__ == "__main__":
-    with  gzip.open("test/Wikidata-20131129161111.xml.gz", "r") as f:
-        x = read_xml(f)
-        print "\n".join(map(str, x))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
+                        default="test/Wikidata-Q1.xml.gz", nargs="?")
+    args = parser.parse_args()
+
+    if args.input[-3:] == ".gz":
+        in_file = gzip.open(args.input, "r")
+    else:
+        in_file = open(args.input, "r")
+
+    for element in read_xml(in_file):
+        print element
