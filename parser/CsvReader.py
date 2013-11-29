@@ -18,6 +18,10 @@ def read_csv(input_file, seperator=","):
             claims = []
         claims.append((prop, value))
 
+    if not current_title is None:
+        yield current_title, claims
+
+
 def read_compressed_csv(input_file, seperator=","):
     title = None
     claims = []
@@ -25,11 +29,13 @@ def read_compressed_csv(input_file, seperator=","):
         if line[0] == "=":
             if not title is None:
                 yield title, claims
-                claims = []
             title = line[1:].strip()
         else:
             prop, value = line.strip().split(seperator, 1)
             claims.append((prop, value))
+    if not title is None:
+        yield title, claims
+        claims = []
 
 
 
