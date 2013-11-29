@@ -1,6 +1,9 @@
 
 """
-read_xml returns a generator that yields the tuple (title, [(p1, v1), (p2, v2),..])
+read_xml returns a generator that yields the tuple (title, [(p1, dt1, v1), (p2, dt1, v2),..])
+where
+pn is a property
+
 """
 
 import gzip
@@ -53,10 +56,10 @@ def _process_json(json_string):
                 raise RuntimeError("unknown datatype: %s" % datatype)
         else:
             value = claim[0]
-        claims.append((prop,  value))
+        claims.append((prop, datatype, value))
     return claims
 
 if __name__ == "__main__":
-    with  gzip.open("../test/Wikidata-20131129161111.xml.gz", "r") as f:
+    with  gzip.open("test/Wikidata-20131129161111.xml.gz", "r") as f:
         x = read_xml(f)
         print "\n".join(map(str, x))

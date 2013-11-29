@@ -12,16 +12,18 @@ import XmlReader
 class AbstractUniverseTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
-        self.result = [("Q1", [("373", "Universe"), ("31", "Q223557"), ("31", "Q1088088")])]
+        self.result = [("Q1", [("373", "string", "Universe"),
+                               ("31", "wikibase-entityid", "Q223557"),
+                               ("31", "wikibase-entityid", "Q1088088")])]
 
     def test_universe(self):
         self.assertThat(len(self.result), Equals(1))
 
         q1 = self.result[0]
         self.assertThat("Q1", Equals(q1[0]))
-        self.assertThat(q1[1], Contains(("373", "Universe")))
-        self.assertThat(q1[1], Contains(("31", "Q223557")))
-        self.assertThat(q1[1], Contains(("31", "Q1088088")))
+        self.assertThat(q1[1], Contains(("373", "string", "Universe")))
+        self.assertThat(q1[1], Contains(("31", "wikibase-entityid", "Q223557")))
+        self.assertThat(q1[1], Contains(("31", "wikibase-entityid", "Q1088088")))
 
 
 class XmlReaderTest(AbstractUniverseTest):
