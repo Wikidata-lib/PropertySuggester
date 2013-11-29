@@ -6,6 +6,7 @@ p_n is a property
 d_n is a datatype
 v_n is a value
 """
+import multiprocessing
 import time, gzip, json, argparse
 try:
     import xml.etree.cElementTree as ElementTree
@@ -18,24 +19,28 @@ title_tag = "{"+NS+"}"+"title"
 text_tag = "{"+NS+"}"+"text"
 
 
-def read_xml(input_file):
-    count = 0
+def read_xml(input_file, thread_count=8):
+    pool = multiprocessing.Pool(thread_count)
+    for title, claims in pool.imap(_process_json, _get_xml(input_file)):
+        yield title, claims
 
+
+def _get_xml(input_file):
+    count = 0
+    title = None
     for event, element in ElementTree.iterparse(input_file):
         if element.tag == title_tag:
             title = element.text
         elif element.tag == text_tag:
-            claims = _process_json(element.text)
-
+            claim_json = element.text
             count += 1
             if count % 10000 == 0:
                 print "processed %.2fMB"%(input_file.tell() / 1024.0**2)
-
-            yield (title, claims)
+            yield title, claim_json
         element.clear()
 
 
-def _process_json(json_string):
+def _process_json((title, json_string)):
     data = json.loads(json_string)
     claims = []
     for claim in data["claims"]:
@@ -54,15 +59,16 @@ def _process_json(json_string):
             else:
                 raise RuntimeError("unknown datatype: %s" % datatype)
         else:
-            value = claim[0]
+            datatype = value = claim[0]
+
         claims.append((prop, datatype, value))
-    return claims
+    return title, claims
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
-                        default="test/Wikidata-Q1.xml.gz", nargs="?")
-    parser.add_argument("-s", "--silent", help="Show output", action="store_true")
+                        default="test/Wikidata-20131129215005.xml.gz", nargs="?")
+    parser.add_argument("-v", "--verbose", help="Show output", action="store_true")
     args = parser.parse_args()
 
     if args.input[-3:] == ".gz":
@@ -71,7 +77,7 @@ if __name__ == "__main__":
         in_file = open(args.input, "r")
 
     start = time.time()
-    if args.silent:
+    if not args.verbose:
         for element in read_xml(in_file):
             pass
     else:
