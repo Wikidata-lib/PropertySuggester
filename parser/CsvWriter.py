@@ -21,6 +21,8 @@ if __name__ == "__main__":
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported")
     parser.add_argument("output", help="The CSV output file (default=sys.stdout)", default="sys.stdout", nargs='?')
     parser.add_argument("-c", "--compressed", help="Use compressed csv (every entity is shown only once)", action="store_true")
+    parser.add_argument("-p", "--processes", help="Number of processors to use (default 4)", type=int, default=4)
+
     args = parser.parse_args()
 
     if args.input[-3:] == ".gz":
@@ -35,7 +37,7 @@ if __name__ == "__main__":
 
     start = time.time()
     if args.compressed:
-        write_compressed_csv(XmlReader.read_xml(in_file), out_file)
+        write_compressed_csv(XmlReader.read_xml(in_file, args.processes), out_file)
     else:
         write_csv(XmlReader.read_xml(in_file), out_file)
     print "total time: %.2fs"%(time.time() - start)

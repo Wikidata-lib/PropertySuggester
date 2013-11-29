@@ -51,5 +51,25 @@ class CompressedCsvReaderTest(AbstractUniverseTest):
             out.seek(0)
         self.result = list(CsvReader.read_compressed_csv(out))
 
+
+class MultiprocessingBigTest(TestCase):
+    def test_simple_multiprocessing(self):
+        r0 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 0))
+        r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 1))
+        r4 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 4))
+
+        self.assertThat(len(r0), Equals(1))
+        self.assertThat(r0, Equals(r1))
+        self.assertThat(r0, Equals(r4))
+
+    def test_multiprocessing(self):
+        r0 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 0))
+        r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 1))
+        r4 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 4))
+
+        self.assertThat(len(r0), Equals(87))
+        self.assertThat(r0, Equals(r1))
+        self.assertThat(r0, Equals(r4))
+
 if __name__ == '__main__':
     unittest.main()

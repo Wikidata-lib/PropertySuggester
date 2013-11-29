@@ -20,10 +20,13 @@ text_tag = "{"+NS+"}"+"text"
 
 
 def read_xml(input_file, thread_count=8):
-    pool = multiprocessing.Pool(thread_count)
-    for title, claims in pool.imap(_process_json, _get_xml(input_file)):
-        yield title, claims
-
+    if thread_count > 0:
+        pool = multiprocessing.Pool(thread_count)
+        for title, claims in pool.imap(_process_json, _get_xml(input_file)):
+            yield title, claims
+    else:
+        for title, claim_json in _get_xml(input_file):
+            yield _process_json((title, claim_json))
 
 def _get_xml(input_file):
     count = 0
@@ -69,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
                         default="test/Wikidata-20131129215005.xml.gz", nargs="?")
     parser.add_argument("-v", "--verbose", help="Show output", action="store_true")
+    parser.add_argument("-p", "--processes", help="Number of processors to use (default 4)", type=int, default=4)
     args = parser.parse_args()
 
     if args.input[-3:] == ".gz":
@@ -78,10 +82,10 @@ if __name__ == "__main__":
 
     start = time.time()
     if not args.verbose:
-        for element in read_xml(in_file):
+        for element in read_xml(in_file, args.processes):
             pass
     else:
-        for element in read_xml(in_file):
+        for element in read_xml(in_file, args.processes):
             print element
     
     print "total time: %.2fs"%(time.time() - start)
