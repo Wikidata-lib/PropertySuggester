@@ -2,8 +2,9 @@
 """
 read_xml returns a generator that yields the tuple (title, [(p1, dt1, v1), (p2, dt1, v2),..])
 where
-pn is a property
-
+p_n is a property
+d_n is a datatype
+v_n is a value
 """
 
 import gzip

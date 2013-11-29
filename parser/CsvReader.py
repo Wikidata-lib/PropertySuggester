@@ -1,5 +1,9 @@
 """
-read_csv returns a generator that yields the tuple (title, [(p1, v1), (p2, v2),..])
+read_csv returns a generator that yields the tuple (title, [(p1, dt1, v1), (p2, dt1, v2),..])
+where
+p_n is a property
+d_n is a datatype
+v_n is a value
 """
 
 from StringIO import StringIO
