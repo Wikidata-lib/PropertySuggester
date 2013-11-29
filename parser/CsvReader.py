@@ -8,6 +8,7 @@ v_n is a value
 
 import argparse, gzip, time
 
+
 def read_csv(input_file, seperator=","):
     current_title = None
     claims = []
@@ -37,8 +38,6 @@ def read_compressed_csv(input_file, seperator=","):
             claims.append((prop, datatype, value))
     if not title is None:
         yield title, claims
-        claims = []
-
 
 
 if __name__ == "__main__":

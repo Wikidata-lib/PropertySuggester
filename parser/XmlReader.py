@@ -11,7 +11,7 @@ import time, gzip, json, argparse
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
-    import xml.etree.ElementTree
+    import xml.etree.ElementTree as ElementTree
 
 
 NS = "http://www.mediawiki.org/xml/export-0.8/"
@@ -28,6 +28,7 @@ def read_xml(input_file, thread_count=8):
         for title, claim_json in _get_xml(input_file):
             yield _process_json((title, claim_json))
 
+
 def _get_xml(input_file):
     count = 0
     title = None
@@ -38,7 +39,7 @@ def _get_xml(input_file):
             claim_json = element.text
             count += 1
             if count % 10000 == 0:
-                print "processed %.2fMB"%(input_file.tell() / 1024.0**2)
+                print "processed %.2fMB" % (input_file.tell() / 1024.0**2)
             yield title, claim_json
         element.clear()
 

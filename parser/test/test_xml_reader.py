@@ -14,7 +14,7 @@ class AbstractUniverseTest(TestCase):
                                ("31", "wikibase-entityid", "Q1088088")])]
 
     def test_universe(self):
-        self.assertThat(len(self.result), Equals(1))
+        self.assertThat(self.result, HasLength(1))
 
         q1 = self.result[0]
         self.assertThat("Q1", Equals(q1[0]))
@@ -58,18 +58,17 @@ class MultiprocessingBigTest(TestCase):
         r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 1))
         r4 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 4))
 
-        self.assertThat(len(r0), Equals(1))
-        self.assertThat(r0, Equals(r1))
-        self.assertThat(r0, Equals(r4))
+        self.assertThat(r0, HasLength(1))
+        self.assertThat((r1, r4), AllMatch(Equals(r0)))
 
     def test_multiprocessing(self):
         r0 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 0))
         r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 1))
         r4 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 4))
 
-        self.assertThat(len(r0), Equals(87))
-        self.assertThat(r0, Equals(r1))
-        self.assertThat(r0, Equals(r4))
+        self.assertThat(r0, HasLength(87))
+        self.assertThat((r1, r4), AllMatch(Equals(r0)))
 
 if __name__ == '__main__':
     unittest.main()
+
