@@ -1,7 +1,9 @@
 import sys
-import XmlReader
 import gzip
 import argparse
+
+import XmlReader
+
 
 def write_csv(entities, output_file, seperator=","):
     for entity, claims in entities:

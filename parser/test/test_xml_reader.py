@@ -3,10 +3,7 @@ import unittest
 from testtools import TestCase
 from testtools.matchers import *
 import gzip
-import CsvReader
-import CsvWriter
-
-import XmlReader
+import CsvReader, CsvWriter, XmlReader
 
 
 class AbstractUniverseTest(TestCase):
@@ -29,14 +26,14 @@ class AbstractUniverseTest(TestCase):
 class XmlReaderTest(AbstractUniverseTest):
     def setUp(self):
         TestCase.setUp(self)
-        with gzip.open("../test/Wikidata-Q1.xml.gz", "r") as f:
+        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
             self.result = list(XmlReader.read_xml(f))
 
 
 class CsvReaderTest(AbstractUniverseTest):
     def setUp(self):
         TestCase.setUp(self)
-        with gzip.open("../test/Wikidata-Q1.xml.gz", "r") as f:
+        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
             out = StringIO()
             # for testing generate csv from xml just to parse it again
             CsvWriter.write_csv(XmlReader.read_xml(f), out)
@@ -47,7 +44,7 @@ class CsvReaderTest(AbstractUniverseTest):
 class CompressedCsvReaderTest(AbstractUniverseTest):
     def setUp(self):
         TestCase.setUp(self)
-        with gzip.open("../test/Wikidata-Q1.xml.gz", "r") as f:
+        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
             out = StringIO()
             # for testing generate csv from xml just to parse it again
             CsvWriter.write_compressed_csv(XmlReader.read_xml(f), out)

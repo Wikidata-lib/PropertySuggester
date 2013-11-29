@@ -8,6 +8,7 @@ v_n is a value
 
 from StringIO import StringIO
 import gzip
+
 import CsvWriter, XmlReader
 
 def read_csv(input_file, seperator=","):
