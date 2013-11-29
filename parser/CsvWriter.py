@@ -1,6 +1,4 @@
-import sys
-import gzip
-import argparse
+import sys, time, gzip, argparse
 
 import XmlReader
 
@@ -35,7 +33,9 @@ if __name__ == "__main__":
     else:
         out_file = open(args.output, "w")
 
+    start = time.time()
     if args.compressed:
         write_compressed_csv(XmlReader.read_xml(in_file), out_file)
     else:
         write_csv(XmlReader.read_xml(in_file), out_file)
+    print "total time: %.2fs"%(time.time() - start)

@@ -6,11 +6,7 @@ p_n is a property
 d_n is a datatype
 v_n is a value
 """
-import argparse
-from distutils.spawn import _nt_quote_args
-
-import gzip
-import json
+import time, gzip, json, argparse
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
@@ -66,6 +62,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
                         default="test/Wikidata-Q1.xml.gz", nargs="?")
+    parser.add_argument("-s", "--silent", help="Show output", action="store_true")
     args = parser.parse_args()
 
     if args.input[-3:] == ".gz":
@@ -73,5 +70,12 @@ if __name__ == "__main__":
     else:
         in_file = open(args.input, "r")
 
-    for element in read_xml(in_file):
-        print element
+    start = time.time()
+    if args.silent:
+        for element in read_xml(in_file):
+            pass
+    else:
+        for element in read_xml(in_file):
+            print element
+    
+    print "total time: %.2fs"%(time.time() - start)
