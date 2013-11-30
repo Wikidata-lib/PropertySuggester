@@ -5,6 +5,11 @@ where
 p_n is a property
 d_n is a datatype
 v_n is a value
+
+usage:
+with open("file.xml", "r") as f:
+    for title, claim in read_xml(f):
+        do_things()
 """
 import multiprocessing
 import time, gzip, json, argparse
@@ -13,6 +18,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
+from CompressedFileType import CompressedFileType
 
 NS = "http://www.mediawiki.org/xml/export-0.8/"
 title_tag = "{"+NS+"}"+"title"
@@ -71,22 +77,17 @@ def _process_json((title, json_string)):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
-                        default="test/Wikidata-20131129215005.xml.gz", nargs="?")
+                        default="test/Wikidata-20131129215005.xml.gz", nargs="?", type=CompressedFileType('r'))
     parser.add_argument("-v", "--verbose", help="Show output", action="store_true")
     parser.add_argument("-p", "--processes", help="Number of processors to use (default 4)", type=int, default=4)
     args = parser.parse_args()
 
-    if args.input[-3:] == ".gz":
-        in_file = gzip.open(args.input, "r")
-    else:
-        in_file = open(args.input, "r")
-
     start = time.time()
     if not args.verbose:
-        for element in read_xml(in_file, args.processes):
+        for element in read_xml(args.input, args.processes):
             pass
     else:
-        for element in read_xml(in_file, args.processes):
+        for element in read_xml(args.input, args.processes):
             print element
     
     print "total time: %.2fs"%(time.time() - start)
