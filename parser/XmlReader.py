@@ -43,18 +43,8 @@ def read_xml(input_file, thread_count=4):
             pool.join()
     else:
         for title, claim_json in _get_xml(input_file):
-            try:
-                yield _process_json((title, claim_json))
-            except Exception, e:
-                # show some debug info
-                print "WARNING: could not parse at %s"%(input_file.tell())
-                print e
-                print type(claim_json)
-                print claim_json
-                print traceback.format_exc()
-                with open(title + ".dump", "w") as f:
-                    f.write(claim_json)
-                exit()
+            yield _process_json((title, claim_json))
+
 
 
 def _get_xml(input_file):
