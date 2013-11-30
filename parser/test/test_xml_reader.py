@@ -3,10 +3,7 @@ import unittest
 from testtools import TestCase
 from testtools.matchers import *
 import gzip
-import CsvReader
-import CsvWriter
-
-import XmlReader
+import CsvReader, CsvWriter, XmlReader
 
 
 class AbstractUniverseTest(TestCase):
@@ -17,7 +14,7 @@ class AbstractUniverseTest(TestCase):
                                ("31", "wikibase-entityid", "Q1088088")])]
 
     def test_universe(self):
-        self.assertThat(len(self.result), Equals(1))
+        self.assertThat(self.result, HasLength(1))
 
         q1 = self.result[0]
         self.assertThat("Q1", Equals(q1[0]))
@@ -29,14 +26,14 @@ class AbstractUniverseTest(TestCase):
 class XmlReaderTest(AbstractUniverseTest):
     def setUp(self):
         TestCase.setUp(self)
-        with gzip.open("../test/Wikidata-Q1.xml.gz", "r") as f:
+        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
             self.result = list(XmlReader.read_xml(f))
 
 
 class CsvReaderTest(AbstractUniverseTest):
     def setUp(self):
         TestCase.setUp(self)
-        with gzip.open("../test/Wikidata-Q1.xml.gz", "r") as f:
+        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
             out = StringIO()
             # for testing generate csv from xml just to parse it again
             CsvWriter.write_csv(XmlReader.read_xml(f), out)
@@ -47,12 +44,31 @@ class CsvReaderTest(AbstractUniverseTest):
 class CompressedCsvReaderTest(AbstractUniverseTest):
     def setUp(self):
         TestCase.setUp(self)
-        with gzip.open("../test/Wikidata-Q1.xml.gz", "r") as f:
+        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
             out = StringIO()
             # for testing generate csv from xml just to parse it again
             CsvWriter.write_compressed_csv(XmlReader.read_xml(f), out)
             out.seek(0)
         self.result = list(CsvReader.read_compressed_csv(out))
 
+
+class MultiprocessingBigTest(TestCase):
+    def test_simple_multiprocessing(self):
+        r0 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 0))
+        r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 1))
+        r4 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 4))
+
+        self.assertThat(r0, HasLength(1))
+        self.assertThat((r1, r4), AllMatch(Equals(r0)))
+
+    def test_multiprocessing(self):
+        r0 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 0))
+        r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 1))
+        r4 = list(XmlReader.read_xml(gzip.open("test/Wikidata-20131129161111.xml.gz"), 4))
+
+        self.assertThat(r0, HasLength(87))
+        self.assertThat((r1, r4), AllMatch(Equals(r0)))
+
 if __name__ == '__main__':
     unittest.main()
+

@@ -6,9 +6,8 @@ d_n is a datatype
 v_n is a value
 """
 
-from StringIO import StringIO
-import gzip
-import CsvWriter, XmlReader
+import argparse, gzip, time
+
 
 def read_csv(input_file, seperator=","):
     current_title = None
@@ -39,15 +38,25 @@ def read_compressed_csv(input_file, seperator=","):
             claims.append((prop, datatype, value))
     if not title is None:
         yield title, claims
-        claims = []
-
 
 
 if __name__ == "__main__":
-    with gzip.open("test/Wikidata-20131129161111.xml.gz", "r") as f:
-        out = StringIO()
-        # for testing generate csv from xml just to parse it again
-        CsvWriter.write_compressed_csv(XmlReader.read_xml(f), out)
-        out.seek(0)
-    x = read_compressed_csv(out)
-    print "\n".join(map(str, x))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", help="The CSV input file (a wikidata dump), gzip is supported")
+    parser.add_argument("-s", "--silent", help="Show output", action="store_true")
+    args = parser.parse_args()
+
+    if args.input[-3:] == ".gz":
+        in_file = gzip.open(args.input, "r")
+    else:
+        in_file = open(args.input, "r")
+
+    start = time.time()
+    if args.silent:
+        for element in read_csv(in_file):
+            pass
+    else:
+        for element in read_csv(in_file):
+            print element
+
+    print "total time: %.2fs"%(time.time() - start)
