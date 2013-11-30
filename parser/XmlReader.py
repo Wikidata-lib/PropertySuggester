@@ -12,7 +12,7 @@ with open("file.xml", "r") as f:
         do_things()
 """
 import multiprocessing
-import time, gzip, json, argparse
+import time, gzip, json, argparse, traceback, signal
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
@@ -23,35 +23,65 @@ from CompressedFileType import CompressedFileType
 NS = "http://www.mediawiki.org/xml/export-0.8/"
 title_tag = "{"+NS+"}"+"title"
 text_tag = "{"+NS+"}"+"text"
+model_tag = "{"+NS+"}"+"model"
+page_tag = "{"+NS+"}"+"page"
 
+# http://noswap.com/blog/python-multiprocessing-keyboardinterrupt
+def init_worker():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-def read_xml(input_file, thread_count=8):
-    if thread_count > 0:
-        pool = multiprocessing.Pool(thread_count)
-        for title, claims in pool.imap(_process_json, _get_xml(input_file)):
-            yield title, claims
+def read_xml(input_file, thread_count=4):
+    if thread_count > 1:
+        pool = multiprocessing.Pool(thread_count-1, init_worker) # one thread is for xml parsing
+        try:
+	    for title, claims in pool.imap(_process_json, _get_xml(input_file)):
+                yield title, claims
+        except KeyboardInterrupt:
+	    print "KeyboardInterrupt"
+	    pool.terminate()
+            pool.join()
     else:
         for title, claim_json in _get_xml(input_file):
-            yield _process_json((title, claim_json))
+            try:
+		data = _process_json((title, claim_json))
+		yield data
+	    except Exception, e:
+                # show some debug info
+		print "WARNING: could not parse at %s"%(input_file.tell())
+		print e
+		print type(claim_json)
+                print claim_json
+                print traceback.format_exc()
+                with open(title + ".dump", "w") as f:
+                     f.write(claim_json)
+		exit()
 
 
 def _get_xml(input_file):
     count = 0
     title = None
+    model = None
     for event, element in ElementTree.iterparse(input_file):
         if element.tag == title_tag:
             title = element.text
+        elif element.tag == model_tag:
+            model = element.text
         elif element.tag == text_tag:
             claim_json = element.text
+	elif element.tag == page_tag:
             count += 1
-            if count % 10000 == 0:
+            if count % 3000 == 0:
                 print "processed %.2fMB" % (input_file.tell() / 1024.0**2)
-            yield title, claim_json
+            if model == "wikibase-item":
+                yield title, claim_json
         element.clear()
 
 
 def _process_json((title, json_string)):
     data = json.loads(json_string)
+    if not "claims" in data:
+        return title, []
+
     claims = []
     for claim in data["claims"]:
         claim = claim["m"]
@@ -66,8 +96,11 @@ def _process_json((title, json_string)):
                 value = claim[3]["time"]
             elif datatype == "globecoordinate":
                 value = "N%f, E%f" % (claim[3]["latitude"], claim[3]["longitude"])
-            else:
-                raise RuntimeError("unknown datatype: %s" % datatype)
+            elif datatype == "bad":
+                # for example in Q2241
+		continue
+	    else:
+                raise RuntimeError("unknown wikidata datatype: %s" % datatype)
         else:
             datatype = value = claim[0]
 
