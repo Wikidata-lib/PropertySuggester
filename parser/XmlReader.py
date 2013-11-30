@@ -32,29 +32,29 @@ def init_worker():
 
 def read_xml(input_file, thread_count=4):
     if thread_count > 1:
-        pool = multiprocessing.Pool(thread_count-1, init_worker) # one thread is for xml parsing
+        # thread_count -1 because one thread is for xml parsing
+        pool = multiprocessing.Pool(thread_count-1, init_worker)
         try:
-	    for title, claims in pool.imap(_process_json, _get_xml(input_file)):
+            for title, claims in pool.imap(_process_json, _get_xml(input_file)):
                 yield title, claims
         except KeyboardInterrupt:
-	    print "KeyboardInterrupt"
-	    pool.terminate()
+            print "KeyboardInterrupt"
+            pool.terminate()
             pool.join()
     else:
         for title, claim_json in _get_xml(input_file):
             try:
-		data = _process_json((title, claim_json))
-		yield data
-	    except Exception, e:
+                yield _process_json((title, claim_json))
+            except Exception, e:
                 # show some debug info
-		print "WARNING: could not parse at %s"%(input_file.tell())
-		print e
-		print type(claim_json)
+                print "WARNING: could not parse at %s"%(input_file.tell())
+                print e
+                print type(claim_json)
                 print claim_json
                 print traceback.format_exc()
                 with open(title + ".dump", "w") as f:
-                     f.write(claim_json)
-		exit()
+                    f.write(claim_json)
+                exit()
 
 
 def _get_xml(input_file):
@@ -68,7 +68,7 @@ def _get_xml(input_file):
             model = element.text
         elif element.tag == text_tag:
             claim_json = element.text
-	elif element.tag == page_tag:
+        elif element.tag == page_tag:
             count += 1
             if count % 3000 == 0:
                 print "processed %.2fMB" % (input_file.tell() / 1024.0**2)
@@ -98,8 +98,8 @@ def _process_json((title, json_string)):
                 value = "N%f, E%f" % (claim[3]["latitude"], claim[3]["longitude"])
             elif datatype == "bad":
                 # for example in Q2241
-		continue
-	    else:
+                continue
+            else:
                 raise RuntimeError("unknown wikidata datatype: %s" % datatype)
         else:
             datatype = value = claim[0]
@@ -110,7 +110,7 @@ def _process_json((title, json_string)):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
-                        default="test/Wikidata-20131129215005.xml.gz", nargs="?", type=CompressedFileType('r'))
+                        default="test/Wikidata-20131129161111.xml.gz", nargs="?", type=CompressedFileType('r'))
     parser.add_argument("-v", "--verbose", help="Show output", action="store_true")
     parser.add_argument("-p", "--processes", help="Number of processors to use (default 4)", type=int, default=4)
     args = parser.parse_args()
@@ -123,4 +123,4 @@ if __name__ == "__main__":
         for element in read_xml(args.input, args.processes):
             print element
     
-    print "total time: %.2fs"%(time.time() - start)
+    print "total time: %.2fs" % (time.time() - start)
