@@ -3,7 +3,7 @@ import unittest
 from testtools import TestCase
 from testtools.matchers import *
 import gzip
-.. import TableGenerator
+import TableGenerator
 import os
 
 fn = os.path.join(os.path.dirname(__file__), 'CsvQ15Test.csv')
