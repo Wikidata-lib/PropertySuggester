@@ -51,15 +51,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="The CSV input file (a wikidata dump), gzip is supported",
                         type=CompressedFileType('r'))
+    parser.add_argument("-c", "--compressed", help="Use compressed csv (every entity is shown only once)",
+                        action="store_true")
     parser.add_argument("-s", "--silent", help="Show output", action="store_true")
     args = parser.parse_args()
 
+    if args.compressed:
+        read_method = read_compressed_csv
+    else:
+        read_method = read_csv
+
     start = time.time()
     if args.silent:
-        for element in read_csv(args.input):
+        for element in read_method(args.input):
             pass
     else:
-        for element in read_csv(args.input):
+        for element in read_method(args.input):
             print element
 
     print "total time: %.2fs"%(time.time() - start)

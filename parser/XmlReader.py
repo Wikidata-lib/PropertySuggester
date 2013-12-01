@@ -49,8 +49,7 @@ def read_xml(input_file, thread_count=4):
 
 def _get_xml(input_file):
     count = 0
-    title = None
-    model = None
+    title = claim_json = model = None
     for event, element in ElementTree.iterparse(input_file):
         if element.tag == title_tag:
             title = element.text
