@@ -6,14 +6,19 @@ import gzip
 import TableGenerator
 import os
 
-fn = os.path.join(os.path.dirname(__file__), 'CsvQ15Test.csv')
-
 class TableGeneratorTest(TestCase):
 
     def setUp(self):
         TestCase.setUp(self)
+
+    def buildGen(self):
+        yield 'Q15', [('31', 'wikibase-entityid', 'Q5107'), ('373', 'string', 'Africa'), ('625', 'globecoordinate', 'N7.188056, E21.093611')]
+
     def testTableGenerator(self):
-        table = TableGenerator.computeTable(fn)
+        table = TableGenerator.computeTable(self.buildGen())
+        self.assertTrue('31' in table)
+        self.assertTrue('373' in table)
+        self.assertTrue('625' in table)
         for pid1 in table:
             self.assertThat(table[pid1]["appearances"], Equals(1))
             self.assertThat(type(table[pid1]["type"]), Equals(str))
