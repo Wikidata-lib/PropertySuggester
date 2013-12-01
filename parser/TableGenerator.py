@@ -1,23 +1,20 @@
 import argparse
 import CsvReader
+from collections import defaultdict
 
 def computeTable(f):
-    table = {}
-    with open(args.input, "r") as f:
+    table = defaultdict(int)
+    with open(f, "r") as f:
         for entity, claims in CsvReader.read_csv(f):
             for claim1 in claims:
                 pid1 = claim1[0]
-                if(not(table.has_key(pid1))):
-                    row = {}
-                    table[pid1] = {}
-                    table[pid1]["appearances"] = 0
+                if not pid1 in table:
+                    table[pid1] = defaultdict(int)
                     table[pid1]["type"] = claim1[1]
                 table[pid1]["appearances"] += 1
                 for claim2 in claims:
                     pid2 = claim2[0]
-                    if(not(table[pid1].has_key(pid2))):
-                        table[pid1][pid2] = 0
-                    if(not(pid1 == pid2)):
+                    if pid1 != pid2:
                        table[pid1][pid2] += 1
     return table
     
