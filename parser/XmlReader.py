@@ -12,10 +12,18 @@ with open("file.xml", "r") as f:
         do_things()
 """
 import multiprocessing
-import time, json, argparse, traceback, signal
+import time, argparse, traceback, signal
+
+try:
+    import ujson as json
+except ImportError:
+    print "ujson not found"
+    import json as json
+
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
+    print "cElmentTree not found"
     import xml.etree.ElementTree as ElementTree
 
 from CompressedFileType import CompressedFileType
