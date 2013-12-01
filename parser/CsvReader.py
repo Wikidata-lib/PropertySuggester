@@ -4,9 +4,16 @@ where
 p_n is a property
 d_n is a datatype
 v_n is a value
+
+usage:
+with open("file.csv", "r") as f:
+    for title, claim in read_csv(f):
+        do_things()
+
 """
 
 import argparse, gzip, time
+from CompressedFileType import CompressedFileType
 
 
 def read_csv(input_file, seperator=","):
@@ -42,21 +49,24 @@ def read_compressed_csv(input_file, seperator=","):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="The CSV input file (a wikidata dump), gzip is supported")
+    parser.add_argument("input", help="The CSV input file (a wikidata dump), gzip is supported",
+                        type=CompressedFileType('r'))
+    parser.add_argument("-c", "--compressed", help="Use compressed csv (every entity is shown only once)",
+                        action="store_true")
     parser.add_argument("-s", "--silent", help="Show output", action="store_true")
     args = parser.parse_args()
 
-    if args.input[-3:] == ".gz":
-        in_file = gzip.open(args.input, "r")
+    if args.compressed:
+        read_method = read_compressed_csv
     else:
-        in_file = open(args.input, "r")
+        read_method = read_csv
 
     start = time.time()
     if args.silent:
-        for element in read_csv(in_file):
+        for element in read_method(args.input):
             pass
     else:
-        for element in read_csv(in_file):
+        for element in read_method(args.input):
             print element
 
     print "total time: %.2fs"%(time.time() - start)
