@@ -1,13 +1,13 @@
-import sys, time, gzip, argparse
+import sys, time, argparse
 from CompressedFileType import CompressedFileType
 
 import XmlReader
 
 
-def write_csv(entities, output_file, seperator=","):
+def write_csv(entities, output_file, sep=","):
     for entity, claims in entities:
         for prop, datatype, value in claims:
-            output_file.write((entity + seperator + prop + seperator + datatype + seperator + value + "\n").encode("utf-8"))
+            output_file.write((entity + sep + prop + sep + datatype + sep + value + "\n").encode("utf-8"))
 
 
 def write_compressed_csv(entities, output_file, seperator=","):
@@ -32,5 +32,5 @@ if __name__ == "__main__":
     if args.compressed:
         write_compressed_csv(XmlReader.read_xml(args.input, args.processes), args.output)
     else:
-        write_csv(XmlReader.read_xml(args.input), args.output)
+        write_csv(XmlReader.read_xml(args.input, args.processes), args.output)
     print "total time: %.2fs"%(time.time() - start)

@@ -12,7 +12,7 @@ with open("file.csv", "r") as f:
 
 """
 
-import argparse, gzip, time
+import argparse, time
 from CompressedFileType import CompressedFileType
 
 

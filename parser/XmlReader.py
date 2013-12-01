@@ -12,7 +12,7 @@ with open("file.xml", "r") as f:
         do_things()
 """
 import multiprocessing
-import time, gzip, json, argparse, traceback, signal
+import time, json, argparse, traceback, signal
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
@@ -26,9 +26,11 @@ text_tag = "{"+NS+"}"+"text"
 model_tag = "{"+NS+"}"+"model"
 page_tag = "{"+NS+"}"+"page"
 
+
 # http://noswap.com/blog/python-multiprocessing-keyboardinterrupt
 def init_worker():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+
 
 def read_xml(input_file, thread_count=4):
     if thread_count > 1:
@@ -40,11 +42,16 @@ def read_xml(input_file, thread_count=4):
         except KeyboardInterrupt:
             print "KeyboardInterrupt"
             pool.terminate()
+        except Exception:
+            pool.terminate()
+            traceback.format_exc()
+        else:
+            pool.close()
+        finally:
             pool.join()
     else:
         for title, claim_json in _get_xml(input_file):
             yield _process_json((title, claim_json))
-
 
 
 def _get_xml(input_file):
@@ -89,7 +96,8 @@ def _process_json((title, json_string)):
                 # for example in Q2241
                 continue
             else:
-                raise RuntimeError("unknown wikidata datatype: %s" % datatype)
+                print "WARNING unknown wikidata datatype: %s" % datatype
+                continue
         else:
             datatype = value = claim[0]
 
@@ -106,10 +114,10 @@ if __name__ == "__main__":
 
     start = time.time()
     if not args.verbose:
-        for element in read_xml(args.input, args.processes):
+        for x in read_xml(args.input, args.processes):
             pass
     else:
-        for element in read_xml(args.input, args.processes):
-            print element
+        for x in read_xml(args.input, args.processes):
+            print x
     
     print "total time: %.2fs" % (time.time() - start)
