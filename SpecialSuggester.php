@@ -28,7 +28,6 @@ class SpecialSuggester extends SpecialPage {
 		$out->addModules( 'ext.Suggester' );
 
 		$out->addWikiMsg( 'suggester-intro' );
-		$out->addHTML( "hihihihihihi <br/> <br/> " );
 
 	   /* $id = new EntityId( Item::ENTITY_TYPE, 3 );
 		//kramberechnen
@@ -60,9 +59,9 @@ class SpecialSuggester extends SpecialPage {
 		$entity = $schnittstelle->getEntity($id);
 		
 		$results = $suggester->suggestionsByEntity($entity, 10);
-		foreach($results as $rank => $correlation)
+		foreach($results as $rank => $suggestion)
 		{
-			$out->addHTML($rank+1 . ". " . $correlation['id'] . ":  " . $correlation['correlation'] . "<br />");
+			$out->addHTML($rank+1 . ". " . $suggestion->getPropertyId() . ":  " . $suggestion->getCorrelation() . "<br />");
 		}
 	}
 	
