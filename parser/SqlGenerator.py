@@ -1,31 +1,44 @@
 import argparse
 import CsvReader
 import TableGenerator
-from collections import defaultdict
 import MySQLdb
+import time
+def pushDictContentIntoDB(table, db):
+    db.execute("CREATE TABLE IF NOT EXISTS wbs_properties(pid INT, count INT, type varchar(20), primary key(pid))")
+    db.execute("CREATE TABLE IF NOT EXISTS wbs_propertyPairs(pid1 INT, pid2 INT, count INT, correlation FLOAT, primary key(pid1, pid2))")
+    db.execute("DELETE FROM wbs_propertyPairs")
+    db.execute("DELETE FROM wbs_properties")
 
-def pushDictContentIntoDB(2dDict, db):
-    db.execute("DROP TABLE IF EXISTS propertyPairs")
-    db.execute("create table propertyPairs(pid1 INT, pid2 INT, count INT, primary key(pid1, pid2))")
-    db.execute("DROP TABLE IF EXISTS properties")
-    db.execute("create table properties(pid INT, count INT, type varchar(20), primary key(pid))")
-    for pid1 in 2dDict:
-        db.execute("INSERT INTO properties(pid, count, type) VALUES" + "(" + str(pid1) + ", " + str(2dDict[pid1][appearances])+", " + 2dDict[pid1][type]+")")
-        for pid2 in 2dDict[pid1]:
-            if pid2.isdigit() and pid1 != pid2:
-                db.execute("INSERT INTO propertyPairs(pid1, pid2, count) VALUES" + "(" + str(pid1) + ", " + str(pid2)+", " + str(2dDict[pid1][pid2])+")")
-                
+    print "properties: {0}".format(len(table))
+    rowcount = 0
+    for pid1, row in table.iteritems():
+        db.execute("INSERT INTO wbs_properties(pid, count, type) VALUES (%s, %s, %s)", (pid1, row["appearances"], row["type"]))
+        for pid2, value in row.iteritems():
+            if pid1 != pid2 and pid2.isdigit():  # "appearances" and "type" is in the same table, ignore them
+                correlation = value/float(row["appearances"])
+                db.execute("INSERT INTO wbs_propertyPairs(pid1, pid2, count, correlation) VALUES (%s, %s, %s, %s)", (pid1, pid2, value, correlation))
+                rowcount += 1
+                if not rowcount % 1000:
+                    print "rows {0}".format(rowcount)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="this program generates a correlation-table from a CSV-file")
     parser.add_argument("input", help="The CSV input file (wikidata triple)")
-    parser.add_argument("host", help="DB host")
-    parser.add_argument("user", help="username for DB")
-    parser.add_argument("pw", help="pw for DB")
-    parser.add_argument("db", help="Target DB")
+    parser.add_argument("db", help="target database")
+    parser.add_argument("--host", help="DB host", default="127.0.0.1")
+    parser.add_argument("--user", help="username for DB", default="root")
+    parser.add_argument("--pw", help="pw for DB", default="")
     args = parser.parse_args()
-    connection = MySQLdb.connect(host="localhost",user="root",passwd="newpassword",db="engy1")
+    connection = MySQLdb.connect(host=args.host, user=args.user, passwd=args.pw, db=args.db)
     db = connection.cursor()
-    2dDict = TableGenerator.computeTable(CsvReader.read_csv(open(args.input, "r")))
-    pushDictContentIntoDB(2dDict, db)
-    
+    start = time.time()
+    print "computing table"
+    table = TableGenerator.computeTable(CsvReader.read_csv(open(args.input, "r")))
+    print "done - {0:.2f}s".format(time.time()-start)
+    print "writing to database"
+    pushDictContentIntoDB(table, db)
+    db.close()
+    connection.commit()
+
 
