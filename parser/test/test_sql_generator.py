@@ -12,7 +12,7 @@ class SqlGeneratorTest(TestCase):
         self.db = mock()
 
     def testCreateTable(self):
-        table = {'1': {'appearances': 8, 'type': 'string', '1': 0, '2': 5}}
+        table = {'1': {'appearances': 8, 'type': 'string', '1': 0, '2': 5, '3': 0}}
         SqlGenerator.pushDictContentIntoDB(table, self.db)
 
         verify(self.db).execute(contains("CREATE TABLE IF NOT EXISTS wbs_properties"))
