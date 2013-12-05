@@ -6,6 +6,7 @@ use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
+//use Wikibase.ui.entitysearch;
 
 class SpecialSuggester extends SpecialPage {
 	
@@ -28,36 +29,19 @@ class SpecialSuggester extends SpecialPage {
 		$out->addModules( 'ext.Suggester' );
 
 		$out->addWikiMsg( 'suggester-intro' );
-
-	   /* $id = new EntityId( Item::ENTITY_TYPE, 3 );
-		//kramberechnen
-		$schnittstelle = new WikiPageEntityLookup();
-		$serialisiertes = $schnittstelle->getEntity($id);
-
-		$claims = $serialisiertes->getAllSnaks();
-		for($i = 0; $i < count($claims); $i++)
-		{
-			$out->addHTML("Atrribut ". $i .": " . 
-					$claims[$i]->getPropertyId() . "<br/> Typ: type" . 
-					$claims[$i]->getDataValue()->getType() . "<br/> value: " .
-					$claims[$i]->getDataValue()->getValue() . "<br/><br/>"); //wir wollen die property id 
-		}
-
-		$out->addHTML("<br/> <br/> \n\n liste: " . $serialisiertes->serialize());*/
-
-		
-		$out->addHTML("Correlation values for all Attributes regarding item Q2 'Moritz Finke': <br />");
-		
-		//Suggestor testen:
-		$suggester = new SimplePHPSuggester();
-		
-		$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$id = new EntityId( Item::ENTITY_TYPE, 2 );
-		$entity = $lookup->getEntity($id);
-		$resultWrapper = $suggester->suggestionsByEntity($entity, 10);
-		foreach($resultWrapper as $key => $row)	{
-			$out->addHTML("property id:" . $row->pid2. " correlation:" .  $row->cor . "<br/>");
-		}
-	}
+                  
+                $out->addHTML("<input placeholder='Property' id='property-chooser' class='ui-autocomplete-input' autofocus>");
+              
+                $out->addHTML("<input type='button' value='Add' id='add-property-btn'></input>");
+                
+                $out->addHTML("<p/>");
+                
+                $out->addHtml("<ul id='selected-properties-list'></ul>");                               
+                
+                $out->addHtml("<p/>");
+                		
+                $out->addHTML("<div id='result'></div>");
+        }
+	
 }
 
