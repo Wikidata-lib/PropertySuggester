@@ -1,5 +1,7 @@
 <?php
 
+include "Suggestion.php";
+
 interface Suggester {
 	/**
 	 * Returns suggested attributes

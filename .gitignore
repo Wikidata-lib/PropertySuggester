@@ -2,4 +2,5 @@
 *~
 *.kate-swp
 .*.swp
+parser/env/
 /nbproject/private/
