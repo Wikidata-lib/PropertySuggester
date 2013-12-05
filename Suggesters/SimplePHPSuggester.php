@@ -4,30 +4,39 @@ use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
 
-include "Suggester.php";
+include "SuggesterEngine.php";
 
 function compare_pairs($a, $b){ 
 	return $a->getCorrelation() > $b->getCorrelation() ? -1 : 1;
 }
 
-class SimplePHPSuggester implements Suggester {
+class SimplePHPSuggester implements SuggesterEngine {
 	private $propertyRelations = array();
 	
 	public function getPropertyRelations(){
 		return $this->propertyRelations;
 	}
 	
-	public function suggestionsByAttributes( $attributeValuePairs, $resultSize ) {
-		$result = array();
-		$k = 0;
-		foreach($this->propertyRelations as $key => $attributeCorrelations)
-		{
-			$aggregateCorrelation = $this->computeAggregateCorrelation($attributeCorrelations, $attributeValuePairs);
-			$result[$k] = new Suggestion($key, $aggregateCorrelation, NULL);
-			$k++;
+	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
+		$list = implode(", ", $attributeList);
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->query("
+			SELECT pid2 AS pid, sum(correlation) AS cor
+			FROM wbs_PropertyPairs
+			WHERE pid1 IN ($list) AND pid2 NOT IN ($list)
+			GROUP BY pid2
+			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
+			ORDER BY cor DESC
+			LIMIT $resultSize");
+		return $res;
+	}
+			
+	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
+		$attributeList = array();
+		foreach($attributeValuePairs as $key => $value)	{
+			array_push($attributeList, (int)(substr($value->getPropertyId(),1)));
 		}
-		usort($result, 'compare_pairs');
-		return $result;
+		return $this->suggestionsByAttributeList($attributeList, $resultSize, $threshold);
 	}
 	
 	private function computeAggregateCorrelation($attributeCorrelations, $attributeValuePairs){
@@ -43,39 +52,9 @@ class SimplePHPSuggester implements Suggester {
 		return $sum/count($attributeValuePairs);
 	}
 
-	public function suggestionsByEntity( $entity, $resultSize ) {
+	public function suggestionsByEntity( $entity, $resultSize, $threshold = 0 ) {
 		$attributeValuePairs = $entity->getAllSnaks();
-		return $this->suggestionsByAttributes( $attributeValuePairs, $resultSize );
+		return $this->suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold );
 	}
 	
-	public function computeTable(){
-		$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$entityPerPage = StoreFactory::getStore( 'sqlstore' )->newEntityPerPage();
-		$entityIterator = $entityPerPage->getEntities(Item::ENTITY_TYPE);//WithoutTerm(\Wikibase\Term::TYPE_DESCRIPTION, 'en', Item::ENTITY_TYPE, 100, 0);
-
-		foreach($entityIterator as $key => $value) {
-			$entity = $lookup->getEntity($value);
-			foreach($entity->getAllSnaks() as $i => $snak1)
-			{
-				$propertyId1 = $snak1->getPropertyId()->getPrefixedId();
-				if(!isset($this->propertyRelations[$propertyId1]['appearances']))
-				{
-					$this->propertyRelations[$propertyId1]['appearances'] = 0; //init
-				}
-				$this->propertyRelations[$propertyId1]['appearances']++;
-				foreach($entity->getAllSnaks() as $j => $snak2)
-				{
-					$propertyId2 = $snak2->getPropertyId()->getPrefixedId();
-					if(!isset($this->propertyRelations[$propertyId1][$propertyId2]))
-					{
-						$this->propertyRelations[$propertyId1][$propertyId2] = 0; //init
-					}
-					if(!($propertyId1 === $propertyId2))
-					{
-						$this->propertyRelations[$propertyId1][$propertyId2]++;
-					}
-				}
-			}
-		}
-	}
 }
