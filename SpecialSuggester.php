@@ -42,6 +42,5 @@ class SpecialSuggester extends SpecialPage {
                 		
                 $out->addHTML("<div id='result'></div>");
         }
-	
 }
 

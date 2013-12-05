@@ -18,12 +18,12 @@ class SimplePHPSuggester implements SuggesterEngine {
 	}
 	
 	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
-		$list = implode(", ", $attributeList);
-		$dbr = wfGetDB( DB_SLAVE );
+		$concat_list = implode(", ", $attributeList);
+                $dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query("
 			SELECT pid2 AS pid, sum(correlation) AS cor
 			FROM wbs_PropertyPairs
-			WHERE pid1 IN ($list) AND pid2 NOT IN ($list)
+			WHERE pid1 IN ($concat_list) AND pid2 NOT IN ($concat_list)
 			GROUP BY pid2
 			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
 			ORDER BY cor DESC

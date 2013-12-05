@@ -14,6 +14,15 @@ include '/Suggesters/SimplePHPSuggester.php';
  */
 
 
+function cleanProperty($propertyId) {
+    if ($propertyId[0] === 'P') {
+            return (int)substr($propertyId, 1);
+    }
+    return (int)$propertyId;
+}
+
+
+
 class GetSuggestions extends ApiBase {
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
@@ -44,7 +53,10 @@ class GetSuggestions extends ApiBase {
 			$entity = $lookup->getEntity($id);
 			$suggestions = $suggester->suggestionsByEntity($entity, $resultSize);
 		} else {
-			$suggestions = $suggester->suggestionsByAttributeList($params['properties'], $resultSize);
+                        $list = $params['properties'][0];
+                        $splitted_list = explode(",", $list);
+                        $int_list = array_map("cleanProperty", $splitted_list);
+			$suggestions = $suggester->suggestionsByAttributeList($int_list, $resultSize);
 		}
 		
 		$resultArray = array();
@@ -55,6 +67,7 @@ class GetSuggestions extends ApiBase {
 		
 	//	wfProfileOut( __METHOD__ );
 	}
+        
 
 	/**
 	 * @see ApiBase::getAllowedParams()
