@@ -4,13 +4,13 @@ use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
 
-include "Suggester.php";
+include "SuggesterEngine.php";
 
 function compare_pairs($a, $b){ 
 	return $a->getCorrelation() > $b->getCorrelation() ? -1 : 1;
 }
 
-class SimplePHPSuggester implements Suggester {
+class SimplePHPSuggester implements SuggesterEngine {
 	private $propertyRelations = array();
 	
 	public function getPropertyRelations(){
@@ -18,6 +18,10 @@ class SimplePHPSuggester implements Suggester {
 	}
 	
 	public function suggestionsByAttributes( $attributeValuePairs, $resultSize ) {
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select( /* ...see docs... */ );
+		
+		
 		$result = array();
 		$k = 0;
 		foreach($this->propertyRelations as $key => $attributeCorrelations)

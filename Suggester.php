@@ -13,13 +13,17 @@ $wgExtensionCredits['other'][] = array(
 
 $dir = __DIR__ . '/';
 
-$wgExtensionMessagesFiles['Suggester'] = $dir . 'Suggester.i18n.php';
-$wgExtensionMessagesFiles['SuggesterAlias']  = $dir . 'Suggester.alias.php';
+$wgExtensionMessagesFiles['Suggester']				= $dir . 'Suggester.i18n.php';
+$wgExtensionMessagesFiles['SuggesterAlias']			= $dir . 'Suggester.alias.php';
 
-$wgAutoloadClasses['SpecialSuggester'] = $dir . 'SpecialSuggester.php';
+$wgAutoloadClasses['SpecialSuggester']				= $dir . 'SpecialSuggester.php';
+$wgAutoloadClasses['GetSuggestions']				= $dir . 'GetSuggestions.php';
 
-$wgSpecialPages['Suggester'] = 'SpecialSuggester';
-$wgSpecialPageGroups['Suggester'] = 'wikibaserepo';
+$wgSpecialPages['Suggester']						= 'SpecialSuggester';
+$wgSpecialPageGroups['Suggester']					= 'wikibaserepo';
+
+$wgAPIModules['wbsgetsuggestions'] 					= 'GetSuggestions';
+
 
 $wgResourceModules['ext.Suggester'] = array(
 	'scripts' => 'ext.Suggester.js',
