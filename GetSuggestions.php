@@ -11,10 +11,6 @@ include '/Suggesters/SimplePHPSuggester.php';
  *
  * @since 0.1
  * @licence GNU GPL v2+
- * @author John Erling Blad < jeblad@gmail.com >
- * @author Jeroen De Dauw < jeroendedauw@gmail.com >
- * @author Marius Hoch < hoo@online.de >
- * @author Michał Łazowik
  */
 
 
@@ -37,29 +33,20 @@ class GetSuggestions extends ApiBase {
 			$this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
 		}
 		
-		if(isset( $params['entity'] )){
-			$mode = "entity";
-		}
-		
-		if(!isset( $params['size'])){
-			$resultSize = 10;
-		}
-		else{
-			$resultSize = (int)($params['size']);
-		}
+		$resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
 
 		$result = $this->getResult();
 		$suggester = new SimplePHPSuggester();
 		
-		if($mode == "entity"){
+		if (isset( $params['entity'] )){
 			$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 			$id = new EntityId( Item::ENTITY_TYPE, (int)($params['entity']) );
 			$entity = $lookup->getEntity($id);
 			$suggestions = $suggester->suggestionsByEntity($entity, $resultSize);
-		}
-		else{
+		} else {
 			$suggestions = $suggester->suggestionsByAttributeList($params['properties'], $resultSize);
 		}
+		
 		$resultArray = array();
 		foreach($suggestions as $rank => $suggestion){
 			array_push($resultArray, $suggestion);
