@@ -9,6 +9,7 @@ function handleInput () {
         li_element = "<li>" + input_text + " (" + input_id + ")" + delete_link + "</input></li>";
         $("#selected-properties-list").append(li_element);
         $( "#property-chooser").val('');
+        doQuery()
     }
     
 }
@@ -17,6 +18,14 @@ function deleteFromList(source, property_id){
         
     return false;
 }
+
+function doQuery() {
+    url = "api.php?properties=" + encodeURIComponent(selected_ids.join(","));
+    $.get("http://localhost/devrepo/api.php?action=wbsearchentities&format=json&language=de&type=property&search=v", function( data ) {
+        $("#result").text(JSON.stringify(data));
+    });
+}
+
 $( document ).ready(function (){
     $( 'input.ui-autocomplete-input' ).entityselector({
              url: mw.util.wikiScript( 'api' ),

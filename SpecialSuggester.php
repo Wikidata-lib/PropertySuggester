@@ -39,6 +39,8 @@ class SpecialSuggester extends SpecialPage {
                 
                 $out->addHtml("<p/>");
                 		
+                $out->addHTML("<div id='result'></div>");
+                
 		$out->addHTML("Correlation values for all Attributes regarding item Q2 'Moritz Finke': <br/>");
 		
 		//Suggester testen:
