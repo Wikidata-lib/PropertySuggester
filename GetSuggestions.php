@@ -32,33 +32,40 @@ class GetSuggestions extends ApiBase {
 
 		$params = $this->extractRequestParams();
 
-		if ( !isset( $params['entityid'] ) ) {
+		if ( ! ( isset( $params['entity'] ) xor isset( $params['properties'])) ) {
 			wfProfileOut( __METHOD__ );
-			$this->dieUsage( 'provide parameter "entityid"', 'param-missing' );
+			$this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
+		}
+		
+		if(isset( $params['entity'] )){
+			$mode = "entity";
+		}
+		
+		if(!isset( $params['size'])){
+			$resultSize = 10;
+		}
+		else{
+			$resultSize = (int)($params['size']);
 		}
 
 		$result = $this->getResult();
-		
 		$suggester = new SimplePHPSuggester();
 		
-		$schnittstelle = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$id = new EntityId( Item::ENTITY_TYPE, (int)($params['entityid']) );
-		$entity = $schnittstelle->getEntity($id);
-		
-		$results = $suggester->suggestionsByEntity($entity, 10);
-		foreach($results as $rank => $suggestion)
-		{
-			$result->addValue("", "attribut $rank", $suggestion->getPropertyId());
+		if($mode == "entity"){
+			$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+			$id = new EntityId( Item::ENTITY_TYPE, (int)($params['entity']) );
+			$entity = $lookup->getEntity($id);
+			$suggestions = $suggester->suggestionsByEntity($entity, $resultSize);
 		}
+		else{
+			$suggestions = $suggester->suggestionsByAttributeList($params['properties'], $resultSize);
+		}
+		$resultArray = array();
+		foreach($suggestions as $rank => $suggestion){
+			array_push($resultArray, $suggestion);
+		}
+		$result->addValue(null, "Suggestions", $resultArray);
 		
-		$success = true;
-
-		$result->addValue(
-			null,
-			'success',
-			(int)$success
-		);
-
 	//	wfProfileOut( __METHOD__ );
 	}
 
@@ -67,7 +74,7 @@ class GetSuggestions extends ApiBase {
 	 */
 	public function getAllowedParams() {
 		return array(
-			'entityid' => array(
+			'entity' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => false,
 			),
@@ -75,6 +82,10 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => true,
 				ApiBase::PARAM_ALLOW_DUPLICATES => false
+			),
+			'size' => array(
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_ISMULTI => false
 			)
 		);
 	}
@@ -84,8 +95,9 @@ class GetSuggestions extends ApiBase {
 	 */
 	public function getParamDescription() {
 		return array_merge( parent::getParamDescription(), array(
-			'entityid' => 'Suggest attributes for given entity',
-			'properties' => 'Identifier for the site on which the corresponding page resides'
+			'entity' => 'Suggest attributes for given entity',
+			'properties' => 'Identifier for the site on which the corresponding page resides',
+			'size' => 'Specify number of suggestions to be returned'
 		) );
 	}
 

@@ -17,22 +17,26 @@ class SimplePHPSuggester implements SuggesterEngine {
 		return $this->propertyRelations;
 	}
 	
-	public function suggestionsByAttributes( $attributeValuePairs, $resultSize, $threshold = 0 ) {
-		$attributeList = array();
-		foreach($attributeValuePairs as $key => $value)	{
-			$attributeList[$key] = (int)(substr($value->getPropertyId(),1));
-		}
+	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
 		$list = implode(", ", $attributeList);
 		$dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query("
-			SELECT pid2, sum(correlation) AS cor
+			SELECT pid2 AS pid, sum(correlation) AS cor
 			FROM wbs_PropertyPairs
 			WHERE pid1 IN ($list) AND pid2 NOT IN ($list)
 			GROUP BY pid2
 			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
 			ORDER BY cor DESC
-			LIMIT 10");
+			LIMIT $resultSize");
 		return $res;
+	}
+			
+	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
+		$attributeList = array();
+		foreach($attributeValuePairs as $key => $value)	{
+			array_push($attributeList, (int)(substr($value->getPropertyId(),1)));
+		}
+		return $this->suggestionsByAttributeList($attributeList, $resultSize, $threshold);
 	}
 	
 	private function computeAggregateCorrelation($attributeCorrelations, $attributeValuePairs){
@@ -50,7 +54,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 
 	public function suggestionsByEntity( $entity, $resultSize, $threshold = 0 ) {
 		$attributeValuePairs = $entity->getAllSnaks();
-		return $this->suggestionsByAttributes( $attributeValuePairs, $resultSize, $threshold );
+		return $this->suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold );
 	}
 	
 }
