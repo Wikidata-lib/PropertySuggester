@@ -40,7 +40,6 @@ class GetSuggestions extends ApiBase {
 		$result = $this->getResult();
 		
 		$suggester = new SimplePHPSuggester();
-		$suggester->computeTable();
 		
 		$schnittstelle = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$id = new EntityId( Item::ENTITY_TYPE, (int)($params['entityid']) );
