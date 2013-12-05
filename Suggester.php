@@ -22,7 +22,8 @@ $wgSpecialPages['Suggester'] = 'SpecialSuggester';
 $wgSpecialPageGroups['Suggester'] = 'wikibaserepo';
 
 $wgResourceModules['ext.Suggester'] = array(
-	'scripts' => 'ext.Suggester.js',
+	'scripts' => ['ext.Suggester.js',
+                      'jquery.wikibase.entityselector'],
 	'styles' => 'ext.Suggester.css',
 	'localBasePath' => $dir . '/modules',
 	'remoteExtPath' => 'Suggester/modules',

@@ -6,6 +6,7 @@ use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
+//use Wikibase.ui.entitysearch;
 
 class SpecialSuggester extends SpecialPage {
 	
@@ -29,7 +30,14 @@ class SpecialSuggester extends SpecialPage {
 
 		$out->addWikiMsg( 'suggester-intro' );
 		$out->addHTML( "hihihihihihi <br/> <br/> " );
-
+               
+   
+               $out->addHTML('<input placeholder="Property" name="name" class="ui-autocomplete-input"> </br>');
+              
+               $out->addHTML("<input type='button' value='Add' action='SpecialSuggester.php'></input>");
+               $out->addHTML("<script> $( 'input.ui-autocomplete-input' ).entityselector( {url: mw.util.wikiScript( 'api' ),selectOnAutocomplete: true, type: 'property'
+			} );</script>");
+                
 	   /* $id = new EntityId( Item::ENTITY_TYPE, 3 );
 		//kramberechnen
 		$schnittstelle = new WikiPageEntityLookup();
