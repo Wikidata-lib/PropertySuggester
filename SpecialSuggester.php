@@ -29,34 +29,19 @@ class SpecialSuggester extends SpecialPage {
 		$out->addModules( 'ext.Suggester' );
 
 		$out->addWikiMsg( 'suggester-intro' );
-               
-   
-               $out->addHTML('<input placeholder="Property" name="name" class="ui-autocomplete-input"> </br>');
+                  
+                $out->addHTML("<input placeholder='Property' id='property-chooser' class='ui-autocomplete-input' autofocus>");
               
-               $out->addHTML("<input type='button' value='Add' action='SpecialSuggester.php'></input>");
-               $out->addHTML("<script> $( 'input.ui-autocomplete-input' ).entityselector( {url: mw.util.wikiScript( 'api' ),selectOnAutocomplete: true, type: 'property'
-			} );</script>");
+                $out->addHTML("<input type='button' value='Add' id='add-property-btn'></input>");
+                $out->addHTML("<p/>");
                 
-	   /* $id = new EntityId( Item::ENTITY_TYPE, 3 );
-		//kramberechnen
-		$schnittstelle = new WikiPageEntityLookup();
-		$serialisiertes = $schnittstelle->getEntity($id);
-
-		$claims = $serialisiertes->getAllSnaks();
-		for($i = 0; $i < count($claims); $i++)
-		{
-			$out->addHTML("Atrribut ". $i .": " . 
-					$claims[$i]->getPropertyId() . "<br/> Typ: type" . 
-					$claims[$i]->getDataValue()->getType() . "<br/> value: " .
-					$claims[$i]->getDataValue()->getValue() . "<br/><br/>"); //wir wollen die property id 
-		}
-
-		$out->addHTML("<br/> <br/> \n\n liste: " . $serialisiertes->serialize());*/
-
+                $out->addHtml("<ul id='selected-properties-list'></ul>");                               
+                
+                $out->addHtml("<p/>");
+                		
+		$out->addHTML("Correlation values for all Attributes regarding item Q2 'Moritz Finke': <br/>");
 		
-		$out->addHTML("Correlation values for all Attributes regarding item Q2 'Moritz Finke': <br />");
-		
-		//Suggestor testen:
+		//Suggester testen:
 		$suggester = new SimplePHPSuggester();
 		$suggester->computeTable();
 		
