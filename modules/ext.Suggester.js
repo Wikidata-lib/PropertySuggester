@@ -1,7 +1,22 @@
+ var selected_ids = [];
 
-// var selected_ids = [];
-
-
+function handleInput () {
+    input_text =  $( "#property-chooser").val();
+    input_id = $("#property-chooser").next("input").val();
+    if (input_text!=  "" && input_id != ""){    
+        selected_ids.push(input_id);
+        delete_link = "<a href='#' onclick='deleteFromList(this, \\\"" + input_id + "\\\")>x</a>";
+        li_element = "<li>" + input_text + " (" + input_id + ")" + delete_link + "</input></li>";
+        $("#selected-properties-list").append(li_element);
+        $( "#property-chooser").val('');
+    }
+    
+}
+function deleteFromList(source, property_id){
+    alert(source);
+        
+    return false;
+}
 $( document ).ready(function (){
     $( 'input.ui-autocomplete-input' ).entityselector({
              url: mw.util.wikiScript( 'api' ),
@@ -10,10 +25,17 @@ $( document ).ready(function (){
     });
     
     $( "#add-property-btn" ).click(function() {
-        alert( $( "#property-chooser").val() );
-        //$("#property-chooser").next("input").val()
-        //$("#selected-properties-list").append("<li>b</li>")
+        handleInput();
+      
     });
+    
+
+    $("input.ui-autocomplete-input").keyup(function (e) {
+    if (e.keyCode == 13) {
+        handleInput();
+    
+    }
+});
     
     // delete from list
     
