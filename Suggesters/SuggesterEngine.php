@@ -1,6 +1,8 @@
 <?php
 
-interface Suggester {
+include "Suggestion.php";
+
+interface SuggesterEngine {
 	/**
 	 * Returns suggested attributes
 	 *
@@ -8,6 +10,6 @@ interface Suggester {
 	 *
 	 * @return Snak
 	 */
-	public function suggestionsByAttributes($attributeValuePairs, $resultSize);
+	public function suggestionsByAttributeValuePairs($attributeValuePairs, $resultSize);
 	public function suggestionsByEntity($entity, $resultSize);
 }
