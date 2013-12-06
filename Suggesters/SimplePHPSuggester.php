@@ -11,19 +11,25 @@ function compare_pairs($a, $b){
 }
 
 class SimplePHPSuggester implements SuggesterEngine {
+        private $depreciatedPropertyIds = "107";
 	private $propertyRelations = array();
+        
+        public function getDepreciatedPropertyIds(){
+		return $this->depreciatedPropertyIds;
+	}
 	
 	public function getPropertyRelations(){
 		return $this->propertyRelations;
 	}
 	
 	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
-		$concat_list = implode(", ", $attributeList);
+		$suggestionIds = implode(", ", $attributeList);
+                $excludedIds = $suggestionIds . ", " . $this->getDepreciatedPropertyIds();
                 $dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query("
-			SELECT pid2 AS pid, sum(correlation) AS cor
+			SELECT pid2 AS pid, sum(correlation)/" . count($attributeList) . " AS cor
 			FROM wbs_PropertyPairs
-			WHERE pid1 IN ($concat_list) AND pid2 NOT IN ($concat_list)
+			WHERE pid1 IN ($suggestionIds) AND pid2 NOT IN ($excludedIds)
 			GROUP BY pid2
 			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
 			ORDER BY cor DESC
