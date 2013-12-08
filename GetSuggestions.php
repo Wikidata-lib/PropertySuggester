@@ -3,6 +3,7 @@
 use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\StoreFactory;
+use Wikibase\Property;
 
 include '/Suggesters/SimplePHPSuggester.php';
 

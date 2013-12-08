@@ -11,11 +11,11 @@ function compare_pairs($a, $b){
 }
 
 class SimplePHPSuggester implements SuggesterEngine {
-        private $depreciatedPropertyIds = "107";
+        private $deprecatedPropertyIds = "107";
 	private $propertyRelations = array();
         
-        public function getDepreciatedPropertyIds(){
-		return $this->depreciatedPropertyIds;
+        public function getDeprecatedPropertyIds(){
+		return $this->deprecatedPropertyIds;
 	}
 	
 	public function getPropertyRelations(){
@@ -24,7 +24,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	
 	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
 		$suggestionIds = implode(", ", $attributeList);
-                $excludedIds = $suggestionIds . ", " . $this->getDepreciatedPropertyIds();
+                $excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
                 $dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query("
 			SELECT pid2 AS pid, sum(correlation)/" . count($attributeList) . " AS cor
