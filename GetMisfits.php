@@ -5,10 +5,10 @@ use Wikibase\Item;
 use Wikibase\StoreFactory;
 use Wikibase\Property;
 
-include '/Suggesters/SimplePHPSuggester.php';
+include '/Suggesters/SimpleMisfitSuggester.php';
 
 /**
- * API module to get property suggestions.
+ * API module to get suggestions for misfit properties.
  *
  * @since 0.1
  * @licence GNU GPL v2+
@@ -24,7 +24,7 @@ function cleanProperty($propertyId) {
 
 
 
-class GetSuggestions extends ApiBase {
+class GetMisfits extends ApiBase {
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
@@ -43,20 +43,20 @@ class GetSuggestions extends ApiBase {
 			$this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
 		}
 		
-		$resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
+		$threshold = isset( $params['threshold']) ? (float)($params['threshold']) : 0.05;
 
 		$result = $this->getResult();
-		$suggester = new SimplePHPSuggester(); 
+		$suggester = new SimpleMisfitSuggester(); 
                 $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		if (isset( $params['entity'] )){
 			$id = new EntityId( Item::ENTITY_TYPE, (int)($params['entity']) );
 			$entity = $lookup->getEntity($id);
-			$suggestions = $suggester->suggestionsByEntity($entity, $resultSize);
+			$suggestions = $suggester->suggestMisfitsByEntity($entity, $threshold);
 		} else {
                         $list = $params['properties'][0];
                         $splitted_list = explode(",", $list);
                         $int_list = array_map("cleanProperty", $splitted_list);
-			$suggestions = $suggester->suggestionsByAttributeList($int_list, $resultSize);
+			$suggestions = $suggester->suggestMisfitsByAttributList($int_list, $threshold);
 		}
 		foreach($suggestions as $suggestion){
                         $id = new EntityId( Property::ENTITY_TYPE, (int)($suggestion->getPropertyId()) );
@@ -84,7 +84,7 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_ISMULTI => true,
 				ApiBase::PARAM_ALLOW_DUPLICATES => false
 			),
-			'size' => array(
+			'threshold' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => false
 			)
@@ -96,9 +96,9 @@ class GetSuggestions extends ApiBase {
 	 */
 	public function getParamDescription() {
 		return array_merge( parent::getParamDescription(), array(
-			'entity' => 'Suggest attributes for given entity',
-			'properties' => 'Identifier for the site on which the corresponding page resides',
-			'size' => 'Specify number of suggestions to be returned'
+			'entity' => 'Entity which will be analyzed to find misfit properties',
+			'properties' => 'Set of properties which will be analyzed to find misfits',
+			'threshold' => 'Only properties with a correlation-level smaller than this threshold will be regarded as misfits (default = 0.05)'
 		) );
 	}
 
@@ -107,7 +107,7 @@ class GetSuggestions extends ApiBase {
 	 */
 	public function getDescription() {
 		return array(
-			'API module to get property suggestions.'
+			'API module for finding misfits in a set of properties.'
 		);
 	}
 
