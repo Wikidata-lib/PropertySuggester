@@ -46,10 +46,9 @@ class GetSuggestions extends ApiBase {
 		$resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
 
 		$result = $this->getResult();
-		$suggester = new SimplePHPSuggester();
-		
+		$suggester = new SimplePHPSuggester(); 
+                $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		if (isset( $params['entity'] )){
-			$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 			$id = new EntityId( Item::ENTITY_TYPE, (int)($params['entity']) );
 			$entity = $lookup->getEntity($id);
 			$suggestions = $suggester->suggestionsByEntity($entity, $resultSize);
@@ -59,13 +58,14 @@ class GetSuggestions extends ApiBase {
                         $int_list = array_map("cleanProperty", $splitted_list);
 			$suggestions = $suggester->suggestionsByAttributeList($int_list, $resultSize);
 		}
-		
-		$resultArray = array();
-		foreach($suggestions as $rank => $suggestion){
-			array_push($resultArray, $suggestion);
-		}
-		$result->addValue(null, "Suggestions", $resultArray);
-		
+		foreach($suggestions as $suggestion){
+                        $id = new EntityId( Property::ENTITY_TYPE, (int)($suggestion->getPropertyId()) );
+                        $property = $lookup->getEntity($id);
+                        if(isset($property)){
+                                $name = $property->getLabel('de');
+                        }
+                        $result->addValue(null, null, "{ 'pid': ".$suggestion->getPropertyId(). ", 'cor': " .$suggestion->getCorrelation().  ", 'name': ".$name." }");
+		}		
 	//	wfProfileOut( __METHOD__ );
 	}
         

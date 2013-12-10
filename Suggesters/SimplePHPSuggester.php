@@ -34,8 +34,13 @@ class SimplePHPSuggester implements SuggesterEngine {
 			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
 			ORDER BY cor DESC
 			LIMIT $resultSize");
-		return $res;
-	}
+		$resultArray = array();
+                foreach($res as $rank => $suggestInfo){
+                        $suggestion = new Suggestion($suggestInfo->pid, $suggestInfo->cor, null, null);
+                        array_push($resultArray, $suggestion);       
+                }
+                return $resultArray;
+         }
 			
 	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
 		$attributeList = array();

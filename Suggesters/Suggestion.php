@@ -3,15 +3,21 @@
 class Suggestion {
 
 	private $propertyId;
-	private $affilation;
+	private $correlation;
 	private $suggestedValue;
+        
+        function __construct($propertyId, $correlation, $suggestedValue = null){
+            $this->propertyId = $propertyId;
+            $this->correlation = $correlation;
+            $this->suggestedValue = $suggestedValue;
+	}
 	
 	public function getPropertyId() {
 		return $this->propertyId;
 	}
 
 	public function getCorrelation() {
-		return $this->affilation;
+		return $this->correlation;
 	}
 
 	public function getSuggestedValue() {
@@ -23,18 +29,10 @@ class Suggestion {
 	}
 
 	public function setCorrelation($correlation) {
-		$this->affilation = $correlation;
+		$this->correlation = $correlation;
 	}
 
 	public function setSuggestedValue($suggestedValue) {
 		$this->suggestedValue = $suggestedValue;
-	}
-	
-	
-	function Suggestion($propertyId, $correlation, $suggestedValue){
-		$this->propertyId = $propertyId;
-		$this->affilation = $correlation;
-		$this->suggestedValue = $suggestedValue;
-	}
-	
+	}	
 }
