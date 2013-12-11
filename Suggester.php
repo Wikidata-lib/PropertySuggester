@@ -18,11 +18,13 @@ $wgExtensionMessagesFiles['SuggesterAlias']			= $dir . 'Suggester.alias.php';
 
 $wgAutoloadClasses['SpecialSuggester']				= $dir . 'SpecialSuggester.php';
 $wgAutoloadClasses['GetSuggestions']				= $dir . 'GetSuggestions.php';
+$wgAutoloadClasses['GetMisfits']				= $dir . 'GetMisfits.php';
 
 $wgSpecialPages['Suggester']						= 'SpecialSuggester';
 $wgSpecialPageGroups['Suggester']					= 'wikibaserepo';
 
 $wgAPIModules['wbsgetsuggestions'] 					= 'GetSuggestions';
+$wgAPIModules['wbsgetmisfits']                                          = 'GetMisfits';
 
 
 $wgResourceModules['ext.Suggester'] = array(
