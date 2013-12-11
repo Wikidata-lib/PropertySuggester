@@ -11,25 +11,36 @@ function compare_pairs($a, $b){
 }
 
 class SimplePHPSuggester implements SuggesterEngine {
+        private $deprecatedPropertyIds = "107";
 	private $propertyRelations = array();
+        
+        public function getDeprecatedPropertyIds(){
+		return $this->deprecatedPropertyIds;
+	}
 	
 	public function getPropertyRelations(){
 		return $this->propertyRelations;
 	}
 	
 	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
-		$list = implode(", ", $attributeList);
-		$dbr = wfGetDB( DB_SLAVE );
+		$suggestionIds = implode(", ", $attributeList);
+                $excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
+                $dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query("
-			SELECT pid2 AS pid, sum(correlation) AS cor
+			SELECT pid2 AS pid, sum(correlation)/" . count($attributeList) . " AS cor
 			FROM wbs_PropertyPairs
-			WHERE pid1 IN ($list) AND pid2 NOT IN ($list)
+			WHERE pid1 IN ($suggestionIds) AND pid2 NOT IN ($excludedIds)
 			GROUP BY pid2
 			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
 			ORDER BY cor DESC
 			LIMIT $resultSize");
-		return $res;
-	}
+		$resultArray = array();
+                foreach($res as $rank => $suggestInfo){
+                        $suggestion = new Suggestion($suggestInfo->pid, $suggestInfo->cor, null, null);
+                        array_push($resultArray, $suggestion);       
+                }
+                return $resultArray;
+         }
 			
 	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
 		$attributeList = array();

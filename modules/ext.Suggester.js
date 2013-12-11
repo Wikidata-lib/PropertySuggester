@@ -17,7 +17,7 @@ function handleInput () {
     pid = $("#property-chooser").next("input").val();
     if (input_text!=  "" && pid != ""){    
         selected_ids.push(pid);
-        delete_link = $("<a href='#'>x</a>").click(pid, deleteFromList);
+        delete_link = $("<a href='#'> x </a>").click(pid, deleteFromList);
         li_element = $("<li>" + input_text + " (" + pid + ")" + "</input></li>");
         li_element.append(delete_link);
         $("#selected-properties-list").append(li_element);
@@ -27,9 +27,9 @@ function handleInput () {
 }
 
 function doQuery() {
-    url = "api.php?properties=" + selected_ids.map(encodeURIComponent).join(",");
-    $.get("http://localhost/devrepo/api.php?action=wbsearchentities&format=json&language=de&type=property&search=v", function( data ) {
-        $("#result").text(url + "   " +JSON.stringify(data));
+    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",");
+    $.get(url, function( data ) {
+        $("#result").text(JSON.stringify(data));
     });
 }
 
