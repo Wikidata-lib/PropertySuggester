@@ -39,7 +39,7 @@ class SpecialSuggester extends SpecialPage {
                 $out->addHtml("<ul id='selected-properties-list'></ul>");                               
                 
                 $out->addHtml("<p/>");
-                		
+                
                 $out->addHTML("<div id='result'></div>");
         }
 }

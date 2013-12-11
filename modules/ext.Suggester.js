@@ -29,7 +29,11 @@ function handleInput () {
 function doQuery() {
     url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",");
     $.get(url, function( data ) {
-        $("#result").text(JSON.stringify(data));
+        $("#result").html("<h3>Suggestions:</h3>");
+        suggestions = data["suggestions"];
+        $.each(suggestions, function (k, v) {
+            $("#result").append(JSON.stringify(v) + "<br>");
+        });
     });
 }
 
