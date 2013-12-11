@@ -63,10 +63,15 @@ class GetMisfits extends ApiBase {
                         $entry = array();
                         $id = new PropertyId("P" . $suggestion->getPropertyId());
                         $property = $lookup->getEntity($id);
-                        $entry["name"] = $property->getLabel('de');
+                        if(isset($property)){
+                                $entry["name"] = $property->getLabel('de');
+                        }
+                        else{
+                                $entry["name"] = "WARNING: This property does not exist!";
+                        }
                         $entry["id"] = $suggestion->getPropertyId();
                         $entry["correlation"] = $suggestion->getCorrelation();
-                        $entries[] = $entry;
+                        $entries[] = $entry;     
                 }
                 $result->addValue(null, "suggestions", $entries);
         
