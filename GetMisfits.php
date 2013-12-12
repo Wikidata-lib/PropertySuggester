@@ -5,6 +5,9 @@ use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\StoreFactory;
 use Wikibase\Property;
+//ToDo: use Wikibase\LanguageFallbackChainFactory;
+use Wikibase\Repo\WikibaseRepo;
+use Wikibase\Utils;
 
 include '/Suggesters/SimpleMisfitSuggester.php';
 
@@ -26,9 +29,10 @@ function cleanProperty($propertyId) {
 
 
 class GetMisfits extends ApiBase {
-
+    
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
+   
 	}
 
 	/**
@@ -63,8 +67,11 @@ class GetMisfits extends ApiBase {
                         $entry = array();
                         $id = new PropertyId("P" . $suggestion->getPropertyId());
                         $property = $lookup->getEntity($id);
-                        if(isset($property)){
-                                $entry["name"] = $property->getLabel('de');
+                        if(isset($property) && isset($params['language'])){
+                                $entry["name"] = $property->getLabel($params['language']);
+                        }
+                        else if(isset($property) && !(isset($params['language']))){                    //ToDo: Fallback
+                                $entry["name"] = $property->getLabel('en');
                         }
                         else{
                                 $entry["name"] = "WARNING: This property does not exist!";
@@ -97,6 +104,10 @@ class GetMisfits extends ApiBase {
 			'threshold' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => false
+			),
+                    	'language' => array(
+				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+				ApiBase::PARAM_ISMULTI => false,
 			)
 		);
 	}
@@ -108,7 +119,8 @@ class GetMisfits extends ApiBase {
 		return array_merge( parent::getParamDescription(), array(
 			'entity' => 'Entity which will be analyzed to find misfit properties',
 			'properties' => 'Set of properties which will be analyzed to find misfits',
-			'threshold' => 'Only properties with a correlation-level smaller than this threshold will be regarded as misfits (default = 0.05)'
+			'threshold' => 'Only properties with a correlation-level smaller than this threshold will be regarded as misfits (default = 0.05)',
+                        'language' => 'language for result'
 		) );
 	}
 

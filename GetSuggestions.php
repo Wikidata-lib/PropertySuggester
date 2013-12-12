@@ -5,6 +5,9 @@ use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
+//ToDo: use Wikibase\LanguageFallbackChainFactory;
+use Wikibase\Repo\WikibaseRepo;
+use Wikibase\Utils;
 
 include '/Suggesters/SimplePHPSuggester.php';
 
@@ -62,7 +65,12 @@ class GetSuggestions extends ApiBase {
             $entry = array();
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
-            $entry["name"] = $property->getLabel('de');
+            if(isset($params['language'])){
+                    $entry["name"] = $property->getLabel($params['language']);       
+            }
+            else{                                                                //ToDo: Fallback
+                    $entry["name"] = $property->getLabel('en');
+            }
             $entry["id"] = $suggestion->getPropertyId();
             $entry["correlation"] = $suggestion->getCorrelation();
             $entries[] = $entry;
@@ -88,6 +96,10 @@ class GetSuggestions extends ApiBase {
             'size' => array(
                     ApiBase::PARAM_TYPE => 'string',
                     ApiBase::PARAM_ISMULTI => false
+            ),
+            'language' => array(
+                    ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+                    ApiBase::PARAM_ISMULTI => false,
             )
         );
     }
@@ -99,7 +111,8 @@ class GetSuggestions extends ApiBase {
             return array_merge( parent::getParamDescription(), array(
                     'entity' => 'Suggest attributes for given entity',
                     'properties' => 'Identifier for the site on which the corresponding page resides',
-                    'size' => 'Specify number of suggestions to be returned'
+                    'size' => 'Specify number of suggestions to be returned',
+                    'language' => 'language for result'
             ) );
     }
 
