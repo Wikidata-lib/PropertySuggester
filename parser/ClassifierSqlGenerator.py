@@ -1,6 +1,6 @@
 import argparse
 import CsvReader
-import TableGenerator
+import ClassifierTableGenerator
 import MySQLdb
 import time
 
@@ -15,7 +15,7 @@ def pushDictContentIntoDB(table, db):
                     UNIQUE INDEX pid_qid (pid, qid)
                 )"""
     )
-    db.execute("""CREATE TABLE wbs_propertyvaluecorrelations (
+    db.execute("""CREATE TABLE IF NOT EXISTS wbs_propertyvaluecorrelations (
                     pair_id INT UNSIGNED NOT NULL,
                     pid INT UNSIGNED NOT NULL,
                     count INT UNSIGNED NOT NULL,
@@ -30,8 +30,8 @@ def pushDictContentIntoDB(table, db):
     rowcount = 0
     pair_counter = 0
     for (pid1, qid), row in table.iteritems():
-        db.execute("INSERT INTO wbs_propertyvaluepairs(pid, qid, count) VALUES (%s, %s, %s)",
-                   (pid1, qid, row["appearances"]))
+        db.execute("INSERT INTO wbs_propertyvaluepairs(id, pid, qid, count) VALUES (%s, %s, %s, %s)",
+                   (pair_counter, pid1, qid, row["appearances"]))
         for pid2, value in row.iteritems():
             if pid1 != pid2 and pid2.isdigit() and value > 0:
                 correlation = value / float(row["appearances"])
@@ -46,8 +46,8 @@ def pushDictContentIntoDB(table, db):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="this program generates a correlation-table from a CSV-file")
     parser.add_argument("input", help="The CSV input file (wikidata triple)")
-    parser.add_argument("classifier", help="A list of classifiers (e.g. 31)", nargs="+")
     parser.add_argument("db", help="target database")
+    parser.add_argument("classifier", help="A list of classifiers (e.g. 31)", nargs="+")
     parser.add_argument("--host", help="DB host", default="127.0.0.1")
     parser.add_argument("--user", help="username for DB", default="root")
     parser.add_argument("--pw", help="pw for DB", default="")
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     db = connection.cursor()
     start = time.time()
     print "computing table"
-    table = TableGenerator.computeTable(CsvReader.read_csv(open(args.input, "r")))
+    table = ClassifierTableGenerator.computeTable(CsvReader.read_csv(open(args.input, "r")), args.classifier)
     print "done - {0:.2f}s".format(time.time() - start)
     print "writing to database"
     pushDictContentIntoDB(table, db)
