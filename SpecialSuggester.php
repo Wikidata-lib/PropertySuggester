@@ -1,6 +1,6 @@
 <?php
 
-include '/Suggesters/SimplePHPSuggester.php';
+include 'Suggesters/SimplePHPSuggester.php';
 
 use Wikibase\EntityId;
 use Wikibase\Item;

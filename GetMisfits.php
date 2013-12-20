@@ -9,7 +9,7 @@ use Wikibase\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\Utils;
 
-include '/Suggesters/SimpleMisfitSuggester.php';
+include 'Suggesters/SimpleMisfitSuggester.php';
 
 /**
  * API module to get suggestions for misfit properties.

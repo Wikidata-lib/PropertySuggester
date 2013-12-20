@@ -9,7 +9,7 @@ use Wikibase\StoreFactory;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\Utils;
 
-include '/Suggesters/SimplePHPSuggester.php';
+include 'Suggesters/SimplePHPSuggester.php';
 
 /**
  * API module to get property suggestions.
