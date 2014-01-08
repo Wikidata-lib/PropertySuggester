@@ -14,7 +14,7 @@ class SpecialSuggester extends SpecialPage {
          * Constructor
          */
 	public function __construct() {
-		parent::__construct( 'Suggester', '', true );
+		parent::__construct( 'PropertySuggester', '', true );
 	}
 
 	/**
@@ -26,9 +26,9 @@ class SpecialSuggester extends SpecialPage {
 		$out = $this->getContext()->getOutput();
 
 		$this->setHeaders();
-		$out->addModules( 'ext.Suggester' );
+		$out->addModules( 'ext.PropertySuggester' );
 
-		$out->addWikiMsg( 'suggester-intro' );
+		$out->addWikiMsg( 'propertysuggester-intro' );
                   
                 $out->addHTML("<input placeholder='Property' id='property-chooser' class='ui-autocomplete-input' autofocus>");
               
