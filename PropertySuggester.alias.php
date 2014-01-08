@@ -10,5 +10,5 @@ $specialPageAliases = array();
 
 /** English (English) */
 $specialPageAliases['en'] = array(
-	'Suggester' => array( 'Suggester' ),
+	'PropertySuggester' => array( 'PropertySuggester' ),
 );
