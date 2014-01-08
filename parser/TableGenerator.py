@@ -17,7 +17,7 @@ def computeTable(generator):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="this program generates a correlation-table from a CSV-file")
-    parser.add_argument("input", help="The CSV input file (wikidata triple)")
+    parser.add_argument("input", help="The CSV input file (wikidata triple)", type=CompressedFileType('r'))
     args = parser.parse_args()
-    table = computeTable(CsvReader.read_csv(open(args.input, "r")))
+    table = computeTable(CsvReader.read_csv(args.input))
     print table
