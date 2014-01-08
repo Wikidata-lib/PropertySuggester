@@ -11,13 +11,13 @@ $messages = array();
 $messages['en'] = array(
 	'suggester-desc'              => 'Shows suggested properties',
 	'suggester'                   => 'Property Suggester',
-	'suggester-intro'             => 'The Suggester is great!',
+	'suggester-intro'             => 'The Property Suggester is great!',
 );
 
 /** Message documentation (Message documentation)
  */
 $messages['qqq'] = array(
-	'suggester-desc' => '{{desc|name=Suggester|url=http://www.mediawiki.org/wiki/Extension:Suggester}}',
+	'suggester-desc' => '{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}',
         'suggester'              => 'Property Suggester',
         'suggester-intro'   => 'introduces suggester',
 );
