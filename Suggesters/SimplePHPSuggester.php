@@ -29,7 +29,7 @@ class SimplePHPSuggester implements SuggesterEngine {
                 $dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query("
 			SELECT pid2 AS pid, sum(correlation)/" . count($attributeList) . " AS cor
-			FROM wbs_PropertyPairs
+			FROM wbs_propertypairs
 			WHERE pid1 IN ($suggestionIds) AND pid2 NOT IN ($excludedIds)
 			GROUP BY pid2
 			HAVING sum(correlation)/" . count($attributeList) . " > $threshold
