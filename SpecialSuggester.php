@@ -30,7 +30,7 @@ class SpecialSuggester extends SpecialPage {
 
 		$out->addWikiMsg( 'propertysuggester-intro' );
                   
-                $out->addHTML("<input placeholder='Property' id='property-chooser' class='ui-autocomplete-input' autofocus>");
+                $out->addHTML("<input placeholder='Property' id='property-chooser' autofocus>");
               
                 $out->addHTML("<input type='button' value='Add' id='add-property-btn'></input>");
                 

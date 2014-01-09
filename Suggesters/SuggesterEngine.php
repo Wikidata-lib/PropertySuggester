@@ -11,5 +11,5 @@ interface SuggesterEngine {
 	 * @return Snak
 	 */
 	public function suggestionsByAttributeValuePairs($attributeValuePairs, $resultSize);
-	public function suggestionsByEntity($entity, $resultSize);
+	public function suggestionsByItem($entity, $resultSize);
 }

@@ -38,18 +38,18 @@ function doQuery() {
 }
 
 $( document ).ready(function (){
-    $( 'input.ui-autocomplete-input' ).entityselector({
+    $( '#property-chooser' ).entityselector({
              url: mw.util.wikiScript( 'api' ),
              selectOnAutocomplete: true, 
              type: 'property'
     });
     
-    $( "#add-property-btn" ).click(function() {
+    $( '#add-property-btn' ).click(function() {
         handleInput();
     });
     
 
-    $("input.ui-autocomplete-input").keyup(function (e) {
+    $( '#property-chooser' ).keyup(function (e) {
         if (e.keyCode === 13) {
             handleInput();
         }
