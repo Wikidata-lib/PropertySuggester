@@ -56,7 +56,7 @@ class GetSuggestions extends ApiBase {
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
-                $int_list = array_map("cleanProperty", $splitted_list);
+                $int_list = array_map("cleanPropertyId", $splitted_list);
                 $suggestions = $suggester->suggestionsByAttributeList($int_list, $resultSize);
         }
         $entries = array();
