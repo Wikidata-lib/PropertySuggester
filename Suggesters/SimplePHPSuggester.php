@@ -22,6 +22,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 		return $this->propertyRelations;
 	}
 	
+        // this function is not part of SuggesterEngine.php?!
 	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
 		$suggestionIds = implode(", ", $attributeList);
                 $excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
@@ -37,7 +38,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 		$resultArray = array();
                 foreach($res as $rank => $suggestInfo){
                         $suggestion = new Suggestion($suggestInfo->pid, $suggestInfo->cor, null, null);
-                        array_push($resultArray, $suggestion);       
+                        $resultArray[] =  $suggestion;
                 }
                 return $resultArray;
          }
@@ -45,7 +46,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
 		$attributeList = array();
 		foreach($attributeValuePairs as $key => $value)	{
-			array_push($attributeList, (int)(substr($value->getPropertyId(),1)));
+			$attributeList[] = (int)substr($value->getPropertyId());
 		}
 		return $this->suggestionsByAttributeList($attributeList, $resultSize, $threshold);
 	}
