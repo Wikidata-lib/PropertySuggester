@@ -15,7 +15,7 @@ function deleteFromList(evt){
 function handleInput () {
     input_text =  $( "#property-chooser").val();
     pid = $("#property-chooser").next("input").val();
-    if (input_text!=  "" && pid != ""){    
+    if (input_text!==  "" && pid !== ""){    
         selected_ids.push(pid);
         delete_link = $("<a href='#'> x </a>").click(pid, deleteFromList);
         li_element = $("<li>" + input_text + " (" + pid + ")" + "</input></li>");
@@ -27,7 +27,7 @@ function handleInput () {
 }
 
 function doQuery() {
-    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",");
+    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",") + "&language=" + wgContentLanguage;
     $.get(url, function( data ) {
         $("#result").html("<h3>Suggestions:</h3>");
         suggestions = data["suggestions"];
