@@ -27,15 +27,13 @@ class SpecialSuggester extends SpecialPage {
 
 		$this->setHeaders();
 		$out->addModules( 'ext.PropertySuggester' );
-                $out->addHTML('<p class ="info">This is a prototype of the Property Suggester. <br/>'
-                        . 'Just enter some properties, the PropertySuggester will propose matching properties ranked by correlation.<br/>'
+		$out->addWikiMsg( 'propertysuggester-intro' );
+                $out->addHTML('<p>Just enter some properties, the PropertySuggester will propose matching properties ranked by correlation.<br/>'
                         . 'Try for example <i>place of birth</i> (person) and <i>singles record</i> (tennis player)'
-                        . ' and look how the results match to tennis player and persons.<br/>'
-                        . '</p>'
-                        
+                        . ' and look how the results match to tennis player and persons.</p>'
                       );
            
-                $out->addHTML("<input placeholder='Property' id='property-chooser' class='ui-autocomplete-input' autofocus>");
+                $out->addHTML("<input placeholder='Property' id='property-chooser' autofocus>");
               
                 $out->addHTML("<input type='button' value='Add' id='add-property-btn'></input>");
                 

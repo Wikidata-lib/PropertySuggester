@@ -1,7 +1,7 @@
 <?php
 
 use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\EntityId;
+use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
@@ -19,13 +19,12 @@ include 'Suggesters/SimplePHPSuggester.php';
  */
 
 
-function cleanProperty($propertyId) {
+function cleanPropertyId($propertyId) {
     if ($propertyId[0] === 'P') {
             return (int)substr($propertyId, 1);
     }
     return (int)$propertyId;
 }
-
 
 
 class GetSuggestions extends ApiBase {
@@ -51,13 +50,13 @@ class GetSuggestions extends ApiBase {
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
-                $id = new EntityId( Item::ENTITY_TYPE, (int)($params['entity']) );
+                $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByEntity($entity, $resultSize);
+                $suggestions = $suggester->suggestionsByItem($entity, $resultSize);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
-                $int_list = array_map("cleanProperty", $splitted_list);
+                $int_list = array_map("cleanPropertyId", $splitted_list);
                 $suggestions = $suggester->suggestionsByAttributeList($int_list, $resultSize);
         }
         $entries = array();

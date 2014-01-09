@@ -24,7 +24,7 @@ def pushDictContentIntoDB(table, db):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="this program generates a correlation-table from a CSV-file")
-    parser.add_argument("input", help="The CSV input file (wikidata triple)")
+    parser.add_argument("input", help="The CSV input file (wikidata triple)", type=CompressedFileType('r'))
     parser.add_argument("db", help="target database")
     parser.add_argument("--host", help="DB host", default="127.0.0.1")
     parser.add_argument("--user", help="username for DB", default="root")
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     db = connection.cursor()
     start = time.time()
     print "computing table"
-    table = TableGenerator.computeTable(CsvReader.read_csv(open(args.input, "r")))
+    table = TableGenerator.computeTable(CsvReader.read_csv(args.input))
     print "done - {0:.2f}s".format(time.time()-start)
     print "writing to database"
     pushDictContentIntoDB(table, db)
