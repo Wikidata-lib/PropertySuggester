@@ -19,7 +19,7 @@ include 'Suggesters/SimpleMisfitSuggester.php';
  */
 
 
-function cleanProperty($propertyId) {
+function cleanPropertyId($propertyId) {
     if ($propertyId[0] === 'P') {
             return (int)substr($propertyId, 1);
     }

@@ -46,7 +46,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
 		$attributeList = array();
 		foreach($attributeValuePairs as $key => $value)	{
-			$attributeList[] = (int)substr($value->getPropertyId());
+			$attributeList[] = $value->getPropertyId()->getNumericId();
 		}
 		return $this->suggestionsByAttributeList($attributeList, $resultSize, $threshold);
 	}
@@ -64,7 +64,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 		return $sum/count($attributeValuePairs);
 	}
 
-	public function suggestionsByEntity( $entity, $resultSize, $threshold = 0 ) {
+	public function suggestionsByItem( $entity, $resultSize, $threshold = 0 ) {
 		$attributeValuePairs = $entity->getAllSnaks();
 		return $this->suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold );
 	}
