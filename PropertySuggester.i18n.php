@@ -11,7 +11,7 @@ $messages = array();
 $messages['en'] = array(
 	'propertysuggester-desc'              => 'Shows suggested properties',
 	'propertysuggester'                   => 'Property Suggester',
-	'propertysuggester-intro'             => 'The Property Suggester is great!',
+	'propertysuggester-intro'             => 'This is a prototype of the PropertySuggester.',
 );
 
 /** Message documentation (Message documentation)
