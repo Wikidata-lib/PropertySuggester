@@ -27,7 +27,7 @@ function handleInput () {
 }
 
 function doQuery() {
-    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",") + "&language=" + wgContentLanguage;
+    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",") + "&language=" + wgPageContentLanguage;
     $.get(url, function( data ) {
         $("#result").html("<h3>Suggestions:</h3>");
         suggestions = data["suggestions"];
