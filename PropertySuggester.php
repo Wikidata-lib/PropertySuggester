@@ -19,6 +19,8 @@ $wgExtensionMessagesFiles['PropertySuggesterAlias'] = $dir . 'PropertySuggester.
 $wgAutoloadClasses['SpecialSuggester']          = $dir . 'SpecialSuggester.php';
 $wgAutoloadClasses['GetSuggestions']            = $dir . 'GetSuggestions.php';
 $wgAutoloadClasses['GetMisfits']                = $dir . 'GetMisfits.php';
+$wgAutoloadClasses['PropertySuggesterHooks']    = $dir . 'PropertySuggesterHooks.php';
+
 
 $wgSpecialPages['PropertySuggester']            = 'SpecialSuggester';
 $wgSpecialPageGroups['PropertySuggester']       = 'wikibaserepo';
@@ -26,10 +28,20 @@ $wgSpecialPageGroups['PropertySuggester']       = 'wikibaserepo';
 $wgAPIModules['wbsgetsuggestions']              = 'GetSuggestions';
 $wgAPIModules['wbsgetmisfits']                  = 'GetMisfits';
 
+//$wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 
 $wgResourceModules['ext.PropertySuggester'] = array(
         'scripts' => array('modules/ext.PropertySuggester.js'),
         'styles' => 'modules/ext.PropertySuggester.css',
+        'messages' => array(),
+        'dependencies' => array('ext.PropertySuggester.entityselector'),
+        'localBasePath' => __DIR__,
+        'remoteExtPath' => 'PropertySuggester',
+);
+
+$wgResourceModules['ext.PropertySuggester.entityselector'] = array(
+        'scripts' => array('modules/ext.PropertySuggester.EntitySelector.js'),
+        'styles' => array(),
         'messages' => array(),
         'dependencies' => array('jquery.wikibase.entityselector'),
         'localBasePath' => __DIR__,
