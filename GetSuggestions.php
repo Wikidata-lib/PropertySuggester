@@ -43,40 +43,61 @@ class GetSuggestions extends ApiBase {
                 wfProfileOut( __METHOD__ );
                 $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
         }
-
         $resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
-
-        $result = $this->getResult();
+		
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByItem($entity, $resultSize);
+                $suggestions = $suggester->suggestionsByItem($entity, 100);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, $resultSize);
+                $suggestions = $suggester->suggestionsByAttributeList($int_list, 100);
         }
-        $entries = array();
+		
+		if(!isset($params['language'])){				                             //ToDo: Fallback
+				$params['language'] = $property->getLabel('en');
+		}
+        $entries = $this->createJSON($suggestions, $params['language'], $lookup);
+		if(isset($params['prefix']))
+		{
+			$entries = $this->filterByPrefix($entries, $params['prefix']);
+		}
+		
+        $result = $this->getResult();
+        $result->addValue(null, "suggestions", $entries);
+    }
+	
+	public function filterByPrefix($entries, $prefix)
+	{
+		$matchingEntries = array();
+		foreach($entries as $entry)
+		{
+			if(preg_match("/\b($prefix\w*)\b/i", $entry["name"]))
+			{
+				$matchingEntries[] = $entry;
+			}
+		}
+		return $matchingEntries;
+	}
+	
+	
+	public function createJSON($suggestions, $language, $lookup) {
+		$entries = array();
         foreach($suggestions as $suggestion){
             $entry = array();
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
-            if(isset($params['language'])){
-                    $entry["name"] = $property->getLabel($params['language']);       
-            }
-            else{                                                                //ToDo: Fallback
-                    $entry["name"] = $property->getLabel('en');
-            }
+            $entry["name"] = $property->getLabel($language);   
             $entry["id"] = $suggestion->getPropertyId();
             $entry["correlation"] = $suggestion->getCorrelation();
             $entries[] = $entry;
         }
-        $result->addValue(null, "suggestions", $entries);
-    }
-        
+		return $entries;
+	}
 
     /**
      * @see ApiBase::getAllowedParams()
@@ -84,22 +105,26 @@ class GetSuggestions extends ApiBase {
     public function getAllowedParams() {
         return array(
             'entity' => array(
-                    ApiBase::PARAM_TYPE => 'string',
-                    ApiBase::PARAM_ISMULTI => false,
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_ISMULTI => false
             ),
             'properties' => array(
-                    ApiBase::PARAM_TYPE => 'string',
-                    ApiBase::PARAM_ISMULTI => true,
-                    ApiBase::PARAM_ALLOW_DUPLICATES => false
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_ISMULTI => true,
+				ApiBase::PARAM_ALLOW_DUPLICATES => false
             ),
             'size' => array(
-                    ApiBase::PARAM_TYPE => 'string',
-                    ApiBase::PARAM_ISMULTI => false
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_ISMULTI => false
             ),
             'language' => array(
-                    ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
-                    ApiBase::PARAM_ISMULTI => false,
-            )
+				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+				ApiBase::PARAM_ISMULTI => false
+            ),
+			'prefix' => array(
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_ISMULTI => false
+			)
         );
     }
 
