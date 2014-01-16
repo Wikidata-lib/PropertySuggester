@@ -9,14 +9,17 @@
              */
             _create: function() {                
                 this._oldCreate.apply(this, arguments);
-                this.element.focus(this._focusHandler);
                 
-            },
-                        
-            _focusHandler: function() {
-                if ($(this).val() === "") {        
-                    $(this).data("entityselector").search("*");
-                }
+                var self = this;
+                
+                var handler = function() {
+                    if (self.value() === "") {        
+                        self.search("*");
+                    }
+                };
+                
+                self.element.focus(handler);
+                self.element.bind("input", handler);
             },
                         
             _oldRequest: $.wikibase.entityselector.prototype._request,
