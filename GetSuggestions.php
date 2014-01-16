@@ -59,7 +59,7 @@ class GetSuggestions extends ApiBase {
 				$params['language'] = $property->getLabel('en');
 		}
         $entries = $this->createJSON($suggestions, $params['language'], $lookup);
-		if(isset($params['search']))
+		if(isset($params['search']) && !($params['search']=="*"))
 		{
 			$entries = $this->filterByPrefix($entries, $params['search']);
 		}
