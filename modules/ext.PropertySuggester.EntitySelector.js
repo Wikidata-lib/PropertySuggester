@@ -2,6 +2,23 @@
 // $.widget( 'wikibase.entityselector2', $.wikibase.entityselector, {
  $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
             
+            _oldCreate: $.wikibase.entityselector.prototype._create,
+            
+            /**
+             * Show initial results
+             */
+            _create: function() {                
+                this._oldCreate.apply(this, arguments);
+                this.element.focus(this._focusHandler);
+                
+            },
+                        
+            _focusHandler: function() {
+                if ($(this).val() === "") {        
+                    $(this).data("entityselector").search("*");
+                }
+            },
+                        
             _oldRequest: $.wikibase.entityselector.prototype._request,
     
             /**
@@ -34,7 +51,7 @@
                     }
                     $.ui.suggester.prototype._request.apply( this, arguments );
                 } else {
-                    _oldRequest.apply( this, arguments );
+                    this._oldRequest.apply( this, arguments );
                 }
             }, 
      

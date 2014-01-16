@@ -66,7 +66,7 @@ class GetSuggestions extends ApiBase {
         $this->getResult()->addValue(null, 'search', $entries);
         $this->getResult()->addValue(null, 'success', 1);
         $this->getResult()->addValue(null, 'search-continue', 10);
-        $this->getResult()->addValue('searchinfo', 'search', $params['search']);
+        $this->getResult()->addValue('searchinfo', 'search', $params['search'] == "*" ? "" : $params['search'] );
     }
 	
 	public function filterByPrefix($entries, $search)
