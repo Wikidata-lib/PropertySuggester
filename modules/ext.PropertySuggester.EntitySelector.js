@@ -31,28 +31,30 @@
              * @see ui.suggester._request
              */
             _request: function( request, suggest ) {
-                if (this.options.type === "property" && typeof wbEntity !== 'undefined') {
-                    this._term = request.term;
-                    if ( !this._continueSearch ) {
-                            this.offset = 0;
-                    }
+                if (this.options.type === "property" &&
+                    typeof wbEntity !== 'undefined' &&
+                    !$.isEmptyObject(JSON.parse(wbEntity).claims)) {
+                        this._term = request.term;
+                        if ( !this._continueSearch ) {
+                                this.offset = 0;
+                        }
 
-                    $.extend( this.options.ajax, {
-                            url: this.options.url,
-                            timeout: this.options.timeout,
-                            params: {
-                                    action: 'wbsgetsuggestions',
-                                    entity: wbEntityId,
-                                    format: 'json',
-                                    language: this.options.language,
-                                    type: this.options.type,
-                                    'continue': this.offset
-                            }
-                    } );
-                    if ( this.options.limit !== null ) {
-                            this.options.ajax.params.limit = this.options.limit;
-                    }
-                    $.ui.suggester.prototype._request.apply( this, arguments );
+                        $.extend( this.options.ajax, {
+                                url: this.options.url,
+                                timeout: this.options.timeout,
+                                params: {
+                                        action: 'wbsgetsuggestions',
+                                        entity: wbEntityId,
+                                        format: 'json',
+                                        language: this.options.language,
+                                        type: this.options.type,
+                                        'continue': this.offset
+                                }
+                        } );
+                        if ( this.options.limit !== null ) {
+                                this.options.ajax.params.limit = this.options.limit;
+                        }
+                        $.ui.suggester.prototype._request.apply( this, arguments );
                 } else {
                     this._oldRequest.apply( this, arguments );
                 }
