@@ -12,7 +12,7 @@ final class PropertySuggesterHooks {
          * @return boolean
          */
         public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
-                $out->addModules( 'ext.PropertySuggester.entityselector' );
+                $out->addModules( 'ext.PropertySuggester.EntitySelector' );
                 return true;
         }
        

@@ -28,18 +28,18 @@ $wgSpecialPageGroups['PropertySuggester']       = 'wikibaserepo';
 $wgAPIModules['wbsgetsuggestions']              = 'GetSuggestions';
 $wgAPIModules['wbsgetmisfits']                  = 'GetMisfits';
 
-//$wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
+$wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 
 $wgResourceModules['ext.PropertySuggester'] = array(
         'scripts' => array('modules/ext.PropertySuggester.js'),
         'styles' => 'modules/ext.PropertySuggester.css',
         'messages' => array(),
-        'dependencies' => array('ext.PropertySuggester.entityselector'),
+        'dependencies' => array('ext.PropertySuggester.EntitySelector'),
         'localBasePath' => __DIR__,
         'remoteExtPath' => 'PropertySuggester',
 );
 
-$wgResourceModules['ext.PropertySuggester.entityselector'] = array(
+$wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
         'scripts' => array('modules/ext.PropertySuggester.EntitySelector.js'),
         'styles' => array(),
         'messages' => array(),
