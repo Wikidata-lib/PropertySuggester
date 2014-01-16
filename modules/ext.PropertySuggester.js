@@ -29,10 +29,10 @@ function handleInput () {
 }
 
 function doQuery() {
-    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",") + "&language=" + wgPageContentLanguage;
+    url = mw.util.wikiScript( 'api' ) + "?action=wbsgetsuggestions&format=json&properties=" + selected_ids.map(encodeURIComponent).join(",") + "&limit=20&language=" + wgPageContentLanguage;
     $.get(url, function( data ) {
         $("#result").html("<h3>Suggestions:</h3>");
-        suggestions = data["suggestions"];
+        suggestions = data["search"];
         $.each(suggestions, function (k, v) {
             $("#result").append(JSON.stringify(v) + "<br>");
         });

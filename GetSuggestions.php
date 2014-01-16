@@ -110,9 +110,9 @@ class GetSuggestions extends ApiBase {
                 continue;
             }
             $entry["id"] = "P".$suggestion->getPropertyId();
-            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //does this always work?
-			$entry["description"] = $property->getDescription($language);
             $entry["label"] = $property->getLabel($language);   
+			$entry["description"] = $property->getDescription($language);
+            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //TODO get url!
             $entries[] = $entry;
         }
 		return $entries;
