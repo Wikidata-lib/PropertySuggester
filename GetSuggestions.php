@@ -42,31 +42,48 @@ class GetSuggestions extends ApiBase {
                 wfProfileOut( __METHOD__ );
                 $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
         }
-        $resultSize = isset( $params['size']) ? (int)($params['size']) : 200;
+        
+        if (isset($params['search']) && $params['search'] != "*") {
+            $search = $params['search'];
+        } else {
+            $search = "";
+        }
+                
+        $limit = $params['limit'];
+        $continue = $params['continue'];
+        
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByItem($entity, 200);
+                $suggestions = $suggester->suggestionsByItem($entity, 1000);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, 200);
+                $suggestions = $suggester->suggestionsByAttributeList($int_list, 1000);
         }
-		if(!isset($params['language'])){				                             //ToDo: Fallback
-				$params['language'] = $property->getLabel('en');
+        
+        $language = "en";
+		if(isset($params['language'])){ // TODO: use fallback
+				$language = $params['language'];
 		}
-        $entries = $this->createJSON($suggestions, $params['language'], $lookup);
-		if(isset($params['search']) && !($params['search']=="*"))
+        
+        $entries = $this->createJSON($suggestions, $language, $lookup);
+		if($search)
 		{
-			$entries = $this->filterByPrefix($entries, $params['search']);
+			$entries = $this->filterByPrefix($entries, $search);
 		}
-        $this->getResult()->addValue(null, 'search', $entries);
+        
+        $sliced_entries = array_slice($entries, $continue, $limit);
+        
+        $this->getResult()->addValue(null, 'search', $sliced_entries);
         $this->getResult()->addValue(null, 'success', 1);
-        $this->getResult()->addValue(null, 'search-continue', 10);
-        $this->getResult()->addValue('searchinfo', 'search', $params['search'] == "*" ? "" : $params['search'] );
+        if ( count($entries) > $continue + $limit) {
+            $this->getResult()->addValue(null, 'search-continue', $continue + $limit);
+        }
+        $this->getResult()->addValue('searchinfo', 'search', $search );
     }
 	
 	public function filterByPrefix($entries, $search)
@@ -89,6 +106,9 @@ class GetSuggestions extends ApiBase {
             $entry = array();
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
+            if ($property == null) {
+                continue;
+            }
             $entry["id"] = "P".$suggestion->getPropertyId();
             $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //does this always work?
 			$entry["description"] = $property->getDescription($language);
@@ -105,24 +125,33 @@ class GetSuggestions extends ApiBase {
         return array(
             'entity' => array(
 				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_ISMULTI => false
             ),
             'properties' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => true,
 				ApiBase::PARAM_ALLOW_DUPLICATES => false
             ),
-            'size' => array(
-				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_ISMULTI => false
-            ),
+			'limit' => array(
+				ApiBase::PARAM_TYPE => 'limit',
+				ApiBase::PARAM_DFLT => 7,
+				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
+				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_RANGE_ENFORCE => true,
+			),
+			'continue' => array(
+				ApiBase::PARAM_TYPE => 'limit',
+				ApiBase::PARAM_DFLT => 0,
+				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
+				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_RANGE_ENFORCE => true,
+			),
             'language' => array(
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
-				ApiBase::PARAM_ISMULTI => false
             ),
 			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_ISMULTI => false
 			)
         );
     }
