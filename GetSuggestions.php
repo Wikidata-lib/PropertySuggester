@@ -42,18 +42,18 @@ class GetSuggestions extends ApiBase {
                 wfProfileOut( __METHOD__ );
                 $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
         }
-        $resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
+        $resultSize = isset( $params['size']) ? (int)($params['size']) : 200;
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByItem($entity, 10);
+                $suggestions = $suggester->suggestionsByItem($entity, 200);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, 10);
+                $suggestions = $suggester->suggestionsByAttributeList($int_list, 200);
         }
 		if(!isset($params['language'])){				                             //ToDo: Fallback
 				$params['language'] = $property->getLabel('en');
@@ -71,7 +71,7 @@ class GetSuggestions extends ApiBase {
 		$matchingEntries = array();
 		foreach($entries as $entry)
 		{
-			if(preg_match("/\b($search\w*)\b/i", $entry["label"]))                
+			if( 0 == strcasecmp( $search, substr($entry["label"], 0, strlen($search) ) ) )                
 			{
 				$matchingEntries[] = $entry;
 			}
