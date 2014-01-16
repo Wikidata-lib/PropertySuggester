@@ -29,8 +29,8 @@ function cleanPropertyId($propertyId) {
 
 class GetSuggestions extends ApiBase {
 
-    public function __construct( ApiMain $main, $name, $prefix = '' ) {
-            parent::__construct( $main, $name, $prefix );
+    public function __construct( ApiMain $main, $name, $search = '' ) {
+            parent::__construct( $main, $name, $search );
     }
 
     /**
@@ -38,45 +38,40 @@ class GetSuggestions extends ApiBase {
      */
     public function execute() {
         $params = $this->extractRequestParams();
-
         if ( ! ( isset( $params['entity'] ) xor isset( $params['properties'])) ) {
                 wfProfileOut( __METHOD__ );
                 $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
         }
         $resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
-		
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByItem($entity, 100);
+                $suggestions = $suggester->suggestionsByItem($entity, 10);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, 100);
+                $suggestions = $suggester->suggestionsByAttributeList($int_list, 10);
         }
-		
 		if(!isset($params['language'])){				                             //ToDo: Fallback
 				$params['language'] = $property->getLabel('en');
 		}
         $entries = $this->createJSON($suggestions, $params['language'], $lookup);
-		if(isset($params['prefix']))
+		if(isset($params['search']))
 		{
-			$entries = $this->filterByPrefix($entries, $params['prefix']);
+			$entries = $this->filterByPrefix($entries, $params['search']);
 		}
-		
-        $result = $this->getResult();
-        $result->addValue(null, "suggestions", $entries);
+        $this->getResult()->addValue(null, 'search', $entries);
     }
 	
-	public function filterByPrefix($entries, $prefix)
+	public function filterByPrefix($entries, $search)
 	{
 		$matchingEntries = array();
 		foreach($entries as $entry)
 		{
-			if(preg_match("/\b($prefix\w*)\b/i", $entry["name"]))
+			if(preg_match("/\b($search\w*)\b/i", $entry["label"]))                
 			{
 				$matchingEntries[] = $entry;
 			}
@@ -91,9 +86,10 @@ class GetSuggestions extends ApiBase {
             $entry = array();
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
-            $entry["name"] = $property->getLabel($language);   
-            $entry["id"] = $suggestion->getPropertyId();
-            $entry["correlation"] = $suggestion->getCorrelation();
+            $entry["id"] = "P".$suggestion->getPropertyId();
+            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //does this always work?
+			$entry["description"] = $property->getDescription($language);
+            $entry["label"] = $property->getLabel($language);   
             $entries[] = $entry;
         }
 		return $entries;
@@ -121,7 +117,7 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
 				ApiBase::PARAM_ISMULTI => false
             ),
-			'prefix' => array(
+			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => false
 			)
