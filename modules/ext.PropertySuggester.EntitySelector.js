@@ -1,39 +1,35 @@
 
-// $.widget( 'wikibase.entityselector2', $.wikibase.entityselector, {
  $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
-            
-            _oldCreate: $.wikibase.entityselector.prototype._create,
-            
             /**
-             * Show initial results
-             */
-            _create: function() {                
-                this._oldCreate.apply(this, arguments);
-                
-                var self = this;
-                
-                var handler = function() {
-                    if (self.value() === "") {        
-                        self.search("*");
-                    }
-                };
-                
-                self.element.focus(handler);
-                self.element.bind("input", handler);
-            },
-                        
-            _oldRequest: $.wikibase.entityselector.prototype._request,
-    
-            /**
-             * override usual entityselector and replace _request if a property
-             * is requested and we are on an Entity page.
+             * override usual entityselector and replace _request and _create 
+             * if a property is requested and we are on an Entity page.
              * 
              * @see ui.suggester._request
-             */
+             */    
+    
+            _oldCreate: $.wikibase.entityselector.prototype._create,
+            
+            _create: function() {                
+                var self = this;
+                
+                self._oldCreate.apply(self, arguments);
+                
+                if (self.__useSuggester()) {
+                    var handler = function() {
+                        if (self.value() === "") {        
+                            self.search("*");
+                        }
+                    };
+
+                    self.element.focus(handler);
+                    self.element.bind("input", handler);
+                }
+            },
+
+            _oldRequest: $.wikibase.entityselector.prototype._request,
+
             _request: function( request, suggest ) {
-                if (this.options.type === "property" &&
-                    typeof wbEntity !== 'undefined' &&
-                    !$.isEmptyObject(JSON.parse(wbEntity).claims)) {
+                if (this.__useSuggester() && !$.isEmptyObject(JSON.parse(wbEntity).claims)) {
                         this._term = request.term;
                         if ( !this._continueSearch ) {
                                 this.offset = 0;
@@ -59,5 +55,9 @@
                     this._oldRequest.apply( this, arguments );
                 }
             }, 
-     
+                    
+            __useSuggester: function() {
+                return this.options.type === 'property' && typeof wbEntityId !== 'undefined'
+            },
+      
  });
