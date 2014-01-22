@@ -1,12 +1,11 @@
 <?php
-
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\Item;
-use Wikibase\Property;
-use Wikibase\StoreFactory;
 //ToDo: use Wikibase\LanguageFallbackChainFactory;
-use Wikibase\Repo\WikibaseRepo;
+
+
+use Wikibase\Api\SearchEntities;
+use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\StoreFactory;
 use Wikibase\Utils;
 
 include 'Suggesters/SimplePHPSuggester.php';
@@ -42,28 +41,34 @@ class GetSuggestions extends ApiBase {
                 wfProfileOut( __METHOD__ );
                 $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
         }
-        $resultSize = isset( $params['size']) ? (int)($params['size']) : 200;
+        $resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByItem($entity, 200);
+                $suggestions = $suggester->suggestionsByItem($entity, 50);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, 200);
+                $suggestions = $suggester->suggestionsByAttributeList($int_list, 50);
         }
 		if(!isset($params['language'])){				                             //ToDo: Fallback
 				$params['language'] = $property->getLabel('en');
 		}
-        $entries = $this->createJSON($suggestions, $params['language'], $lookup);
+        $suggestionEntries = $this->createJSON($suggestions, $params['language'], $lookup);
 		if(isset($params['search']))
 		{
-			$entries = $this->filterByPrefix($entries, $params['search']);
+			$suggestionEntries = $this->filterByPrefix($suggestionEntries, $params['search']);
 		}
-        $this->getResult()->addValue(null, 'search', $entries);
+	/*	$searchParameters = array();
+		$searchParameters['limit'] = 
+		$searchParameters['continue'] = 
+		$searchParameters['search'] = */
+		$apiSearchObject = new SearchEntities;
+		$traditionalEntries = $apiSearchObject->getSearchEntries($params);
+        $this->getResult()->addValue(null, 'search', $suggestionEntries);
     }
 	
 	public function filterByPrefix($entries, $search)
@@ -87,9 +92,10 @@ class GetSuggestions extends ApiBase {
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
             $entry["id"] = "P".$suggestion->getPropertyId();
-            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //does this always work?
+			$entry["label"] = $property->getLabel($language);   
 			$entry["description"] = $property->getDescription($language);
-            $entry["label"] = $property->getLabel($language);   
+            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //does this always work?
+			$entry["correlation"] = $suggestion->getCorrelation();
             $entries[] = $entry;
         }
 		return $entries;
@@ -119,8 +125,24 @@ class GetSuggestions extends ApiBase {
             ),
 			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_ISMULTI => false
-			)
+				ApiBase::PARAM_REQUIRED => true,
+			),
+			'limit' => array(
+				ApiBase::PARAM_TYPE => 'limit',
+				ApiBase::PARAM_DFLT => 7,
+				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
+				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_RANGE_ENFORCE => true,
+			),
+			'continue' => array(
+				ApiBase::PARAM_TYPE => 'limit',
+				ApiBase::PARAM_DFLT => 0,
+				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
+				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_RANGE_ENFORCE => true,
+			),
         );
     }
 
@@ -132,7 +154,9 @@ class GetSuggestions extends ApiBase {
                     'entity' => 'Suggest attributes for given entity',
                     'properties' => 'Identifier for the site on which the corresponding page resides',
                     'size' => 'Specify number of suggestions to be returned',
-                    'language' => 'language for result'
+                    'language' => 'language for result',
+					'limit' => 'Maximal number of results',
+					'continue' => 'Offset where to continue a search'
             ) );
     }
 
