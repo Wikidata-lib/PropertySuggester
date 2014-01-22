@@ -1,7 +1,6 @@
 <?php
 //ToDo: use Wikibase\LanguageFallbackChainFactory;
 
-
 use Wikibase\Api\SearchEntities;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
@@ -17,14 +16,12 @@ include 'Suggesters/SimplePHPSuggester.php';
  * @licence GNU GPL v2+
  */
 
-
 function cleanPropertyId($propertyId) {
     if ($propertyId[0] === 'P') {
             return (int)substr($propertyId, 1);
     }
     return (int)$propertyId;
 }
-
 
 class GetSuggestions extends ApiBase {
 
@@ -41,34 +38,99 @@ class GetSuggestions extends ApiBase {
                 wfProfileOut( __METHOD__ );
                 $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
         }
-        $resultSize = isset( $params['size']) ? (int)($params['size']) : 10;
+        
+        if (isset($params['search']) && $params['search'] != "*") {
+            $search = $params['search'];
+        } else {
+            $search = "";
+        }
+                
+        $limit = $params['limit'];
+        $continue = $params['continue'];
+        
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
-                $suggestions = $suggester->suggestionsByItem($entity, 50);
+
+                $suggestions = $suggester->suggestionsByItem($entity, 1000);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, 50);
+
+                $suggestions = $suggester->suggestionsByAttributeList($int_list, 1000);
         }
-		if(!isset($params['language'])){				                             //ToDo: Fallback
-				$params['language'] = $property->getLabel('en');
+        
+        $language = "en";
+		if(isset($params['language'])){ // TODO: use fallback
+				$language = $params['language'];
 		}
-        $suggestionEntries = $this->createJSON($suggestions, $params['language'], $lookup);
-		if(isset($params['search']))
+        
+        $entries = $this->createJSON($suggestions, $language, $lookup);
+		
+		if($search)
 		{
-			$suggestionEntries = $this->filterByPrefix($suggestionEntries, $params['search']);
+			$entries = $this->filterByPrefix($entries, $search);
 		}
-	/*	$searchParameters = array();
-		$searchParameters['limit'] = 
-		$searchParameters['continue'] = 
-		$searchParameters['search'] = */
-		$apiSearchObject = new SearchEntities;
-		$traditionalEntries = $apiSearchObject->getSearchEntries($params);
-        $this->getResult()->addValue(null, 'search', $suggestionEntries);
+        
+        $sliced_entries = array_slice($entries, $continue, $limit);
+		
+		if(count(sliced_entries) < $limit && $search)
+		{
+			$apicallcontinue = $continue - count($sliced_entries);
+			$apicallcontinue = $apicallcontinue < 0 ? 0 : $apicallcontinue;
+			$searchEntitiesParameters = new DerivativeRequest( 
+				$this->getRequest(),
+				array(
+				'limit' => $limit, //search results can overlap with suggestions. Think!
+				'continue' => $apicallcontinue,
+				'search' => $search,
+				'action' => 'wbsearchentities',
+				'language' => $language,
+				'type' => \Wikibase\Property::ENTITY_TYPE)
+			);
+			
+			
+			$api = new ApiMain($searchEntitiesParameters);
+			$api->execute();
+			$searchEntitesResult = $api->getResultData();
+			$searchResult = $searchEntitesResult['search'];
+			$noDuplicateEntries = array();
+			$distinctCount = 0;
+			foreach($searchResult as $sr)
+			{
+				$duplicate = false;
+				foreach($sliced_entries as $sug)
+				{
+					if($sr["id"] === $sug["id"])
+					{
+						$duplicate = true;
+						break;
+					}
+				}
+				if(!$duplicate)
+				{
+					$noDuplicateEntries[] = $sr;
+					$distinctCount++;
+					if($distinctCount > $limit - count(sliced_entries))
+					{
+						break;
+					}
+				}
+			}
+			$sliced_entries = array_merge($sliced_entries, $noDuplicateEntries);
+		}
+		
+		
+		
+        $this->getResult()->addValue(null, 'search', $sliced_entries);
+        $this->getResult()->addValue(null, 'success', 1);
+        if ( count($entries) > $continue + $limit) {
+            $this->getResult()->addValue(null, 'search-continue', $continue + $limit);
+        }
+        $this->getResult()->addValue('searchinfo', 'search', $search );
     }
 	
 	public function filterByPrefix($entries, $search)
@@ -84,18 +146,21 @@ class GetSuggestions extends ApiBase {
 		return $matchingEntries;
 	}
 	
-	
 	public function createJSON($suggestions, $language, $lookup) {
 		$entries = array();
         foreach($suggestions as $suggestion){
             $entry = array();
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
+            if ($property == null) {
+                continue;
+            }
             $entry["id"] = "P".$suggestion->getPropertyId();
-			$entry["label"] = $property->getLabel($language);   
+            $entry["label"] = $property->getLabel($language);   
 			$entry["description"] = $property->getDescription($language);
-            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //does this always work?
 			$entry["correlation"] = $suggestion->getCorrelation();
+            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //TODO get url!
+			$entry["debug:type"] = "suggestion"; //debug
             $entries[] = $entry;
         }
 		return $entries;
@@ -108,25 +173,12 @@ class GetSuggestions extends ApiBase {
         return array(
             'entity' => array(
 				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_ISMULTI => false
             ),
             'properties' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => true,
 				ApiBase::PARAM_ALLOW_DUPLICATES => false
             ),
-            'size' => array(
-				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_ISMULTI => false
-            ),
-            'language' => array(
-				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
-				ApiBase::PARAM_ISMULTI => false
-            ),
-			'search' => array(
-				ApiBase::PARAM_TYPE => 'string',
-				ApiBase::PARAM_REQUIRED => true,
-			),
 			'limit' => array(
 				ApiBase::PARAM_TYPE => 'limit',
 				ApiBase::PARAM_DFLT => 7,
@@ -143,7 +195,13 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_MIN => 0,
 				ApiBase::PARAM_RANGE_ENFORCE => true,
 			),
-        );
+            'language' => array(
+				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+            ),
+			'search' => array(
+				ApiBase::PARAM_TYPE => 'string',
+			)
+		);
     }
 
     /**
@@ -184,5 +242,4 @@ class GetSuggestions extends ApiBase {
     protected function getExamples() {
         return array();
     }
-
 }
