@@ -48,6 +48,7 @@ class GetSuggestions extends ApiBase {
         $limit = $params['limit'];
         $continue = $params['continue'];
         
+		//Get Suggestions
         $suggester = new SimplePHPSuggester(); 
         $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
         if (isset( $params['entity'] )){
@@ -62,69 +63,58 @@ class GetSuggestions extends ApiBase {
 
                 $suggestions = $suggester->suggestionsByAttributeList($int_list, 1000);
         }
-        
+		
+		//Build result Array
         $language = "en";
 		if(isset($params['language'])){ // TODO: use fallback
 				$language = $params['language'];
 		}
-        
         $entries = $this->createJSON($suggestions, $language, $lookup);
-		
-		if($search)
-		{
+		if($search)	{
 			$entries = $this->filterByPrefix($entries, $search);
 		}
-        
-        $sliced_entries = array_slice($entries, $continue, $limit);
 		
-		if(count($sliced_entries) < $limit && $search)
-		{
-			$apicallcontinue = $continue - count($sliced_entries);
-			$apicallcontinue = $apicallcontinue < 0 ? 0 : $apicallcontinue;
+		//get traditional search results
+		if(count($entries) < $limit + $continue && $search) {
 			$searchEntitiesParameters = new DerivativeRequest( 
 				$this->getRequest(),
 				array(
-				'limit' => $limit, //search results can overlap with suggestions. Think!
-				'continue' => $apicallcontinue,
+				'limit' => $limit + $continue, //search results can overlap with suggestions. Think!
+				'continue' => 0,
 				'search' => $search,
 				'action' => 'wbsearchentities',
 				'language' => $language,
 				'type' => \Wikibase\Property::ENTITY_TYPE)
 			);
-			
-			
 			$api = new ApiMain($searchEntitiesParameters);
 			$api->execute();
 			$searchEntitesResult = $api->getResultData();
 			$searchResult = $searchEntitesResult['search'];
+			
+			//avoid duplicates
+			$existingKeys = array();
+			foreach($entries as $sug) {
+				$exitingKeys[$sug["id"]] = true;
+			}
+			
 			$noDuplicateEntries = array();
 			$distinctCount = 0;
-			foreach($searchResult as $sr)
-			{
-				$duplicate = false;
-				foreach($sliced_entries as $sug)
-				{
-					if($sr["id"] === $sug["id"])
-					{
-						$duplicate = true;
-						break;
-					}
-				}
-				if(!$duplicate)
-				{
+			foreach($searchResult as $sr) {
+				if(!isset($existingKeys[$sr["id"]])) {
 					$noDuplicateEntries[] = $sr;
 					$distinctCount++;
-					if($distinctCount + 1 > ($limit - count($sliced_entries)))
-					{
+					if( (count($sliced_entries) + $distinctCount) >= ($limit + $continue) ) {
 						break;
 					}
 				}
-			}
-			$sliced_entries = array_merge($sliced_entries, $noDuplicateEntries);
+			}		
+			$entries = array_merge($entries, $noDuplicateEntries);
 		}
 		
+		//merge search result sets
+        $sliced_entries = array_slice($entries, $continue, $limit);	
 		
-		
+		//define Result
         $this->getResult()->addValue(null, 'search', $sliced_entries);
         $this->getResult()->addValue(null, 'success', 1);
         if ( count($entries) > $continue + $limit) {
