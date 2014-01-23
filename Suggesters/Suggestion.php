@@ -6,6 +6,13 @@ class Suggestion {
 	private $correlation;
 	private $suggestedValue;
 
+	/**
+	 * constructor 
+	 * 
+	 * @param type $propertyId PropertyId
+	 * @param type $correlation float
+	 * @param type $suggestedValue not used yet!
+	 */
 	function __construct( $propertyId, $correlation, $suggestedValue = null ) {
 		$this->propertyId = $propertyId;
 		$this->correlation = $correlation;

@@ -1,8 +1,6 @@
 <?php
 
-use Wikibase\Item;
-use Wikibase\Property;
-use Wikibase\StoreFactory;
+use Wikibase\DataModel\Entity\PropertyId;
 
 include "SuggesterEngine.php";
 
@@ -11,7 +9,7 @@ function compare_pairs( $a, $b ) {
 }
 
 class SimplePHPSuggester implements SuggesterEngine {
-		private $deprecatedPropertyIds = "107";
+	private $deprecatedPropertyIds = "107";
 	private $propertyRelations = array();
 
 		public function getDeprecatedPropertyIds() {
@@ -25,8 +23,8 @@ class SimplePHPSuggester implements SuggesterEngine {
 		// this function is not part of SuggesterEngine.php?!
 	public function suggestionsByAttributeList( $attributeList, $resultSize, $threshold = 0 ) {
 		$suggestionIds = implode( ", ", $attributeList );
-				$excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
-				$dbr = wfGetDB( DB_SLAVE );
+		$excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
+		$dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->query( "
 			SELECT pid2 AS pid, sum(correlation)/" . count( $attributeList ) . " AS cor
 			FROM wbs_propertypairs
@@ -36,12 +34,13 @@ class SimplePHPSuggester implements SuggesterEngine {
 			ORDER BY cor DESC
 			LIMIT $resultSize" );
 		$resultArray = array();
-				foreach ( $res as $rank => $suggestInfo ) {
-						$suggestion = new Suggestion( $suggestInfo->pid, $suggestInfo->cor, null, null );
-						$resultArray[] =  $suggestion;
-				}
-				return $resultArray;
-		 }
+		foreach ( $res as $i => $row ) {
+			$pid = PropertyId::newFromNumber( (int)$row->pid );
+			$suggestion = new Suggestion( $pid, $row->cor, null, null );
+			$resultArray[] =  $suggestion;
+		}
+		return $resultArray;
+	}
 
 	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold = 0 ) {
 		$attributeList = array();
@@ -49,17 +48,6 @@ class SimplePHPSuggester implements SuggesterEngine {
 			$attributeList[] = $value->getPropertyId()->getNumericId();
 		}
 		return $this->suggestionsByAttributeList( $attributeList, $resultSize, $threshold );
-	}
-
-	private function computeAggregateCorrelation( $attributeCorrelations, $attributeValuePairs ) {
-		$sum = 0;
-		for ( $i = 0; $i < count( $attributeValuePairs ); $i++ ) {
-			$id = $attributeValuePairs[$i]->getPropertyId()->getPrefixedId();
-			if ( isset( $attributeCorrelations[$id] ) ) {
-				$sum += ( $attributeCorrelations[$id] ) / $this->propertyRelations[$id]['appearances'];
-			}
-		}
-		return $sum / count( $attributeValuePairs );
 	}
 
 	public function suggestionsByItem( $entity, $resultSize, $threshold = 0 ) {
