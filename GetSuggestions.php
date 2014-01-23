@@ -1,9 +1,11 @@
 <?php
 //ToDo: use Wikibase\LanguageFallbackChainFactory;
 
-use Wikibase\Api\SearchEntities;
+
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\Property;
+use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Utils;
 
@@ -84,7 +86,7 @@ class GetSuggestions extends ApiBase {
 				'search' => $search,
 				'action' => 'wbsearchentities',
 				'language' => $language,
-				'type' => \Wikibase\Property::ENTITY_TYPE)
+				'type' => Property::ENTITY_TYPE)
 			);
 			$api = new ApiMain($searchEntitiesParameters);
 			$api->execute();
@@ -142,6 +144,8 @@ class GetSuggestions extends ApiBase {
             $entry = array();
             $id = new PropertyId("P" . $suggestion->getPropertyId());
             $property = $lookup->getEntity($id);
+			$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
+			
             if ($property == null) {
                 continue;
             }
@@ -149,7 +153,7 @@ class GetSuggestions extends ApiBase {
             $entry["label"] = $property->getLabel($language);   
 			$entry["description"] = $property->getDescription($language);
 			$entry["correlation"] = $suggestion->getCorrelation();
-            $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //TODO get url!
+			$entry["url"] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
 			$entry["debug:type"] = "suggestion"; //debug
             $entries[] = $entry;
         }
