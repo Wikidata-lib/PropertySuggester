@@ -1,5 +1,5 @@
 <?php
-//ToDo: use Wikibase\LanguageFallbackChainFactory;
+// ToDo: use Wikibase\LanguageFallbackChainFactory;
 
 
 use Wikibase\DataModel\Entity\ItemId;
@@ -18,9 +18,9 @@ include 'Suggesters/SimplePHPSuggester.php';
  * @licence GNU GPL v2+
  */
 
-function cleanPropertyId($propertyId) {
-    if ($propertyId[0] === 'P') {
-            return (int)substr($propertyId, 1);
+function cleanPropertyId( $propertyId ) {
+    if ( $propertyId[0] === 'P' ) {
+            return (int)substr( $propertyId, 1 );
     }
     return (int)$propertyId;
 }
@@ -36,125 +36,130 @@ class GetSuggestions extends ApiBase {
      */
     public function execute() {
         $params = $this->extractRequestParams();
-        if ( ! ( isset( $params['entity'] ) xor isset( $params['properties'])) ) {
+		
+		// Understand params
+        if ( ! ( isset( $params['entity'] ) xor isset( $params['properties'] ) ) ) {
                 wfProfileOut( __METHOD__ );
-                $this->dieUsage( 'provide either entity id parameter "entity" or list of properties "properties"', 'param-missing' );
+                $this->dieUsage( 'provide either entity id parameter \'entity\' or list of properties \'properties\'', 'param-missing' );
         }
-        
-        if (isset($params['search']) && $params['search'] != "*") {
+
+        if ( isset( $params['search'] ) && $params['search'] != '*' ) {
             $search = $params['search'];
         } else {
-            $search = "";
+            $search = '';
         }
-                
-        $limit = $params['limit'];
-        $continue = $params['continue'];
-        
-		//Get Suggestions
-        $suggester = new SimplePHPSuggester(); 
-        $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-        if (isset( $params['entity'] )){
-                $id = new  ItemId($params['entity']);
-                $entity = $lookup->getEntity($id);
-
-                $suggestions = $suggester->suggestionsByItem($entity, 1000);
-        } else {
-                $list = $params['properties'][0];
-                $splitted_list = explode(",", $list);
-                $int_list = array_map("cleanPropertyId", $splitted_list);
-
-                $suggestions = $suggester->suggestionsByAttributeList($int_list, 1000);
-        }
-		
-		//Build result Array
-        $language = "en";
-		if(isset($params['language'])){ // TODO: use fallback
+		$language = 'en';
+		if ( isset( $params['language'] ) ) { // TODO: use fallback
 				$language = $params['language'];
 		}
-        $entries = $this->createJSON($suggestions, $language, $lookup);
-		if($search)	{
-			$entries = $this->filterByPrefix($entries, $search);
+        $limit = $params['limit'];
+        $continue = $params['continue'];
+		$resultSize = $continue + $limit;
+
+		$entries = $this->generateSuggestions($params["entity"], $params['properties'][0], $search, $language);
+		
+		if ( count( $entries ) < $resultSize && $search ) {
+			$entries = $this->mergeWithTraditionalSearchResults( $entries, $resultSize, $search, $language );
 		}
-		
-		//get traditional search results
-		if(count($entries) < $limit + $continue && $search) {
-			$searchEntitiesParameters = new DerivativeRequest( 
-				$this->getRequest(),
-				array(
-				'limit' => $limit + $continue, //search results can overlap with suggestions. Think!
-				'continue' => 0,
-				'search' => $search,
-				'action' => 'wbsearchentities',
-				'language' => $language,
-				'type' => Property::ENTITY_TYPE)
-			);
-			$api = new ApiMain($searchEntitiesParameters);
-			$api->execute();
-			$searchEntitesResult = $api->getResultData();
-			$searchResult = $searchEntitesResult['search'];
-			
-			//avoid duplicates
-			$existingKeys = array();
-			foreach($entries as $sug) {
-				$existingKeys[$sug["id"]] = true;
-			}
-			
-			$noDuplicateEntries = array();
-			$distinctCount = 0;
-			foreach($searchResult as $sr) {
-				if(!isset($existingKeys[$sr["id"]])) {
-					$noDuplicateEntries[] = $sr;
-					$distinctCount++;
-					if( (count($sliced_entries) + $distinctCount) >= ($limit + $continue) ) {
-						break;
-					}
-				}
-			}		
-			$entries = array_merge($entries, $noDuplicateEntries);
-		}
-		
-		//merge search result sets
-        $sliced_entries = array_slice($entries, $continue, $limit);	
-		
-		//define Result
-        $this->getResult()->addValue(null, 'search', $sliced_entries);
-        $this->getResult()->addValue(null, 'success', 1);
-        if ( count($entries) > $continue + $limit) {
-            $this->getResult()->addValue(null, 'search-continue', $continue + $limit);
+
+		// Define Result
+		$slicedEntries = array_slice( $entries, $continue, $limit );
+        $this->getResult()->addValue( null, 'search', $slicedEntries );
+        $this->getResult()->addValue( null, 'success', 1 );
+        if ( count( $entries ) > $resultSize ) {
+            $this->getResult()->addValue( null, 'search-continue', $resultSize );
         }
-        $this->getResult()->addValue('searchinfo', 'search', $search );
+        $this->getResult()->addValue( 'searchinfo', 'search', $search );
     }
 	
-	public function filterByPrefix($entries, $search)
+	public function generateSuggestions($entity, $propertyList, $search, $language)
+	{
+		$suggester = new SimplePHPSuggester();
+        $lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+        if ( isset( $entity ) ) {
+                $id = new  ItemId( $entity );
+                $entity = $lookup->getEntity( $id );
+                $suggestions = $suggester->suggestionsByItem( $entity, 1000 );
+        } else {
+                $splittedList = explode( ',', $propertyList );
+                $intList = array_map( 'cleanPropertyId', $splittedList );
+
+                $suggestions = $suggester->suggestionsByAttributeList( $intList, 1000 );
+        }
+
+		// Build result Array
+        $entries = $this->createJSON( $suggestions, $language, $lookup );
+		if ( $search )	{
+			$entries = $this->filterByPrefix( $entries, $search );
+		}
+		return $entries;
+	}
+	
+	public function mergeWithTraditionalSearchResults(& $entries, $resultSize, $search, $language)
+	{
+		$searchEntitiesParameters = new DerivativeRequest(
+			$this->getRequest(),
+			array(
+			'limit' => $resultSize + 1, // search results can overlap with suggestions. Think! +1 beacause we wanna know if "more"-butten should be enabled
+			'continue' => 0,
+			'search' => $search,
+			'action' => 'wbsearchentities',
+			'language' => $language,
+			'type' => Property::ENTITY_TYPE )
+		);
+		$api = new ApiMain( $searchEntitiesParameters );
+		$api->execute();
+		$searchEntitesResult = $api->getResultData();
+		$searchResult = $searchEntitesResult['search'];
+
+		// Avoid duplicates
+		$existingKeys = array();
+		foreach ( $entries as $sug ) {
+			$existingKeys[$sug['id']] = true;
+		}
+
+		$noDuplicateEntries = array();
+		$distinctCount = 0;
+		foreach ( $searchResult as $sr ) {
+			if ( !isset( $existingKeys[$sr['id']] ) ) {
+				$noDuplicateEntries[] = $sr;
+				$distinctCount++;
+				if ( ( count( $entries ) + $distinctCount ) > ( $resultSize ) ) {
+					break;
+				}
+			}
+		}
+		return array_merge( $entries, $noDuplicateEntries );
+	}
+	
+	public function filterByPrefix( $entries, $search )
 	{
 		$matchingEntries = array();
-		foreach($entries as $entry)
-		{
-			if( 0 == strcasecmp( $search, substr($entry["label"], 0, strlen($search) ) ) )                
-			{
+		foreach ( $entries as $entry ) {
+			if ( 0 == strcasecmp( $search, substr( $entry['label'], 0, strlen( $search ) ) ) ) {
 				$matchingEntries[] = $entry;
 			}
 		}
 		return $matchingEntries;
 	}
-	
-	public function createJSON($suggestions, $language, $lookup) {
+
+	public function createJSON( $suggestions, $language, $lookup ) {
 		$entries = array();
-        foreach($suggestions as $suggestion){
+        foreach ( $suggestions as $suggestion ) {
             $entry = array();
-            $id = new PropertyId("P" . $suggestion->getPropertyId());
-            $property = $lookup->getEntity($id);
+            $id = new PropertyId( 'P' . $suggestion->getPropertyId() );
+            $property = $lookup->getEntity( $id );
 			$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
-			
-            if ($property == null) {
+
+            if ( $property == null ) {
                 continue;
             }
-            $entry["id"] = "P".$suggestion->getPropertyId();
-            $entry["label"] = $property->getLabel($language);   
-			$entry["description"] = $property->getDescription($language);
-			$entry["correlation"] = $suggestion->getCorrelation();
-			$entry["url"] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry["debug:type"] = "suggestion"; //debug
+            $entry['id'] = 'P' . $suggestion->getPropertyId();
+            $entry['label'] = $property->getLabel( $language );
+			$entry['description'] = $property->getDescription( $language );
+			$entry['correlation'] = $suggestion->getCorrelation();
+			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
+			$entry['debug:type'] = 'suggestion'; // debug
             $entries[] = $entry;
         }
 		return $entries;
