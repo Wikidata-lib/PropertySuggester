@@ -1,12 +1,10 @@
 <?php
-
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\Item;
-use Wikibase\Property;
-use Wikibase\StoreFactory;
 //ToDo: use Wikibase\LanguageFallbackChainFactory;
-use Wikibase\Repo\WikibaseRepo;
+
+use Wikibase\Api\SearchEntities;
+use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\StoreFactory;
 use Wikibase\Utils;
 
 include 'Suggesters/SimplePHPSuggester.php';
@@ -18,14 +16,12 @@ include 'Suggesters/SimplePHPSuggester.php';
  * @licence GNU GPL v2+
  */
 
-
 function cleanPropertyId($propertyId) {
     if ($propertyId[0] === 'P') {
             return (int)substr($propertyId, 1);
     }
     return (int)$propertyId;
 }
-
 
 class GetSuggestions extends ApiBase {
 
@@ -57,11 +53,13 @@ class GetSuggestions extends ApiBase {
         if (isset( $params['entity'] )){
                 $id = new  ItemId($params['entity']);
                 $entity = $lookup->getEntity($id);
+
                 $suggestions = $suggester->suggestionsByItem($entity, 1000);
         } else {
                 $list = $params['properties'][0];
                 $splitted_list = explode(",", $list);
                 $int_list = array_map("cleanPropertyId", $splitted_list);
+
                 $suggestions = $suggester->suggestionsByAttributeList($int_list, 1000);
         }
         
@@ -71,13 +69,62 @@ class GetSuggestions extends ApiBase {
 		}
         
         $entries = $this->createJSON($suggestions, $language, $lookup);
+		
 		if($search)
 		{
 			$entries = $this->filterByPrefix($entries, $search);
 		}
         
         $sliced_entries = array_slice($entries, $continue, $limit);
-        
+		
+		if(count(sliced_entries) < $limit && $search)
+		{
+			$apicallcontinue = $continue - count($sliced_entries);
+			$apicallcontinue = $apicallcontinue < 0 ? 0 : $apicallcontinue;
+			$searchEntitiesParameters = new DerivativeRequest( 
+				$this->getRequest(),
+				array(
+				'limit' => $limit, //search results can overlap with suggestions. Think!
+				'continue' => $apicallcontinue,
+				'search' => $search,
+				'action' => 'wbsearchentities',
+				'language' => $language,
+				'type' => \Wikibase\Property::ENTITY_TYPE)
+			);
+			
+			
+			$api = new ApiMain($searchEntitiesParameters);
+			$api->execute();
+			$searchEntitesResult = $api->getResultData();
+			$searchResult = $searchEntitesResult['search'];
+			$noDuplicateEntries = array();
+			$distinctCount = 0;
+			foreach($searchResult as $sr)
+			{
+				$duplicate = false;
+				foreach($sliced_entries as $sug)
+				{
+					if($sr["id"] === $sug["id"])
+					{
+						$duplicate = true;
+						break;
+					}
+				}
+				if(!$duplicate)
+				{
+					$noDuplicateEntries[] = $sr;
+					$distinctCount++;
+					if($distinctCount > $limit - count(sliced_entries))
+					{
+						break;
+					}
+				}
+			}
+			$sliced_entries = array_merge($sliced_entries, $noDuplicateEntries);
+		}
+		
+		
+		
         $this->getResult()->addValue(null, 'search', $sliced_entries);
         $this->getResult()->addValue(null, 'success', 1);
         if ( count($entries) > $continue + $limit) {
@@ -99,7 +146,6 @@ class GetSuggestions extends ApiBase {
 		return $matchingEntries;
 	}
 	
-	
 	public function createJSON($suggestions, $language, $lookup) {
 		$entries = array();
         foreach($suggestions as $suggestion){
@@ -112,7 +158,9 @@ class GetSuggestions extends ApiBase {
             $entry["id"] = "P".$suggestion->getPropertyId();
             $entry["label"] = $property->getLabel($language);   
 			$entry["description"] = $property->getDescription($language);
+			$entry["correlation"] = $suggestion->getCorrelation();
             $entry["url"] = "http://127.0.0.1/devrepo/w/index.php/Property:" . $entry["id"]; //TODO get url!
+			$entry["debug:type"] = "suggestion"; //debug
             $entries[] = $entry;
         }
 		return $entries;
@@ -153,7 +201,7 @@ class GetSuggestions extends ApiBase {
 			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
 			)
-        );
+		);
     }
 
     /**
@@ -164,7 +212,9 @@ class GetSuggestions extends ApiBase {
                     'entity' => 'Suggest attributes for given entity',
                     'properties' => 'Identifier for the site on which the corresponding page resides',
                     'size' => 'Specify number of suggestions to be returned',
-                    'language' => 'language for result'
+                    'language' => 'language for result',
+					'limit' => 'Maximal number of results',
+					'continue' => 'Offset where to continue a search'
             ) );
     }
 
@@ -192,5 +242,4 @@ class GetSuggestions extends ApiBase {
     protected function getExamples() {
         return array();
     }
-
 }
