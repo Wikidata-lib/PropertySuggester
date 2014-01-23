@@ -94,7 +94,7 @@ class GetSuggestions extends ApiBase {
 			//avoid duplicates
 			$existingKeys = array();
 			foreach($entries as $sug) {
-				$exitingKeys[$sug["id"]] = true;
+				$existingKeys[$sug["id"]] = true;
 			}
 			
 			$noDuplicateEntries = array();
