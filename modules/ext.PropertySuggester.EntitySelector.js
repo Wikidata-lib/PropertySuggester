@@ -14,22 +14,27 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 
 		self._oldCreate.apply(self, arguments);
 
-		if (self.__useSuggester()) {
-			var handler = function() {
-				if (self.value() === '') {
-					self.search('*');
+		if ( self.__useSuggester() ) {
+			var inputhandler = function() {
+				if ( self.value() === '' ) {
+					self.search( '*' );
 				}
 			};
+			self.element.bind('input', inputhandler);
 
-			self.element.focus(handler);
-			self.element.bind('input', handler);
+			var focushandler = function() {
+				if ( self.value() === '' && !self.menu.element.is( ':visible' ) ) {
+					self.search( '*' );
+				}
+			};
+			self.element.focus(focushandler);
 		}
 	},
 
 	_oldRequest: $.wikibase.entityselector.prototype._request,
 
 	_request: function( request, suggest ) {
-		if (this.__useSuggester() && !$.isEmptyObject(JSON.parse(wbEntity).claims)) {
+		if ( this.__useSuggester() && !$.isEmptyObject( JSON.parse(wbEntity).claims ) ) {
 			this._term = request.term;
 			if ( !this._continueSearch ) {
 					this.offset = 0;
