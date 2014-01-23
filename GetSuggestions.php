@@ -77,7 +77,7 @@ class GetSuggestions extends ApiBase {
         
         $sliced_entries = array_slice($entries, $continue, $limit);
 		
-		if(count(sliced_entries) < $limit && $search)
+		if(count($sliced_entries) < $limit && $search)
 		{
 			$apicallcontinue = $continue - count($sliced_entries);
 			$apicallcontinue = $apicallcontinue < 0 ? 0 : $apicallcontinue;
@@ -114,7 +114,7 @@ class GetSuggestions extends ApiBase {
 				{
 					$noDuplicateEntries[] = $sr;
 					$distinctCount++;
-					if($distinctCount > $limit - count(sliced_entries))
+					if($distinctCount + 1 > ($limit - count($sliced_entries)))
 					{
 						break;
 					}
