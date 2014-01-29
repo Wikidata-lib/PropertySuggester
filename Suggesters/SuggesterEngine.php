@@ -8,8 +8,8 @@ interface SuggesterEngine {
 	 *
 	 * @since 0.1
 	 *
-	 * @return Snak
+	 * @return Suggestion[]
 	 */
-	public function suggestionsByAttributeValuePairs($attributeValuePairs, $resultSize);
-	public function suggestionsByItem($entity, $resultSize);
+	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize );
+	public function suggestionsByItem( $entity, $resultSize );
 }
