@@ -162,7 +162,9 @@ class GetSuggestions extends ApiBase {
 			}
 			$entry['id'] = $id->getPrefixedId();
 			$entry['label'] = $property->getLabel( $language );
-			$entry['aliases'] = $property->getAliases( $language );
+			if ( $aliases = $property->getAliases( $language ) ) {
+				$entry['aliases'] = $aliases;
+			}
 			$entry['description'] = $property->getDescription( $language );
 			$entry['correlation'] = $suggestion->getCorrelation();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
