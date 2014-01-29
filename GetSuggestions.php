@@ -141,9 +141,11 @@ class GetSuggestions extends ApiBase {
 		if ( stripos( $entry['label'], $search ) === 0 ) {
 			return true;
 		}
-		foreach ( $entry['aliases'] as $alias ) {
-			if ( stripos( $alias, $search ) === 0 ) {
-				return true;
+		if ( $entry['aliases'] ) {
+			foreach ( $entry['aliases'] as $alias ) {
+				if ( stripos( $alias, $search ) === 0 ) {
+					return true;
+				}
 			}
 		}
 		return false;
