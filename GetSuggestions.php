@@ -36,17 +36,15 @@ class GetSuggestions extends ApiBase {
 	public function execute() {
 		$params = $this->extractRequestParams();
 
-		// Understand params
+		// parse params
 		if ( ! ( isset( $params['entity'] ) xor isset( $params['properties'] ) ) ) {
 			wfProfileOut( __METHOD__ );
 			$this->dieUsage( 'provide either entity id parameter \'entity\' or list of properties \'properties\'', 'param-missing' );
 		}
-
 		$search = '';
 		if ( isset( $params['search'] ) && $params['search'] != '*' ) {
 			$search = $params['search'];
-		} 
-		
+		}
 		$language = 'en';
 		if ( isset( $params['language'] ) ) { // TODO: use fallback
 			$language = $params['language'];
@@ -77,11 +75,11 @@ class GetSuggestions extends ApiBase {
 		if ( $entity !== null ) {
 			$id = new  ItemId( $entity );
 			$entity = $lookup->getEntity( $id );
-			$suggestions = $suggester->suggestionsByItem( $entity, 1000 );
+			$suggestions = $suggester->suggestionsByItem( $entity );
 		} else {
 			$splittedList = explode( ',', $propertyList );
 			$intList = array_map( 'cleanPropertyId', $splittedList );
-			$suggestions = $suggester->suggestionsByAttributeList( $intList, 1000 );
+			$suggestions = $suggester->suggestionsByAttributeList( $intList );
 		}
 
 		// Build result Array
@@ -128,17 +126,29 @@ class GetSuggestions extends ApiBase {
 		return $entries;
 	}
 
-	public function filterByPrefix( $entries, $search )
+	protected function filterByPrefix( $entries, $search )
 	{
 		$matchingEntries = array();
 		foreach ( $entries as $entry ) {
-			if ( stripos( $entry['label'], $search ) === 0 ) {
+			if ($this->isMatch($entry, $search)) {
 				$matchingEntries[] = $entry;
 			}
 		}
 		return $matchingEntries;
 	}
-
+	
+	protected function isMatch( $entry, $search ) {
+		if ( stripos( $entry['label'], $search ) === 0 ) {
+			return true;
+		}
+		foreach ( $entry['aliases'] as $alias ) {
+			if ( stripos( $alias, $search ) === 0 ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public function createJSON( $suggestions, $language, $lookup ) {
 		$entries = array();
 		foreach ( $suggestions as $suggestion ) {
@@ -147,11 +157,12 @@ class GetSuggestions extends ApiBase {
 			$property = $lookup->getEntity( $id );
 			$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
 
-			if ( $property == null ) {
+			if ( $property === null ) {
 				continue;
 			}
 			$entry['id'] = $id->getPrefixedId();
 			$entry['label'] = $property->getLabel( $language );
+			$entry['aliases'] = $property->getAliases( $language );
 			$entry['description'] = $property->getDescription( $language );
 			$entry['correlation'] = $suggestion->getCorrelation();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
