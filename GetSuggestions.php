@@ -132,7 +132,7 @@ class GetSuggestions extends ApiBase {
 	{
 		$matchingEntries = array();
 		foreach ( $entries as $entry ) {
-			if ( 0 === strpos( $entry['label'], $search ) ) {
+			if ( stripos( $entry['label'], $search ) === 0 ) {
 				$matchingEntries[] = $entry;
 			}
 		}
