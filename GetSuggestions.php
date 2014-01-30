@@ -37,16 +37,16 @@ class GetSuggestions extends ApiBase {
 		$params = $this->extractRequestParams();
 
 		// parse params
-		if ( ! ( isset( $params['entity'] ) xor isset( $params['properties'] ) ) ) {
+		if ( ! ($params['entity'] xor $params['properties']) ) {
 			wfProfileOut( __METHOD__ );
-			$this->dieUsage( 'provide either entity id parameter \'entity\' or list of properties \'properties\'', 'param-missing' );
+			$this->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
 		}
 		$search = '';
-		if ( isset( $params['search'] ) && $params['search'] != '*' ) {
+		if ( $params['search'] && $params['search'] !== '*' ) {
 			$search = $params['search'];
 		}
 		$language = 'en';
-		if ( isset( $params['language'] ) ) { // TODO: use fallback
+		if ( $params['language'] ) { // TODO: use fallback
 			$language = $params['language'];
 		}
 		
@@ -68,8 +68,7 @@ class GetSuggestions extends ApiBase {
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
 	}
 
-	public function generateSuggestions( $entity, $propertyList, $search, $language )
-	{
+	public function generateSuggestions( $entity, $propertyList, $search, $language ) {
 		$suggester = new SimplePHPSuggester();
 		$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		if ( $entity !== null ) {
@@ -80,7 +79,7 @@ class GetSuggestions extends ApiBase {
 			$splittedList = explode( ',', $propertyList );
 			$intList = array_map( 'cleanPropertyId', $splittedList );
 			$suggestions = $suggester->suggestionsByAttributeList( $intList );
-		}
+		} 
 
 		// Build result Array
 		$entries = $this->createJSON( $suggestions, $language, $lookup );
@@ -90,8 +89,7 @@ class GetSuggestions extends ApiBase {
 		return $entries;
 	}
 
-	public function mergeWithTraditionalSearchResults( & $entries, $resultSize, $search, $language )
-	{
+	public function mergeWithTraditionalSearchResults( & $entries, $resultSize, $search, $language ) {
 		$searchEntitiesParameters = new DerivativeRequest(
 			$this->getRequest(),
 			array(
@@ -126,8 +124,7 @@ class GetSuggestions extends ApiBase {
 		return $entries;
 	}
 
-	protected function filterByPrefix( $entries, $search )
-	{
+	protected function filterByPrefix( $entries, $search ) {
 		$matchingEntries = array();
 		foreach ( $entries as $entry ) {
 			if ($this->isMatch($entry, $search)) {
