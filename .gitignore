@@ -4,3 +4,4 @@
 .*.swp
 parser/env/
 /nbproject/private/
+CodingStylesScript.php
