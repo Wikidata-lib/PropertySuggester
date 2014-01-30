@@ -34,7 +34,7 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 	_oldRequest: $.wikibase.entityselector.prototype._request,
 
 	_request: function( request, suggest ) {
-		if ( this.__useSuggester() && !$.isEmptyObject( JSON.parse(wbEntity).claims ) ) {
+		if ( this.__useSuggester() ) {
 			this._term = request.term;
 			if ( !this._continueSearch ) {
 					this.offset = 0;

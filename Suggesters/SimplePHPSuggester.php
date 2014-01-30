@@ -22,6 +22,9 @@ class SimplePHPSuggester implements SuggesterEngine {
 
 	// this function is not part of SuggesterEngine.php?!
 	public function suggestionsByAttributeList( $attributeList, $resultSize = -1, $threshold = 0 ) {
+		if (! $attributeList ) {
+			return array();
+		}		
 		$suggestionIds = implode( ", ", $attributeList );
 		$excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
 		$dbr = wfGetDB( DB_SLAVE );
