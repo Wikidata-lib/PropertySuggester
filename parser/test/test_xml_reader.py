@@ -41,17 +41,6 @@ class CsvReaderTest(AbstractUniverseTest):
         self.result = list(CsvReader.read_csv(out))
 
 
-class CompressedCsvReaderTest(AbstractUniverseTest):
-    def setUp(self):
-        TestCase.setUp(self)
-        with gzip.open("test/Wikidata-Q1.xml.gz", "r") as f:
-            out = StringIO()
-            # for testing generate csv from xml just to parse it again
-            CsvWriter.write_compressed_csv(XmlReader.read_xml(f), out)
-            out.seek(0)
-        self.result = list(CsvReader.read_compressed_csv(out))
-
-
 class MultiprocessingBigTest(TestCase):
     def test_simple_multiprocessing(self):
         r1 = list(XmlReader.read_xml(gzip.open("test/Wikidata-Q1.xml.gz"), 1))

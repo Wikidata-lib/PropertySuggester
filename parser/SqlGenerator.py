@@ -1,8 +1,12 @@
 import argparse
-import CsvReader
-import TableGenerator
 import MySQLdb
 import time
+
+import CsvReader
+import TableGenerator
+from CompressedFileType import CompressedFileType
+
+
 def pushDictContentIntoDB(table, db):
     db.execute("CREATE TABLE IF NOT EXISTS wbs_properties(pid INT, count INT, type varchar(20), primary key(pid))")
     db.execute("CREATE TABLE IF NOT EXISTS wbs_propertyPairs(pid1 INT, pid2 INT, count INT, correlation FLOAT, primary key(pid1, pid2))")
