@@ -1,6 +1,8 @@
 import argparse
 import CsvReader
+
 from collections import defaultdict
+from CompressedFileType import CompressedFileType
 
 def computeTable(generator):
     table = {}
