@@ -5,7 +5,7 @@ namespace Wikibase\Test\Api;
  *
  * @covers PropertySuggester\GetSuggestions
  * 
- * @group PropertySuggester
+ * @group Extensions/PropertySuggester
  * 
  * @group API
  * @group Database

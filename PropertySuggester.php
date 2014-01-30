@@ -29,6 +29,7 @@ $wgAPIModules['wbsgetsuggestions']				= 'GetSuggestions';
 $wgAPIModules['wbsgetmisfits']					= 'GetMisfits';
 
 $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
+$wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
 
 $wgResourceModules['ext.PropertySuggester'] = array(
 		'scripts'		=> array( 'modules/ext.PropertySuggester.js' ),
