@@ -4,10 +4,6 @@ use Wikibase\DataModel\Entity\PropertyId;
 
 include "SuggesterEngine.php";
 
-function compare_pairs( $a, $b ) {
-	return $a->getCorrelation() > $b->getCorrelation() ? -1 : 1;
-}
-
 class SimplePHPSuggester implements SuggesterEngine {
 	private $deprecatedPropertyIds = "107";
 	private $propertyRelations = array();
@@ -21,19 +17,20 @@ class SimplePHPSuggester implements SuggesterEngine {
 	}
 
 	// this function is not part of SuggesterEngine.php?!
-	public function suggestionsByAttributeList( $attributeList, $resultSize = -1, $threshold = 0 ) {
-		if (! $attributeList ) {
+	public function suggestionsByAttributeList( $attributeList, $resultSize=-1, $threshold=0 ) {
+		if ( !$attributeList ) {
 			return array();
 		}		
 		$suggestionIds = implode( ", ", $attributeList );
 		$excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
+		$count = count( $attributeList );
 		$dbr = wfGetDB( DB_SLAVE );
 		$query =  
 		  "SELECT pid2 AS pid, sum(correlation)/" . count( $attributeList ) . " AS cor
 			FROM wbs_propertypairs
 			WHERE pid1 IN ($suggestionIds) AND pid2 NOT IN ($excludedIds)
 			GROUP BY pid2
-			HAVING sum(correlation)/" . count( $attributeList ) . " > $threshold
+			HAVING sum(correlation)/$count > $threshold
 			ORDER BY cor DESC";
 		if ( ((int)$resultSize) >= 0 ) {
 			$query = $query . " LIMIT $resultSize";
