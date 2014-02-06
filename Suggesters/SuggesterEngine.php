@@ -3,10 +3,14 @@
 include "Suggestion.php";
 
 interface SuggesterEngine {
+
 	/**
 	 * Returns suggested attributes
 	 *
 	 * @since 0.1
+	 *
+	 * @param array $attributeValuePairs
+	 * @param $resultSize
 	 *
 	 * @return Suggestion[]
 	 */

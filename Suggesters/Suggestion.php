@@ -1,45 +1,51 @@
 <?php
 
+use Wikibase\DataModel\Entity\PropertyId;
+
+/**
+ * Suggestion record
+ *
+ * @license GPL 2+
+ * @author ...
+ */
 class Suggestion {
 
+	/**
+	 * @var PropertyId
+	 */
 	private $propertyId;
-	private $correlation;
-	private $suggestedValue;
 
 	/**
-	 * constructor 
-	 * 
-	 * @param type $propertyId PropertyId
-	 * @param type $correlation float
-	 * @param type $suggestedValue not used yet!
+	 * @var float
 	 */
-	function __construct( $propertyId, $correlation, $suggestedValue = null ) {
+	private $correlation;
+
+	/**
+	 * @param PropertyId $propertyId
+	 * @param float $correlation
+	 *
+	 * @throws InvalidArgumentException
+	 */
+	function __construct( PropertyId $propertyId, $correlation ) {
+		if ( !is_float( $correlation ) ) {
+			throw new InvalidArgumentException( '$correlation must be a float' );
+		}
+
 		$this->propertyId = $propertyId;
 		$this->correlation = $correlation;
-		$this->suggestedValue = $suggestedValue;
 	}
 
+	/**
+	 * @return PropertyId
+	 */
 	public function getPropertyId() {
 		return $this->propertyId;
 	}
 
+	/**
+	 * @return float
+	 */
 	public function getCorrelation() {
 		return $this->correlation;
-	}
-
-	public function getSuggestedValue() {
-		return $this->suggestedValue;
-	}
-
-	public function setPropertyId( $propertyId ) {
-		$this->propertyId = $propertyId;
-	}
-
-	public function setCorrelation( $correlation ) {
-		$this->correlation = $correlation;
-	}
-
-	public function setSuggestedValue( $suggestedValue ) {
-		$this->suggestedValue = $suggestedValue;
 	}
 }

@@ -34,18 +34,23 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
+		wfProfileIn( __METHOD__ );
 		$params = $this->extractRequestParams();
 
 		// parse params
-		if ( ! ($params['entity'] xor $params['properties']) ) {
+		if ( !( $params['entity'] xor $params['properties'] ) ) {
 			wfProfileOut( __METHOD__ );
 			$this->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
 		}
+
 		$search = '';
+
 		if ( $params['search'] && $params['search'] !== '*' ) {
 			$search = $params['search'];
 		}
+
 		$language = 'en';
+
 		if ( $params['language'] ) { // TODO: use fallback
 			$language = $params['language'];
 		}
@@ -62,9 +67,11 @@ class GetSuggestions extends ApiBase {
 		$slicedEntries = array_slice( $entries, $params['continue'], $params['limit'] );
 		$this->getResult()->addValue( null, 'search', $slicedEntries );
 		$this->getResult()->addValue( null, 'success', 1 );
+
 		if ( count( $entries ) > $resultSize ) {
 			$this->getResult()->addValue( null, 'search-continue', $resultSize );
 		}
+
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
 	}
 
@@ -202,6 +209,7 @@ class GetSuggestions extends ApiBase {
 			),
 			'language' => array(
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
 			),
 			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
