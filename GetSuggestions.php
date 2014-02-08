@@ -82,7 +82,7 @@ class GetSuggestions extends ApiBase {
 		} 
 
 		// Build result Array
-		$entries = $this->createJSON( $suggestions, $language, $lookup );
+		$entries = $this->createJSON( $suggestions, $language );
 		if ( $search )	{
 			$entries = $this->filterByPrefix( $entries, $search );
 		}
@@ -148,30 +148,46 @@ class GetSuggestions extends ApiBase {
 		return false;
 	}
 	
-	public function createJSON( $suggestions, $language, $lookup ) {
+	public function createJSON( $suggestions, $language ) {
 		$entries = array();
+                $ids = array();
+                $entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
 		foreach ( $suggestions as $suggestion ) {
-			$entry = array();
 			$id = $suggestion->getPropertyId();
-			$property = $lookup->getEntity( $id );
-			$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
-
-			if ( $property === null ) {
-				continue;
-			}
+                        $ids[] = $id;
+                }
+		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );	
+		foreach ( $suggestions as $suggestion ) {
+                        $id = $suggestion->getPropertyId();
+			$entry = array();
 			$entry['id'] = $id->getPrefixedId();
-			$entry['label'] = $property->getLabel( $language );
-			if ( $aliases = $property->getAliases( $language ) ) {
-				$entry['aliases'] = $aliases;
-			}
-			$entry['description'] = $property->getDescription( $language );
-			$entry['correlation'] = $suggestion->getCorrelation();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry['debug_type'] = 'suggestion'; // debug
+                        $entry['rating'] = $suggestion->getCorrelation();
+
+			$aliases = array();
+			foreach ( $terms as $term ) {
+				if ( $term->getEntityId() === $id->getNumericId() ) {
+					if ( $term->getType() === 'label' ) {
+						$entry['label'] = $term->getText();
+					}
+					if ( $term->getType() === 'description' ) {
+						$entry['description'] = $term->getText();
+					}
+					if ( $term->getType() === 'alias' ) {
+						$aliases[] = $term->getText();	
+					}
+				}
+			}
+
+			if ( count( $aliases ) > 0 ) {
+				$entry['aliases'] = $aliases;
+				$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
+			}
+
 			$entries[] = $entry;
-		}
-		return $entries;
-	}
+                }
+                return $entries;
+        }
 
 	/**
 	 * @see ApiBase::getAllowedParams()
