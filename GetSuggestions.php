@@ -150,19 +150,20 @@ class GetSuggestions extends ApiBase {
 	
 	public function createJSON( $suggestions, $language ) {
 		$entries = array();
-                $ids = array();
-                $entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
+		$ids = array();
+		$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
-                        $ids[] = $id;
-                }
+			$ids[] = $id;
+		}
+		//See SearchEntities
 		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );	
 		foreach ( $suggestions as $suggestion ) {
-                        $id = $suggestion->getPropertyId();
+			$id = $suggestion->getPropertyId();
 			$entry = array();
 			$entry['id'] = $id->getPrefixedId();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-                        $entry['rating'] = $suggestion->getCorrelation();
+			$entry['rating'] = $suggestion->getCorrelation();
 
 			$aliases = array();
 			foreach ( $terms as $term ) {
@@ -185,9 +186,9 @@ class GetSuggestions extends ApiBase {
 			}
 
 			$entries[] = $entry;
-                }
-                return $entries;
-        }
+		}
+		return $entries;
+	}
 
 	/**
 	 * @see ApiBase::getAllowedParams()
