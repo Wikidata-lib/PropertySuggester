@@ -1,22 +1,23 @@
 """
-read_csv returns a generator that yields the tuple (title, [(p1, dt1, v1), (p2, dt1, v2),..])
-where
-p_n is a property
-d_n is a datatype
-v_n is a value
+read_csv returns a generator that yields the tuple (title, [claim1, claim2])
 
 usage:
 with open("file.csv", "r") as f:
-    for title, claim in read_csv(f):
+    for title, claims in read_csv(f):
         do_things()
 
 """
 
 import argparse, time
 from CompressedFileType import CompressedFileType
-
+from claim import Claim
 
 def read_csv(input_file, seperator=","):
+    """
+    @rtype : collections.Iterable[(string, list[Claim])]
+    @type input_file: file
+    @type seperator: str
+    """
     current_title = None
     claims = []
     for line in input_file:
@@ -26,7 +27,7 @@ def read_csv(input_file, seperator=","):
                 yield current_title, claims
             current_title = title
             claims = []
-        claims.append((prop, datatype, value))
+        claims.append(Claim(int(prop), datatype, value))
 
     if not current_title is None:
         yield current_title, claims

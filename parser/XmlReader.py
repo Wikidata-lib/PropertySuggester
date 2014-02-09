@@ -1,18 +1,16 @@
 
 """
-read_xml returns a generator that yields the tuple (title, [(p1, dt1, v1), (p2, dt1, v2),..])
-where
-p_n is a property
-d_n is a datatype
-v_n is a value
+read_xml returns a generator that yields the tuple (title, [claim1, claim2])
 
 usage:
-with open("file.xml", "r") as f:
-    for title, claim in read_xml(f):
+with open("file.csv", "r") as f:
+    for title, claims in read_xml(f):
         do_things()
+
 """
 import multiprocessing
 import time, argparse, traceback, signal
+from claim import Claim
 
 try:
     import ujson as json
@@ -41,6 +39,11 @@ def init_worker():
 
 
 def read_xml(input_file, thread_count=4):
+    """
+    @rtype : collections.Iterable[(string, list[Claim])]
+    @type input_file: file
+    @type thread_count: int
+    """
     if thread_count > 1:
         # thread_count -1 because one thread is for xml parsing
         pool = multiprocessing.Pool(thread_count-1, init_worker)
@@ -89,7 +92,7 @@ def _process_json((title, json_string)):
     claims = []
     for claim in data["claims"]:
         claim = claim["m"]
-        prop = str(claim[1])
+        prop = claim[1]
         if claim[0] == "value":
             datatype = claim[2]
             if datatype == "string":
@@ -109,7 +112,7 @@ def _process_json((title, json_string)):
         else:
             datatype = value = claim[0]
 
-        claims.append((prop, datatype, value))
+        claims.append(Claim(prop, datatype, value))
     return title, claims
 
 if __name__ == "__main__":

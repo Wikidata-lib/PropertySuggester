@@ -4,22 +4,26 @@ import CsvReader
 from collections import defaultdict
 from CompressedFileType import CompressedFileType
 
-def computeTable(generator):
+def compute_table(generator):
+    """
+    :type generator: collections.Iterable[(string, list[Claim])]
+    :return: list[(string, list[Claim)]
+    """
     table = {}
     for entity, claims in generator:
-        for pid1, datatype, value in claims:
-            if not pid1 in table:
-                table[pid1] = defaultdict(int)
-                table[pid1]["type"] = datatype
-            table[pid1]["appearances"] += 1
-            for pid2, _, _ in claims:
-                if pid1 != pid2:
-                    table[pid1][pid2] += 1
+        for claim in claims:
+            if not claim.property_id in table:
+                table[claim.property_id] = defaultdict(int)
+                table[claim.property_id]["type"] = claim.datatype
+            table[claim.property_id]["appearances"] += 1
+            for claim2 in claims:
+                if claim.property_id != claim2.property_id:
+                    table[claim.property_id][claim2.property_id] += 1
     return table
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="this program generates a correlation-table from a CSV-file")
     parser.add_argument("input", help="The CSV input file (wikidata triple)", type=CompressedFileType('r'))
     args = parser.parse_args()
-    table = computeTable(CsvReader.read_csv(args.input))
+    table = compute_table(CsvReader.read_csv(args.input))
     print table

@@ -6,9 +6,14 @@ import XmlReader
 
 
 def write_csv(entities, output_file, sep=","):
+    """
+    @type entities: collections.Iterable[(string, list[Claim]]
+    @type output_file: file
+    @type sep: str
+    """
     for entity, claims in entities:
-        for prop, datatype, value in claims:
-            output_file.write((entity + sep + prop + sep + datatype + sep + value + "\n").encode("utf-8"))
+        for claim in claims:
+            output_file.write((entity + sep + str(claim.property_id) + sep + claim.datatype + sep + claim.value + "\n").encode("utf-8"))
 
 
 

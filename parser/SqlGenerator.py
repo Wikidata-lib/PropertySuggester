@@ -16,11 +16,11 @@ def pushDictContentIntoDB(table, db):
     print "properties: {0}".format(len(table))
     rowcount = 0
     for pid1, row in table.iteritems():
-        db.execute("INSERT INTO wbs_properties(pid, count, type) VALUES (%s, %s, %s)", (pid1, row["appearances"], row["type"]))
+        db.execute("INSERT INTO wbs_properties(pid, count, type) VALUES (?, ?, ?)", (pid1, row["appearances"], row["type"]))
         for pid2, value in row.iteritems():
             if pid1 != pid2 and pid2.isdigit() and value > 0:  # "appearances" and "type" is in the same table, ignore them
                 correlation = value/float(row["appearances"])
-                db.execute("INSERT INTO wbs_propertyPairs(pid1, pid2, count, correlation) VALUES (%s, %s, %s, %s)", (pid1, pid2, value, correlation))
+                db.execute("INSERT INTO wbs_propertyPairs(pid1, pid2, count, correlation) VALUES (?, ?, ?, ?)", (pid1, pid2, value, correlation))
                 rowcount += 1
                 if not rowcount % 1000:
                     print "rows {0}".format(rowcount)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     db = connection.cursor()
     start = time.time()
     print "computing table"
-    table = TableGenerator.computeTable(CsvReader.read_csv(args.input))
+    table = TableGenerator.compute_table(CsvReader.read_csv(args.input))
     print "done - {0:.2f}s".format(time.time()-start)
     print "writing to database"
     pushDictContentIntoDB(table, db)
