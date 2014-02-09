@@ -1,4 +1,3 @@
-from StringIO import StringIO
 import unittest
 from testtools import TestCase
 from testtools.matchers import *

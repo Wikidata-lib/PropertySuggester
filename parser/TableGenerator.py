@@ -6,8 +6,8 @@ from CompressedFileType import CompressedFileType
 
 def compute_table(generator):
     """
-    :type generator: collections.Iterable[(string, list[Claim])]
-    :return: list[(string, list[Claim)]
+    @type generator: collections.Iterable[(string, list[Claim])]
+    @return: dict[int, dict]
     """
     table = {}
     for entity, claims in generator:

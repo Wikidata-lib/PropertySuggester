@@ -12,16 +12,16 @@ import argparse, time
 from CompressedFileType import CompressedFileType
 from claim import Claim
 
-def read_csv(input_file, seperator=","):
+def read_csv(input_file, separator=","):
     """
     @rtype : collections.Iterable[(string, list[Claim])]
-    @type input_file: file
-    @type seperator: str
+    @type input_file: file or StringIO.StringIO
+    @type separator: str
     """
     current_title = None
     claims = []
     for line in input_file:
-        title, prop, datatype, value = line.strip().split(seperator, 3)
+        title, prop, datatype, value = line.strip().split(separator, 3)
         if current_title != title:
             if not current_title is None:
                 yield current_title, claims
@@ -39,7 +39,6 @@ if __name__ == "__main__":
                         type=CompressedFileType('r'))
     parser.add_argument("-s", "--silent", help="Show output", action="store_true")
     args = parser.parse_args()
-
 
     start = time.time()
     if args.silent:

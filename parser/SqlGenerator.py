@@ -7,7 +7,11 @@ import TableGenerator
 from CompressedFileType import CompressedFileType
 
 
-def pushDictContentIntoDB(table, db):
+def load_table_into_db(table, db):
+    """
+    @type table: dict[int, dict]
+    @type db: Cursor
+    """
     db.execute("CREATE TABLE IF NOT EXISTS wbs_properties(pid INT, count INT, type varchar(20), primary key(pid))")
     db.execute("CREATE TABLE IF NOT EXISTS wbs_propertyPairs(pid1 INT, pid2 INT, count INT, correlation FLOAT, primary key(pid1, pid2))")
     db.execute("DELETE FROM wbs_propertyPairs")
@@ -18,7 +22,7 @@ def pushDictContentIntoDB(table, db):
     for pid1, row in table.iteritems():
         db.execute("INSERT INTO wbs_properties(pid, count, type) VALUES (?, ?, ?)", (pid1, row["appearances"], row["type"]))
         for pid2, value in row.iteritems():
-            if pid1 != pid2 and pid2.isdigit() and value > 0:  # "appearances" and "type" is in the same table, ignore them
+            if pid1 != pid2 and isinstance(pid2, int) and value > 0:  # "appearances" and "type" is in the same table, ignore them
                 correlation = value/float(row["appearances"])
                 db.execute("INSERT INTO wbs_propertyPairs(pid1, pid2, count, correlation) VALUES (?, ?, ?, ?)", (pid1, pid2, value, correlation))
                 rowcount += 1
@@ -34,6 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("--user", help="username for DB", default="root")
     parser.add_argument("--pw", help="pw for DB", default="")
     args = parser.parse_args()
+
     connection = MySQLdb.connect(host=args.host, user=args.user, passwd=args.pw, db=args.db)
     db = connection.cursor()
     start = time.time()
@@ -41,7 +46,7 @@ if __name__ == "__main__":
     table = TableGenerator.compute_table(CsvReader.read_csv(args.input))
     print "done - {0:.2f}s".format(time.time()-start)
     print "writing to database"
-    pushDictContentIntoDB(table, db)
+    load_table_into_db(table, db)
     db.close()
     connection.commit()
 

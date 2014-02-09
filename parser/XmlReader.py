@@ -1,4 +1,3 @@
-
 """
 read_xml returns a generator that yields the tuple (title, [claim1, claim2])
 
@@ -21,16 +20,16 @@ except ImportError:
 try:
     import xml.etree.cElementTree as ElementTree
 except ImportError:
-    print "cElmentTree not found"
+    print "cElementTree not found"
     import xml.etree.ElementTree as ElementTree
 
 from CompressedFileType import CompressedFileType
 
 NS = "http://www.mediawiki.org/xml/export-0.8/"
-title_tag = "{"+NS+"}"+"title"
-text_tag = "{"+NS+"}"+"text"
-model_tag = "{"+NS+"}"+"model"
-page_tag = "{"+NS+"}"+"page"
+title_tag = "{" + NS + "}" + "title"
+text_tag = "{" + NS + "}" + "text"
+model_tag = "{" + NS + "}" + "model"
+page_tag = "{" + NS + "}" + "page"
 
 
 # http://noswap.com/blog/python-multiprocessing-keyboardinterrupt
@@ -41,12 +40,12 @@ def init_worker():
 def read_xml(input_file, thread_count=4):
     """
     @rtype : collections.Iterable[(string, list[Claim])]
-    @type input_file: file
+    @type input_file:  file or GzipFile or StringIO.StringIO
     @type thread_count: int
     """
     if thread_count > 1:
         # thread_count -1 because one thread is for xml parsing
-        pool = multiprocessing.Pool(thread_count-1, init_worker)
+        pool = multiprocessing.Pool(thread_count - 1, init_worker)
         try:
             for title, claims in pool.imap(_process_json, _get_xml(input_file)):
                 yield title, claims
@@ -78,7 +77,7 @@ def _get_xml(input_file):
         elif element.tag == page_tag:
             count += 1
             if count % 3000 == 0:
-                print "processed %.2fMB" % (input_file.tell() / 1024.0**2)
+                print "processed %.2fMB" % (input_file.tell() / 1024.0 ** 2)
             if model == "wikibase-item":
                 yield title, claim_json
         element.clear()
@@ -98,7 +97,7 @@ def _process_json((title, json_string)):
             if datatype == "string":
                 value = claim[3]
             elif datatype == "wikibase-entityid":
-                value = "Q"+str(claim[3]["numeric-id"])
+                value = "Q" + str(claim[3]["numeric-id"])
             elif datatype == "time":
                 value = claim[3]["time"]
             elif datatype == "globecoordinate":
@@ -115,6 +114,7 @@ def _process_json((title, json_string)):
         claims.append(Claim(prop, datatype, value))
     return title, claims
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="The XML input file (a wikidata dump), gzip is supported",
@@ -130,5 +130,5 @@ if __name__ == "__main__":
     else:
         for x in read_xml(args.input, args.processes):
             print x
-    
+
     print "total time: %.2fs" % (time.time() - start)
