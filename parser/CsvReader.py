@@ -10,8 +10,7 @@ with open("file.csv", "r") as f:
 
 import argparse, time
 from CompressedFileType import CompressedFileType
-from claim import Claim
-from entity import Entity
+from datatypes import Entity, Claim
 
 
 def read_csv(input_file, separator=","):

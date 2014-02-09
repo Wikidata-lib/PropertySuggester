@@ -9,8 +9,7 @@ with open("file.csv", "r") as f:
 """
 import multiprocessing
 import time, argparse, traceback, signal
-from claim import Claim
-from entity import Entity
+from datatypes import Entity, Claim
 
 try:
     import ujson as json

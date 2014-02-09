@@ -3,8 +3,7 @@ import unittest
 from testtools import TestCase
 from testtools.matchers import *
 import CsvWriter
-from claim import Claim
-from entity import Entity
+from datatypes import Entity, Claim
 
 test_data = [Entity('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
                             Claim(373, 'string', 'Europe')])]

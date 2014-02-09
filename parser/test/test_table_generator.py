@@ -2,8 +2,7 @@ import unittest
 from testtools import TestCase
 from testtools.matchers import *
 import TableGenerator
-from claim import Claim
-from entity import Entity
+from datatypes import Entity, Claim
 
 test_data1 = [Entity('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
                              Claim(373, 'string', 'Africa')]),

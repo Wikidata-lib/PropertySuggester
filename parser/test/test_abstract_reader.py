@@ -1,8 +1,7 @@
 from testtools import TestCase
 from testtools.matchers import *
 
-from claim import Claim
-from entity import Entity
+from datatypes import Entity, Claim
 
 
 class AbstractUniverseTest(TestCase):
