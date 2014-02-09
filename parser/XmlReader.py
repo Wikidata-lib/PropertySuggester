@@ -1,15 +1,16 @@
 """
-read_xml returns a generator that yields the tuple (title, [claim1, claim2])
+read_xml returns a generator that yields Entities)
 
 usage:
 with open("file.csv", "r") as f:
-    for title, claims in read_xml(f):
+    for entity in read_xml(f):
         do_things()
 
 """
 import multiprocessing
 import time, argparse, traceback, signal
 from claim import Claim
+from entity import Entity
 
 try:
     import ujson as json
@@ -39,7 +40,7 @@ def init_worker():
 
 def read_xml(input_file, thread_count=4):
     """
-    @rtype : collections.Iterable[(string, list[Claim])]
+    @rtype : collections.Iterable[Entity]
     @type input_file:  file or GzipFile or StringIO.StringIO
     @type thread_count: int
     """
@@ -47,8 +48,8 @@ def read_xml(input_file, thread_count=4):
         # thread_count -1 because one thread is for xml parsing
         pool = multiprocessing.Pool(thread_count - 1, init_worker)
         try:
-            for title, claims in pool.imap(_process_json, _get_xml(input_file)):
-                yield title, claims
+            for entity in pool.imap(_process_json, _get_xml(input_file)):
+                yield entity
         except KeyboardInterrupt:
             print "KeyboardInterrupt"
             pool.terminate()
@@ -86,7 +87,7 @@ def _get_xml(input_file):
 def _process_json((title, json_string)):
     data = json.loads(json_string)
     if not "claims" in data:
-        return title, []
+        return Entity(title, [])
 
     claims = []
     for claim in data["claims"]:
@@ -112,7 +113,7 @@ def _process_json((title, json_string)):
             datatype = value = claim[0]
 
         claims.append(Claim(prop, datatype, value))
-    return title, claims
+    return Entity(title, claims)
 
 
 if __name__ == "__main__":

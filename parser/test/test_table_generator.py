@@ -3,14 +3,15 @@ from testtools import TestCase
 from testtools.matchers import *
 import TableGenerator
 from claim import Claim
+from entity import Entity
 
-test_data1 = [('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
-                       Claim(373, 'string', 'Africa')]),
-              ('Q16', [Claim(31, 'wikibase-entityid', 'Q384')])]
+test_data1 = [Entity('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
+                             Claim(373, 'string', 'Africa')]),
+              Entity('Q16', [Claim(31, 'wikibase-entityid', 'Q384')])]
 
-test_data2 = [('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
-                       Claim(373, 'string', 'Africa'),
-                       Claim(373, 'string', 'Europe')])]
+test_data2 = [Entity('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
+                             Claim(373, 'string', 'Africa'),
+                             Claim(373, 'string', 'Europe')])]
 
 
 class TableGeneratorTest(TestCase):

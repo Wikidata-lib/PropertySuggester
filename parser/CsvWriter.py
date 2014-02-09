@@ -9,12 +9,12 @@ import XmlReader
 
 def write_csv(entities, output_file, sep=","):
     """
-    @type entities: collections.Iterable[(string, list[Claim]]
+    @type entities: collections.Iterable[Entity]
     @type output_file: file or StringIO.StringIO
     @type sep: str
     """
-    for entity, claims in entities:
-        for claim in claims:
+    for entity in entities:
+        for claim in entity.claims:
             output_file.write("{1}{0}{2}{0}{3}{0}{4}\n".format(sep, entity, claim.property_id, claim.datatype, claim.value).encode("utf-8"))
 
 

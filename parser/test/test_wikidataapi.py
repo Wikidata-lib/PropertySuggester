@@ -17,7 +17,7 @@ class WikiDataApiTest(TestCase):
         self.assertThat(result["search"], HasLength(3))
 
     def test_wbsgetsuggestions_by_properties(self):
-        result = self.api.wbs_getsuggestions(properties=[31,373], limit=2, cont=5)
+        result = self.api.wbs_getsuggestions(properties=[31, 373], limit=2, cont=5)
 
         self.assertThat(result["success"], Equals(1))
         self.assertThat(result["search-continue"], Equals(7))

@@ -40,14 +40,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     connection = MySQLdb.connect(host=args.host, user=args.user, passwd=args.pw, db=args.db)
-    db = connection.cursor()
+    cursor = connection.cursor()
     start = time.time()
     print "computing table"
-    table = TableGenerator.compute_table(CsvReader.read_csv(args.input))
+    t = TableGenerator.compute_table(CsvReader.read_csv(args.input))
     print "done - {0:.2f}s".format(time.time()-start)
     print "writing to database"
-    load_table_into_db(table, db)
-    db.close()
+    load_table_into_db(t, cursor)
+    cursor.close()
     connection.commit()
 
 

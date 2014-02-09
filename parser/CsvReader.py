@@ -1,9 +1,9 @@
 """
-read_csv returns a generator that yields the tuple (title, [claim1, claim2])
+read_csv returns a generator that yields Entities)
 
 usage:
 with open("file.csv", "r") as f:
-    for title, claims in read_csv(f):
+    for entity in read_csv(f):
         do_things()
 
 """
@@ -11,10 +11,12 @@ with open("file.csv", "r") as f:
 import argparse, time
 from CompressedFileType import CompressedFileType
 from claim import Claim
+from entity import Entity
+
 
 def read_csv(input_file, separator=","):
     """
-    @rtype : collections.Iterable[(string, list[Claim])]
+    @rtype : collections.Iterable[Entity]
     @type input_file: file or StringIO.StringIO
     @type separator: str
     """
@@ -30,7 +32,7 @@ def read_csv(input_file, separator=","):
         claims.append(Claim(int(prop), datatype, value))
 
     if not current_title is None:
-        yield current_title, claims
+        yield Entity(current_title, claims)
 
 
 if __name__ == "__main__":
