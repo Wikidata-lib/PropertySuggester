@@ -1,4 +1,6 @@
-import sys, time, argparse
+import sys
+import time
+import argparse
 
 from CompressedFileType import CompressedFileType
 import XmlReader
@@ -6,9 +8,14 @@ import XmlReader
 
 
 def write_csv(entities, output_file, sep=","):
-    for entity, claims in entities:
-        for prop, datatype, value in claims:
-            output_file.write((entity + sep + prop + sep + datatype + sep + value + "\n").encode("utf-8"))
+    """
+    @type entities: collections.Iterable[Entity]
+    @type output_file: file or StringIO.StringIO
+    @type sep: str
+    """
+    for entity in entities:
+        for claim in entity.claims:
+            output_file.write("{1}{0}{2}{0}{3}{0}{4}\n".format(sep, entity, claim.property_id, claim.datatype, claim.value).encode("utf-8"))
 
 
 
