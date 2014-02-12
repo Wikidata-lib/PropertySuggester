@@ -25,7 +25,7 @@ def read_csv(input_file, separator=","):
         title, prop, datatype, value = line.strip().split(separator, 3)
         if current_title != title:
             if not current_title is None:
-                yield current_title, claims
+                yield Entity(current_title, claims)
             current_title = title
             claims = []
         claims.append(Claim(int(prop), datatype, value))
