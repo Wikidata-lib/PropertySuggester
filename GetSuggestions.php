@@ -3,6 +3,7 @@
 
 
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
@@ -74,11 +75,15 @@ class GetSuggestions extends ApiBase {
 		if ( $entity !== null ) {
 			$id = new  ItemId( $entity );
 			$entity = $lookup->getEntity( $id );
-			$suggestions = $suggester->suggestionsByItem( $entity );
+			$suggestions = $suggester->suggestByItem( $entity );
 		} else {
-			$splittedList = explode( ',', $propertyList );
-			$intList = array_map( 'cleanPropertyId', $splittedList );
-			$suggestions = $suggester->suggestionsByAttributeList( $intList );
+			$splitList = explode( ',', $propertyList );
+			$intList = array_map( 'cleanPropertyId', $splitList );
+            $properties = array();
+            foreach ($intList as $id) {
+                $properties[] = PropertyId::newFromNumber($id);
+            }
+            $suggestions = $suggester->suggestByPropertyIds( $properties );
 		} 
 
 		// Build result Array
