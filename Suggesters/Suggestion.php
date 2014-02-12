@@ -1,45 +1,32 @@
 <?php
 
+use Wikibase\DataModel\Entity\PropertyId;
+
 class Suggestion {
 
 	private $propertyId;
-	private $correlation;
-	private $suggestedValue;
+	private $probability;
 
-	/**
-	 * constructor 
-	 * 
-	 * @param type $propertyId PropertyId
-	 * @param type $correlation float
-	 * @param type $suggestedValue not used yet!
-	 */
-	function __construct( $propertyId, $correlation, $suggestedValue = null ) {
+    /**
+     * @param PropertyId $propertyId
+     * @param float $probability
+     */
+    function __construct( PropertyId $propertyId, $probability) {
 		$this->propertyId = $propertyId;
-		$this->correlation = $correlation;
-		$this->suggestedValue = $suggestedValue;
+		$this->probability = $probability;
 	}
 
-	public function getPropertyId() {
+    /**
+     * @return PropertyId
+     */
+    public function getPropertyId() {
 		return $this->propertyId;
 	}
 
-	public function getCorrelation() {
-		return $this->correlation;
-	}
-
-	public function getSuggestedValue() {
-		return $this->suggestedValue;
-	}
-
-	public function setPropertyId( $propertyId ) {
-		$this->propertyId = $propertyId;
-	}
-
-	public function setCorrelation( $correlation ) {
-		$this->correlation = $correlation;
-	}
-
-	public function setSuggestedValue( $suggestedValue ) {
-		$this->suggestedValue = $suggestedValue;
+    /**
+     * @return float
+     */
+    public function getProbability() {
+		return $this->probability;
 	}
 }

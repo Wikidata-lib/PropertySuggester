@@ -7,14 +7,14 @@ include "Suggestion.php"; // TODO use autoload
 
 interface SuggesterEngine {
 
-    /**
-     * Returns suggested attributes
-     *
-     * @param PropertyId[] $properties
-     * @param int $limit
-     *
-     * @return Suggestion[]
-     */
+	/**
+	 * Returns suggested attributes
+	 *
+	 * @param PropertyId[] $propertyIds
+	 * @param int $limit
+	 *
+	 * @return Suggestion[]
+	 */
 	public function suggestByPropertyIds( $propertyIds, $limit = -1);
 
     /**

@@ -43,22 +43,22 @@ class SimplePHPSuggester implements SuggesterEngine {
 
         $res = $dbr->select(
             'wbs_propertypairs',
-            array( 'pid' => 'pid2', 'cor' => "sum(correlation)/$count" ),
+            array( 'pid' => 'pid2', 'cor' => "sum(probability)/$count" ),
             array( 'pid1 IN (' . $dbr->makeList($propertyIds) . ')',
                    'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
             __METHOD__,
             array(
                 'LIMIT' => 1000,
                 'GROUP BY' => 'pid2',
-                'HAVING' => "sum(correlation)/$count > $threshold",
-                'ORDER BY' => 'cor DESC'
+                'HAVING' => "sum(probability)/$count > $threshold",
+                'ORDER BY' => 'prob DESC'
             )
         );
 
 		$resultArray = array();
 		foreach ( $res as $row ) {
 			$pid = PropertyId::newFromNumber( (int)$row->pid );
-			$suggestion = new Suggestion( $pid, $row->cor, null, null );
+			$suggestion = new Suggestion( $pid, $row->prob );
 			$resultArray[] =  $suggestion;
 		}
 		return $resultArray;
@@ -83,8 +83,12 @@ class SimplePHPSuggester implements SuggesterEngine {
      * @return Suggestion[]
      */
     public function suggestByItem( Item $item, $limit = -1) {
-		$attributeValuePairs = $item->getAllSnaks();
-		return $this->suggestByPropertyIds( $attributeValuePairs, $limit );
+		$snaks = $item->getAllSnaks();
+		$numericIds = array();
+		foreach ( $snaks as $snak ) {
+			$numericIds[] = $snak->getPropertyId()->getNumericId();
+		}
+		return $this->getSuggestions( $numericIds, $limit );
 	}
 
 }
