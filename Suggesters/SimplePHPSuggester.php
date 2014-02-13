@@ -43,9 +43,9 @@ class SimplePHPSuggester implements SuggesterEngine {
 
 		$res = $dbr->select(
 			'wbs_propertypairs',
-			array( 'pid' => 'pid2', 'cor' => "sum(probability)/$count" ),
+			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
 			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
-				'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
+				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
 			__METHOD__,
 			array(
 				'LIMIT' => 1000,

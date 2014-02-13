@@ -45,15 +45,13 @@ class GetSuggestions extends ApiBase {
 			$this->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
 		}
 
-		$search = '';
-		if ( $params['search'] && $params['search'] !== '*' ) {
+		if ( $params['search'] !== '*' ) {
 			$search = $params['search'];
+		} else {
+			$search = '';
 		}
 
-		$language = 'en';
-		if ( $params['language'] ) {
-			$language = $params['language'];
-		}
+		$language = $params['language'];
 
 		$resultSize = $params['continue'] + $params['limit'];
 
@@ -188,7 +186,7 @@ class GetSuggestions extends ApiBase {
 	 * @param EntityLookup $lookup
 	 * @return array
 	 */
-	public function createJSON( $suggestions, $language, $lookup ) {
+	public function createJSON( $suggestions, $language, EntityLookup $lookup ) {
 		$entries = array();
 		foreach ( $suggestions as $suggestion ) {
 			$entry = array();
@@ -246,6 +244,7 @@ class GetSuggestions extends ApiBase {
 			),
 			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_DFLT => '',
 			)
 		);
 	}
