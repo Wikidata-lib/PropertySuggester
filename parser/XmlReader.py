@@ -108,8 +108,9 @@ def _process_json((title, json_string)):
             else:
                 print "WARNING unknown wikidata datatype: %s" % datatype
                 continue
-        else:
-            datatype = value = claim[0]
+        else: # novalue, somevalue, ...
+            datatype = "unknown"
+            value = claim[0]
 
         claims.append(Claim(prop, datatype, value))
     return Entity(title, claims)
