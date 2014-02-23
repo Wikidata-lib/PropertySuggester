@@ -1,14 +1,16 @@
 <?php
 
+use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\Item;
 
 include "SuggesterEngine.php";
 
 class SimplePHPSuggester implements SuggesterEngine {
-	private $deprecatedPropertyIds = "107";
+	private $deprecatedPropertyIds = [ 107 ];
 	private $propertyRelations = array();
 
-		public function getDeprecatedPropertyIds() {
+	public function getDeprecatedPropertyIds() {
 		return $this->deprecatedPropertyIds;
 	}
 
@@ -16,46 +18,81 @@ class SimplePHPSuggester implements SuggesterEngine {
 		return $this->propertyRelations;
 	}
 
-	// this function is not part of SuggesterEngine.php?!
-	public function suggestionsByAttributeList( $attributeList, $resultSize=-1, $threshold=0 ) {
-		if ( !$attributeList ) {
+	/**
+	 * @param int[] $propertyIds
+	 * @param int $limit
+	 * @param int $threshold
+	 * @throws InvalidArgumentException
+	 * @return Suggestion[]
+	 */
+	private function getSuggestions( $propertyIds, $limit = -1, $threshold = 0 ) {
+		if ( !$propertyIds ) {
 			return array();
-		}		
-		$suggestionIds = implode( ", ", $attributeList );
-		$excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
-		$count = count( $attributeList );
-		$dbr = wfGetDB( DB_SLAVE );
-		$query =  
-		  "SELECT pid2 AS pid, sum(correlation)/" . count( $attributeList ) . " AS cor
-			FROM wbs_propertypairs
-			WHERE pid1 IN ($suggestionIds) AND pid2 NOT IN ($excludedIds)
-			GROUP BY pid2
-			HAVING sum(correlation)/$count > $threshold
-			ORDER BY cor DESC";
-		if ( ((int)$resultSize) >= 0 ) {
-			$query = $query . " LIMIT $resultSize";
 		}
-		$res = $dbr->query($query);
+		if ( !is_int( $limit ) ) {
+			throw new InvalidArgumentException( '$limit must be an int' );
+		}
+		if ( !is_int( $threshold ) ) {
+			throw new InvalidArgumentException( '$threshold must be an int' );
+		}
+
+
+		$dbr = wfGetDB( DB_SLAVE );
+		$excludedIds = array_merge( $propertyIds, $this->getDeprecatedPropertyIds() );
+		$count = count( $propertyIds );
+
+		$res = $dbr->select(
+			'wbs_propertypairs',
+			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
+			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
+				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
+			__METHOD__,
+			array(
+				'LIMIT' => 1000,
+				'GROUP BY' => 'pid2',
+				'HAVING' => "sum(probability)/$count > $threshold",
+				'ORDER BY' => 'prob DESC'
+			)
+		);
+
 		$resultArray = array();
-		foreach ( $res as $i => $row ) {
+		foreach ( $res as $row ) {
 			$pid = PropertyId::newFromNumber( (int)$row->pid );
-			$suggestion = new Suggestion( $pid, $row->cor, null, null );
-			$resultArray[] =  $suggestion;
+			$suggestion = new Suggestion( $pid, $row->prob );
+			$resultArray[] = $suggestion;
 		}
 		return $resultArray;
 	}
 
-	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize = -1, $threshold = 0 ) {
-		$attributeList = array();
-		foreach ( $attributeValuePairs as $key => $value )	{
-			$attributeList[] = $value->getPropertyId()->getNumericId();
+	/**
+	 * @see SuggesterEngine::suggestByPropertyIds
+	 *
+	 * @param PropertyId[] $propertyIds
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+	public function suggestByPropertyIds( $propertyIds, $limit = -1 ) {
+		$numericIds = array();
+		foreach ( $propertyIds as $id ) {
+			$numericIds[] = $id->getNumericId();
 		}
-		return $this->suggestionsByAttributeList( $attributeList, $resultSize, $threshold );
+		return $this->getSuggestions( $numericIds, $limit );
 	}
 
-	public function suggestionsByItem( $entity, $resultSize = -1, $threshold = 0 ) {
-		$attributeValuePairs = $entity->getAllSnaks();
-		return $this->suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold );
+	/**
+	 * @see SuggesterEngine::suggestByEntity
+	 *
+	 * @param Item $item
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+	public function suggestByItem( Item $item, $limit = -1 ) {
+		$snaks = $item->getAllSnaks();
+		$numericIds = array();
+		foreach ( $snaks as $snak ) {
+			$numericIds[] = $snak->getPropertyId()->getNumericId();
+		}
+		return $this->getSuggestions( $numericIds, $limit );
 	}
 
 }
