@@ -10,7 +10,6 @@ use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Utils;
 
-include 'Suggesters/SimplePHPSuggester.php';
 
 /**
  * API module to get property suggestions.
@@ -19,17 +18,11 @@ include 'Suggesters/SimplePHPSuggester.php';
  * @licence GNU GPL v2+
  */
 
-function cleanPropertyId( $propertyId ) {
-	if ( $propertyId[0] === 'P' ) {
-		return (int)substr( $propertyId, 1 );
-	}
-	return (int)$propertyId;
-}
 
 class GetSuggestions extends ApiBase {
 
-	public function __construct( ApiMain $main, $name, $search = '' ) {
-		parent::__construct( $main, $name, $search );
+	public function __construct( ApiMain $main, $name, $prefix = '' ) {
+		parent::__construct( $main, $name, $prefix );
 	}
 
 	/**
@@ -79,7 +72,7 @@ class GetSuggestions extends ApiBase {
 	 * @return array
 	 */
 	public function generateSuggestions( $entity, $propertyList, $search, $language ) {
-		$suggester = new SimplePHPSuggester();
+		$suggester = new SimplePHPSuggester( wfGetDB( DB_SLAVE ) );
 		$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		if ( $entity !== null ) {
 			$id = new  ItemId( $entity );
@@ -89,7 +82,7 @@ class GetSuggestions extends ApiBase {
 			$splitList = explode( ',', $propertyList );
 			$properties = array();
 			foreach ( $splitList as $id ) {
-				$properties[] = PropertyId::newFromNumber( cleanPropertyId( $id ) );
+				$properties[] = PropertyId::newFromNumber( $this->cleanPropertyId( $id ) );
 			}
 			$suggestions = $suggester->suggestByPropertyIds( $properties );
 		}
@@ -102,13 +95,27 @@ class GetSuggestions extends ApiBase {
 	}
 
 	/**
+	 * accepts strings of the format "P123" or "123" and returns
+	 * the id as int. returns 0 if the string is not of the specified format
+	 *
+	 * @param string $propertyId
+	 * @return int
+	 */
+	protected function cleanPropertyId( $propertyId ) {
+		if ( $propertyId[0] === 'P' ) {
+			return (int)substr( $propertyId, 1 );
+		}
+		return (int)$propertyId;
+	}
+
+	/**
 	 * @param array $entries
 	 * @param int $resultSize
 	 * @param string $search
 	 * @param string $language
 	 * @return array
 	 */
-	public function mergeWithTraditionalSearchResults( &$entries, $resultSize, $search, $language ) {
+	public function mergeWithTraditionalSearchResults( array &$entries, $resultSize, $search, $language ) {
 		$searchEntitiesParameters = new DerivativeRequest(
 			$this->getRequest(),
 			array(
@@ -149,7 +156,7 @@ class GetSuggestions extends ApiBase {
 	 * @param string $search
 	 * @return array
 	 */
-	protected function filterByPrefix( &$entries, $search ) {
+	protected function filterByPrefix( array &$entries, $search ) {
 		$matchingEntries = array();
 		foreach ( $entries as $entry ) {
 			if ( $this->isMatch( $entry, $search ) ) {
@@ -166,7 +173,7 @@ class GetSuggestions extends ApiBase {
 	 * @param string $search
 	 * @return bool
 	 */
-	protected function isMatch( &$entry, $search ) {
+	protected function isMatch( array $entry, $search ) {
 		if ( stripos( $entry['label'], $search ) === 0 ) {
 			return true;
 		}

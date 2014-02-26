@@ -2,12 +2,9 @@
 
 include 'Suggesters/SimplePHPSuggester.php';
 
-use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\Property;
 use Wikibase\StoreFactory;
-
-// use Wikibase.ui.entitysearch;
 
 class SpecialSuggester extends SpecialPage {
 
