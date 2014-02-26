@@ -3,9 +3,9 @@
 
 
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
-use Wikibase\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Utils;
@@ -87,7 +87,7 @@ class GetSuggestions extends ApiBase {
 			$suggestions = $suggester->suggestByPropertyIds( $properties );
 		}
 		// Build result Array
-		$entries = $this->createJSON( $suggestions, $language, $lookup );
+		$entries = $this->createJSON( $suggestions, $language );
 		if ( $search ) {
 			$entries = $this->filterByPrefix( $entries, $search );
 		}
@@ -190,29 +190,45 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
-	 * @param EntityLookup $lookup
 	 * @return array
 	 */
-	public function createJSON( $suggestions, $language, EntityLookup $lookup ) {
+	public function createJSON( $suggestions, $language ) {
 		$entries = array();
+		$ids = array();
+		$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
 		foreach ( $suggestions as $suggestion ) {
-			$entry = array();
 			$id = $suggestion->getPropertyId();
-			$property = $lookup->getEntity( $id );
-			$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
-
-			if ( $property === null ) {
-				continue;
-			}
+			$ids[] = $id;
+		}
+		//See SearchEntities
+		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );
+		foreach ( $suggestions as $suggestion ) {
+			$id = $suggestion->getPropertyId();
+			$entry = array();
 			$entry['id'] = $id->getPrefixedId();
-			$entry['label'] = $property->getLabel( $language );
-			if ( $aliases = $property->getAliases( $language ) ) {
-				$entry['aliases'] = $aliases;
-			}
-			$entry['description'] = $property->getDescription( $language );
-			$entry['debug_probability'] = $suggestion->getProbability();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry['debug_type'] = 'suggestion'; // debug
+			$entry['rating'] = $suggestion->getPropertyId();
+
+			$aliases = array();
+			foreach ( $terms as $term ) {
+				if ( $term->getEntityId() === $id->getNumericId() ) {
+					if ( $term->getType() === 'label' ) {
+						$entry['label'] = $term->getText();
+					}
+					if ( $term->getType() === 'description' ) {
+						$entry['description'] = $term->getText();
+					}
+					if ( $term->getType() === 'alias' ) {
+						$aliases[] = $term->getText();
+					}
+				}
+			}
+
+			if ( count( $aliases ) > 0 ) {
+				$entry['aliases'] = $aliases;
+				$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
+			}
+
 			$entries[] = $entry;
 		}
 		return $entries;
