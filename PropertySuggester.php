@@ -18,7 +18,6 @@ $wgExtensionMessagesFiles['PropertySuggesterAlias']	= $dir . 'PropertySuggester.
 
 $wgAutoloadClasses['SpecialSuggester']			= $dir . 'SpecialSuggester.php';
 $wgAutoloadClasses['GetSuggestions']			= $dir . 'GetSuggestions.php';
-$wgAutoloadClasses['GetMisfits']				= $dir . 'GetMisfits.php';
 $wgAutoloadClasses['PropertySuggesterHooks']	= $dir . 'PropertySuggesterHooks.php';
 
 $wgAutoloadClasses['Suggestion']				= $dir . 'Suggesters/Suggestion.php';
@@ -49,6 +48,6 @@ $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 		'messages'		=> array(),
 		'dependencies'	=> array( 'jquery.wikibase.entityselector' ),
 		'localBasePath'	=> __DIR__,
-		'remoteExtPath' => 'PropertySuggester',
+		'remoteExtPath'	=> 'PropertySuggester',
 );
 

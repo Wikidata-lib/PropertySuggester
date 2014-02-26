@@ -42,7 +42,7 @@ function doQuery() {
 
 $( document ).ready(function (){
 	var propertyChooser = $( '#property-chooser' );
-    propertyChooser.entityselector({
+	propertyChooser.entityselector({
 		url: mw.util.wikiScript( 'api' ),
 		selectOnAutocomplete: true, 
 		type: 'property'
