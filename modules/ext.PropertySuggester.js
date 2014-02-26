@@ -6,7 +6,7 @@ function removeFromArray(arr, element) {
  }
  
 function deleteFromList(evt){
-	pid = evt.data;
+	var pid = evt.data;
 	removeFromArray(selected_ids, pid);
 	$(this).closest('li').remove();
 	doQuery();
@@ -14,25 +14,26 @@ function deleteFromList(evt){
 }
 
 function handleInput () {
-	input_text =  $( '#property-chooser').val();
-	pid = $('#property-chooser').next('input').val();
+    var propertyChooser = $( '#property-chooser');
+	var input_text =  propertyChooser.val();
+	var pid = propertyChooser.next('input').val();
 	if (input_text!==  '' && pid !== ''){	
 		selected_ids.push(pid);
-		delete_link = $('<a href="#"> x </a>').click(pid, deleteFromList);
-		li_element = $('<li>' + input_text + ' (' + pid + ')' + '</input></li>');
+		var delete_link = $('<a href="#"> x </a>').click(pid, deleteFromList);
+		var li_element = $('<li>' + input_text + ' (' + pid + ')' + '</input></li>');
 		li_element.append(delete_link);
 		$('#selected-properties-list').append(li_element);
-		$( '#property-chooser').val('').focus();
+		propertyChooser.val('').focus();
 		doQuery();
 	}
 }
 
 function doQuery() {
-	url = mw.util.wikiScript( 'api' ) + '?action=wbsgetsuggestions&format=json&properties=' + 
+	var url = mw.util.wikiScript( 'api' ) + '?action=wbsgetsuggestions&format=json&properties=' +
 			selected_ids.map(encodeURIComponent).join(',') + '&limit=20&language=' + wgPageContentLanguage;
 	$.get(url, function( data ) {
 		$('#result').html('<h3>Suggestions:</h3>');
-		suggestions = data['search'];
+		var suggestions = data['search'];
 		$.each(suggestions, function (k, v) {
 			$('#result').append(JSON.stringify(v) + '<br>');
 		});
@@ -40,7 +41,8 @@ function doQuery() {
 }
 
 $( document ).ready(function (){
-	$( '#property-chooser' ).entityselector({
+	var propertyChooser = $( '#property-chooser' );
+	propertyChooser.entityselector({
 		url: mw.util.wikiScript( 'api' ),
 		selectOnAutocomplete: true, 
 		type: 'property'
@@ -49,9 +51,9 @@ $( document ).ready(function (){
 	$( '#add-property-btn' ).click(function() {
 		handleInput();
 	});
-	
 
-	$( '#property-chooser' ).keyup(function (e) {
+
+    propertyChooser.keyup(function (e) {
 		if (e.keyCode === 13) {
 			handleInput();
 		}
