@@ -1,14 +1,19 @@
 <?php
 
+use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\Item;
 
-include "SuggesterEngine.php";
 
 class SimplePHPSuggester implements SuggesterEngine {
-	private $deprecatedPropertyIds = "107";
+	private $deprecatedPropertyIds = [ 107 ];
 	private $propertyRelations = array();
 
-		public function getDeprecatedPropertyIds() {
+	public function __construct( DatabaseBase $dbr ) {
+		$this->dbr = $dbr;
+	}
+
+	public function getDeprecatedPropertyIds() {
 		return $this->deprecatedPropertyIds;
 	}
 
@@ -16,46 +21,67 @@ class SimplePHPSuggester implements SuggesterEngine {
 		return $this->propertyRelations;
 	}
 
-	// this function is not part of SuggesterEngine.php?!
-	public function suggestionsByAttributeList( $attributeList, $resultSize=-1, $threshold=0 ) {
-		if ( !$attributeList ) {
+	/**
+	 * @param int[] $propertyIds
+	 * @throws InvalidArgumentException
+	 * @return Suggestion[]
+	 */
+	private function getSuggestions( array $propertyIds ) {
+		if ( !$propertyIds ) {
 			return array();
-		}		
-		$suggestionIds = implode( ", ", $attributeList );
-		$excludedIds = $suggestionIds . ", " . $this->getDeprecatedPropertyIds();
-		$count = count( $attributeList );
-		$dbr = wfGetDB( DB_SLAVE );
-		$query =  
-		  "SELECT pid2 AS pid, sum(correlation)/" . count( $attributeList ) . " AS cor
-			FROM wbs_propertypairs
-			WHERE pid1 IN ($suggestionIds) AND pid2 NOT IN ($excludedIds)
-			GROUP BY pid2
-			HAVING sum(correlation)/$count > $threshold
-			ORDER BY cor DESC";
-		if ( ((int)$resultSize) >= 0 ) {
-			$query = $query . " LIMIT $resultSize";
 		}
-		$res = $dbr->query($query);
+		$excludedIds = array_merge( $propertyIds, $this->getDeprecatedPropertyIds() );
+		$count = count( $propertyIds );
+
+		$res = $this->dbr->select(
+			'wbs_propertypairs',
+			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
+			array( 'pid1 IN (' . $this->dbr->makeList( $propertyIds ) . ')',
+				   'pid2 NOT IN (' . $this->dbr->makeList( $excludedIds ) . ')' ),
+			__METHOD__,
+			array(
+				'GROUP BY' => 'pid2',
+				//'HAVING' => "sum(probability)/$count > $threshold",
+				'ORDER BY' => 'prob DESC'
+			)
+		);
+
 		$resultArray = array();
-		foreach ( $res as $i => $row ) {
+		foreach ( $res as $row ) {
 			$pid = PropertyId::newFromNumber( (int)$row->pid );
-			$suggestion = new Suggestion( $pid, $row->cor, null, null );
-			$resultArray[] =  $suggestion;
+			$suggestion = new Suggestion( $pid, $row->prob );
+			$resultArray[] = $suggestion;
 		}
 		return $resultArray;
 	}
 
-	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize = -1, $threshold = 0 ) {
-		$attributeList = array();
-		foreach ( $attributeValuePairs as $key => $value )	{
-			$attributeList[] = $value->getPropertyId()->getNumericId();
+	/**
+	 * @see SuggesterEngine::suggestByPropertyIds
+	 *
+	 * @param PropertyId[] $propertyIds
+	 * @return Suggestion[]
+	 */
+	public function suggestByPropertyIds( array $propertyIds ) {
+		$numericIds = array();
+		foreach ( $propertyIds as $id ) {
+			$numericIds[] = $id->getNumericId();
 		}
-		return $this->suggestionsByAttributeList( $attributeList, $resultSize, $threshold );
+		return $this->getSuggestions( $numericIds );
 	}
 
-	public function suggestionsByItem( $entity, $resultSize = -1, $threshold = 0 ) {
-		$attributeValuePairs = $entity->getAllSnaks();
-		return $this->suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize, $threshold );
+	/**
+	 * @see SuggesterEngine::suggestByEntity
+	 *
+	 * @param Item $item
+	 * @return Suggestion[]
+	 */
+	public function suggestByItem( Item $item ) {
+		$snaks = $item->getAllSnaks();
+		$numericIds = array();
+		foreach ( $snaks as $snak ) {
+			$numericIds[] = $snak->getPropertyId()->getNumericId();
+		}
+		return $this->getSuggestions( $numericIds );
 	}
 
 }

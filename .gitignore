@@ -1,7 +1,1 @@
-.svn
-*~
-*.kate-swp
-.*.swp
-parser/env/
-/nbproject/private/
-CodingStylesScript.php
+.idea/

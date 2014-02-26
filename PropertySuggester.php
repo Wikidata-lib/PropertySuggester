@@ -21,6 +21,10 @@ $wgAutoloadClasses['GetSuggestions']			= $dir . 'GetSuggestions.php';
 $wgAutoloadClasses['GetMisfits']				= $dir . 'GetMisfits.php';
 $wgAutoloadClasses['PropertySuggesterHooks']	= $dir . 'PropertySuggesterHooks.php';
 
+$wgAutoloadClasses['Suggestion']				= $dir . 'Suggesters/Suggestion.php';
+$wgAutoloadClasses['SuggesterEngine']			= $dir . 'Suggesters/SuggesterEngine.php';
+$wgAutoloadClasses['SimplePHPSuggester']		= $dir . 'Suggesters/SimplePHPSuggester.php';
+
 
 $wgSpecialPages['PropertySuggester']			= 'SpecialSuggester';
 $wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
@@ -49,4 +53,3 @@ $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 		'remoteExtPath' => 'PropertySuggester',
 );
 
-// $wgHooks['APIGetDescription'][] = 'efASAPIGetDescription';

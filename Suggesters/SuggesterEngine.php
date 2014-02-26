@@ -1,15 +1,25 @@
 <?php
 
-include "Suggestion.php";
+use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\Item;
 
 interface SuggesterEngine {
+
 	/**
 	 * Returns suggested attributes
 	 *
-	 * @since 0.1
+	 * @param PropertyId[] $propertyIds
 	 *
 	 * @return Suggestion[]
 	 */
-	public function suggestionsByAttributeValuePairs( $attributeValuePairs, $resultSize );
-	public function suggestionsByItem( $entity, $resultSize );
+	public function suggestByPropertyIds( array $propertyIds );
+
+	/**
+	 * Returns suggested attributes
+	 *
+	 * @param Item $item
+	 *
+	 * @return Suggestion[]
+	 */
+	public function suggestByItem( Item $item);
 }
