@@ -3,9 +3,9 @@
 
 
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
-use Wikibase\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Utils;
@@ -190,10 +190,9 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
-	 * @param EntityLookup $lookup
 	 * @return array
 	 */
-	public function createJSON( $suggestions, $language, EntityLookup $lookup ) {
+	public function createJSON( $suggestions, $language ) {
 		$entries = array();
 		$ids = array();
 		$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
@@ -202,13 +201,13 @@ class GetSuggestions extends ApiBase {
 			$ids[] = $id;
 		}
 		//See SearchEntities
-		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );	
+		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
 			$entry = array();
 			$entry['id'] = $id->getPrefixedId();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry['rating'] = $suggestion->getCorrelation();
+			$entry['rating'] = $suggestion->getPropertyId();
 
 			$aliases = array();
 			foreach ( $terms as $term ) {
