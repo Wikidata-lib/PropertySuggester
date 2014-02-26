@@ -5,7 +5,7 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 	 * if a property is requested and we are on an Entity page.
 	 * 
 	 * @see ui.suggester._request
-	 */	
+	 */
 
 	_oldCreate: $.wikibase.entityselector.prototype._create,
 
@@ -15,19 +15,19 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 		self._oldCreate.apply(self, arguments);
 
 		if ( self.__useSuggester() ) {
-			var inputhandler = function() {
+			var inputHandler = function() {
 				if ( self.value() === '' ) {
 					self.search( '*' );
 				}
 			};
-			self.element.bind('input', inputhandler);
+			self.element.bind('input', inputHandler);
 
-			var focushandler = function() {
+			var focusHandler = function() {
 				if ( self.value() === '' && !self.menu.element.is( ':visible' ) ) {
 					self.search( '*' );
 				}
 			};
-			self.element.focus(focushandler);
+			self.element.focus(focusHandler);
 		}
 	},
 
@@ -45,7 +45,7 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 				timeout: this.options.timeout,
 				params: {
 					action: 'wbsgetsuggestions',
-					entity: wbEntityId,
+					entity: mw.config.get('wbEntityId'),
 					format: 'json',
 					language: this.options.language,
 					type: this.options.type,
@@ -62,6 +62,6 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 	}, 
 
 	__useSuggester: function() {
-		return this.options.type === 'property' && typeof wbEntityId !== 'undefined';
-	},
+		return this.options.type === 'property' && typeof mw.config.get('wbEntityId') !== 'undefined';
+	}
  });
