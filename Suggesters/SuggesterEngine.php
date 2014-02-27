@@ -1,7 +1,7 @@
 <?php
 
+use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\Item;
 
 interface SuggesterEngine {
 

@@ -17,9 +17,23 @@ final class PropertySuggesterHooks {
 		$out->addModules( 'ext.PropertySuggester.EntitySelector' );
 		return true;
 	}
-	
+
+	/**
+	 * @param $files
+	 * @return bool
+	 */
 	public static function onUnitTestsList( &$files ) {
 		$files = array_merge( $files, glob( __DIR__ . '/tests/phpunit/*Test.php' ) );
+		return true;
+	}
+
+	/**
+	 * @param DatabaseUpdater $updater
+	 * @return bool
+	 */
+	public static function onCreateSchema( DatabaseUpdater $updater ) {
+		$updater->addExtensionTable( 'wbs_propertypairs',
+			dirname( __FILE__ ) . '/createtable.sql', true );
 		return true;
 	}
 
