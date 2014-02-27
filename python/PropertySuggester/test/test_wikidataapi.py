@@ -1,6 +1,7 @@
 from testtools import TestCase
 from testtools.matchers import *
-from WikidataApi import WikidataApi
+
+from propertysuggester.utils.WikidataApi import WikidataApi
 
 
 class WikiDataApiTest(TestCase):

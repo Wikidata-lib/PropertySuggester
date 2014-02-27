@@ -1,8 +1,8 @@
 import unittest
 from testtools import TestCase
 from testtools.matchers import *
-import TableGenerator
-from datatypes import Entity, Claim
+from propertysuggester.utils.datatypes import Entity, Claim
+from propertysuggester.parser import TableGenerator
 
 test_data1 = [Entity('Q15', [Claim(31, 'wikibase-entityid', 'Q5107'),
                              Claim(373, 'string', 'Africa')]),

@@ -1,8 +1,8 @@
 from StringIO import StringIO
 from testtools import TestCase
-import CsvReader
-from test.test_abstract_reader import AbstractUniverseTest
 
+from propertysuggester.parser import CsvReader
+from propertysuggester.test.test_abstract_reader import AbstractUniverseTest
 
 class CsvReaderTest(AbstractUniverseTest):
     def setUp(self):

@@ -1,7 +1,7 @@
 from testtools import TestCase
 from testtools.matchers import *
 
-from datatypes import Entity, Claim
+from propertysuggester.utils.datatypes import Claim, Entity
 
 
 class AbstractUniverseTest(TestCase):

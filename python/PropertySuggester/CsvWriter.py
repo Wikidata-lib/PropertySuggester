@@ -2,9 +2,9 @@ import sys
 import time
 import argparse
 
-from CompressedFileType import CompressedFileType
-import XmlReader
-
+from propertysuggester.utils.datatypes import Entity
+from propertysuggester.parser import XmlReader
+from propertysuggester.utils import CompressedFileType
 
 
 def write_csv(entities, output_file, sep=","):

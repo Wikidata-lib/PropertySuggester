@@ -9,7 +9,8 @@ with open("file.csv", "r") as f:
 """
 import multiprocessing
 import time, argparse, traceback, signal
-from datatypes import Entity, Claim
+from propertysuggester.utils.CompressedFileType import CompressedFileType
+from propertysuggester.utils.datatypes import Claim, Entity
 
 try:
     import ujson as json
@@ -23,7 +24,6 @@ except ImportError:
     print "cElementTree not found"
     import xml.etree.ElementTree as ElementTree
 
-from CompressedFileType import CompressedFileType
 
 NS = "http://www.mediawiki.org/xml/export-0.8/"
 title_tag = "{" + NS + "}" + "title"

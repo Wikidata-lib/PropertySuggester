@@ -1,9 +1,8 @@
 import argparse
-import CsvReader
 
 from collections import defaultdict
-from CompressedFileType import CompressedFileType
-from datatypes import Entity
+from propertysuggester.parser import CsvReader
+from propertysuggester.utils.CompressedFileType import CompressedFileType
 
 
 def compute_table(generator):

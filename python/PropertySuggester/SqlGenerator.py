@@ -1,10 +1,10 @@
 import argparse
-import MySQLdb
 import time
 
-import CsvReader
-import TableGenerator
-from CompressedFileType import CompressedFileType
+import MySQLdb
+
+from propertysuggester.parser import CsvReader, TableGenerator
+from propertysuggester.utils.CompressedFileType import CompressedFileType
 
 
 def load_table_into_db(table, db):

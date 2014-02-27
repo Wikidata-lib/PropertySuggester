@@ -9,9 +9,9 @@ with open("file.csv", "r") as f:
 """
 
 import argparse, time
-from CompressedFileType import CompressedFileType
-from datatypes import Entity, Claim
 
+from propertysuggester.utils.datatypes import Claim, Entity
+from propertysuggester.utils.CompressedFileType import CompressedFileType
 
 def read_csv(input_file, separator=","):
     """

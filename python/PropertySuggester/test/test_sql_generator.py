@@ -2,7 +2,7 @@ import unittest
 from testtools import TestCase
 from mockito import mock, contains, verify, verifyNoMoreInteractions
 
-import SqlGenerator
+from propertysuggester import SqlGenerator
 
 
 class SqlGeneratorTest(TestCase):
