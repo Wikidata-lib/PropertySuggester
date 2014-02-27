@@ -20,7 +20,8 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		//own setup
+		$this->dbw = wfGetDB( DB_MASTER );
+
 	}
 
 	/*

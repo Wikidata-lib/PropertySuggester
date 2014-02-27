@@ -4,7 +4,13 @@ use Wikibase\DataModel\Entity\PropertyId;
 
 class Suggestion {
 
+	/**
+	 * @var Wikibase\DataModel\Entity\PropertyId
+	 */
 	private $propertyId;
+	/**
+	 * @var float
+	 */
 	private $probability;
 
 	/**

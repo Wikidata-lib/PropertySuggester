@@ -8,7 +8,7 @@ final class PropertySuggesterHooks {
 	 *
 	 * @param OutputPage $out
 	 * @param Skin $skin
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
 		if ( isset( $_GET['nosuggestions'] ) ) {
@@ -33,7 +33,7 @@ final class PropertySuggesterHooks {
 	 */
 	public static function onCreateSchema( DatabaseUpdater $updater ) {
 		$updater->addExtensionTable( 'wbs_propertypairs',
-			dirname( __FILE__ ) . '/createtable.sql', true );
+			dirname( __FILE__ ) . '/create_propertypairs.sql', true );
 		return true;
 	}
 
