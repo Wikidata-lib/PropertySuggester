@@ -1,7 +1,11 @@
 <?php
 
+namespace PropertySuggester\Suggesters;
+
+use DatabaseBase;
+use InvalidArgumentException;
+
 use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 
 /**

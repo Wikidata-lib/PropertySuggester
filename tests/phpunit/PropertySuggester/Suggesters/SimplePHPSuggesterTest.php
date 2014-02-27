@@ -1,13 +1,15 @@
 <?php
 
-namespace PropertySuggester\Test\Api;
+namespace PropertySuggester\Suggesters;
 
+use DatabaseBase;
 use MediaWikiTestCase;
+
 use Wikibase\DataModel\Entity\PropertyId;
 
 /**
  *
- * @covers PropertySuggester\SimplePHPSuggester
+ * @covers PropertySuggester\Suggesters\SimplePHPSuggester
  *
  * @group Extensions/PropertySuggester
  *
@@ -20,12 +22,12 @@ use Wikibase\DataModel\Entity\PropertyId;
 class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var \DatabaseBase
+	 * @var DatabaseBase
 	 */
 	protected $dbr;
 
 	/**
-	 * @var \SuggesterEngine
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 
@@ -50,7 +52,7 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 	public function setUp() {
 		parent::setUp();
 		$this->dbr = wfGetDB( DB_SLAVE );
-		$this->suggester = new \SimplePHPSuggester($this->dbr);
+		$this->suggester = new SimplePHPSuggester($this->dbr);
 
 	}
 

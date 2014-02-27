@@ -11,26 +11,25 @@ $wgExtensionCredits['other'][] = array(
 	'descriptionmsg' => 'propertysuggester-desc',
 );
 
-$dir = __DIR__ . '/';
 
-$wgExtensionMessagesFiles['PropertySuggester']		= $dir . 'PropertySuggester.i18n.php';
-$wgExtensionMessagesFiles['PropertySuggesterAlias']	= $dir . 'PropertySuggester.alias.php';
+$wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
+$wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
 
-$wgAutoloadClasses['SpecialSuggester']			= $dir . 'SpecialSuggester.php';
-$wgAutoloadClasses['GetSuggestions']			= $dir . 'GetSuggestions.php';
-$wgAutoloadClasses['GetMisfits']				= $dir . 'GetMisfits.php';
-$wgAutoloadClasses['PropertySuggesterHooks']	= $dir . 'PropertySuggesterHooks.php';
+// TODO use composer for autoloading
+$wgAutoloadClasses['PropertySuggesterHooks'] = __DIR__ . '/PropertySuggesterHooks.php';
 
-$wgAutoloadClasses['Suggestion']				= $dir . 'Suggesters/Suggestion.php';
-$wgAutoloadClasses['SuggesterEngine']			= $dir . 'Suggesters/SuggesterEngine.php';
-$wgAutoloadClasses['SimplePHPSuggester']		= $dir . 'Suggesters/SimplePHPSuggester.php';
+$src = __DIR__ . '/src/PropertySuggester';
+$wgAutoloadClasses['PropertySuggester\SpecialSuggester'] = $src . '/SpecialSuggester.php';
+$wgAutoloadClasses['PropertySuggester\GetSuggestions'] = $src . '/GetSuggestions.php';
 
+$wgAutoloadClasses['PropertySuggester\Suggesters\Suggestion'] = $src . '/Suggesters/Suggestion.php';
+$wgAutoloadClasses['PropertySuggester\Suggesters\SuggesterEngine'] = $src . '/Suggesters/SuggesterEngine.php';
+$wgAutoloadClasses['PropertySuggester\Suggesters\SimplePHPSuggester'] = $src . '/Suggesters/SimplePHPSuggester.php';
 
-$wgSpecialPages['PropertySuggester']			= 'SpecialSuggester';
+$wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
 $wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
 
-$wgAPIModules['wbsgetsuggestions']				= 'GetSuggestions';
-$wgAPIModules['wbsgetmisfits']					= 'GetMisfits';
+$wgAPIModules['wbsgetsuggestions']				= 'PropertySuggester\GetSuggestions';
 
 $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 $wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';

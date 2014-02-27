@@ -1,11 +1,13 @@
 <?php
 
+namespace PropertySuggester\Suggesters;
+
 use Wikibase\DataModel\Entity\PropertyId;
 
 class Suggestion {
 
 	/**
-	 * @var Wikibase\DataModel\Entity\PropertyId
+	 * @var PropertyId
 	 */
 	private $propertyId;
 	/**

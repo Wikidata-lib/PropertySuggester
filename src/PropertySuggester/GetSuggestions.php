@@ -1,11 +1,18 @@
 <?php
-// ToDo: use Wikibase\LanguageFallbackChainFactory;
 
+namespace PropertySuggester;
+
+use ApiBase;
+use ApiMain;
+use DerivativeRequest;
+
+use PropertySuggester\Suggesters\SimplePHPSuggester;
+use PropertySuggester\Suggesters\Suggestion;
 
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
-use Wikibase\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Utils;

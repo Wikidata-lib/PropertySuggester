@@ -1,6 +1,6 @@
 <?php
 
-namespace PropertySuggester\Test\Api;
+namespace PropertySuggester;
 
 use Wikibase\Test\Api\WikibaseApiTestCase;
 
@@ -20,7 +20,6 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->dbw = wfGetDB( DB_MASTER );
 
 	}
 

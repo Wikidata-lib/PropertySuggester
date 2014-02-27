@@ -1,5 +1,7 @@
 <?php
 
+namespace PropertySuggester\Suggesters;
+
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 

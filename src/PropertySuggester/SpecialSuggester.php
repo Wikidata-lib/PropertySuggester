@@ -1,10 +1,8 @@
 <?php
 
-include 'Suggesters/SimplePHPSuggester.php';
+namespace PropertySuggester;
 
-use Wikibase\Item;
-use Wikibase\Property;
-use Wikibase\StoreFactory;
+use SpecialPage;
 
 class SpecialSuggester extends SpecialPage {
 
