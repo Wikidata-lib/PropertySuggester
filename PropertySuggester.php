@@ -50,6 +50,6 @@ $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 		'messages'		=> array(),
 		'dependencies'	=> array( 'jquery.wikibase.entityselector' ),
 		'localBasePath'	=> __DIR__,
-		'remoteExtPath' => 'PropertySuggester',
+		'remoteExtPath'	=> 'PropertySuggester',
 );
 
