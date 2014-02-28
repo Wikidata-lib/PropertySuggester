@@ -1,24 +1,41 @@
 <?php
 
-use Wikibase\DataModel\Entity\ItemId;
+namespace PropertySuggester\Suggesters;
+
+use DatabaseBase;
+use InvalidArgumentException;
+
+use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\Item;
 
-
+/**
+ * Class SimplePHPSuggester
+ * a Suggester implementation that creates suggestion via MySQL
+ * Needs the wbs_propertypairs table filled with pair probabilities.
+ */
 class SimplePHPSuggester implements SuggesterEngine {
 	private $deprecatedPropertyIds = [ 107 ];
-	private $propertyRelations = array();
 
+	/**
+	 * @param DatabaseBase $dbr
+	 */
 	public function __construct( DatabaseBase $dbr ) {
 		$this->dbr = $dbr;
 	}
 
+	/**
+	 * default is 107 (DEPRECATED main type)
+	 * @return int[]
+	 */
 	public function getDeprecatedPropertyIds() {
 		return $this->deprecatedPropertyIds;
 	}
 
-	public function getPropertyRelations() {
-		return $this->propertyRelations;
+	/**
+	 * @param int[] $deprecatedPropertyIds
+	 */
+	public function setDeprecatedPropertyIds(array $deprecatedPropertyIds) {
+		$this->deprecatedPropertyIds = $deprecatedPropertyIds;
 	}
 
 	/**
@@ -26,7 +43,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	private function getSuggestions( array $propertyIds ) {
+	protected function getSuggestions( array $propertyIds ) {
 		if ( !$propertyIds ) {
 			return array();
 		}

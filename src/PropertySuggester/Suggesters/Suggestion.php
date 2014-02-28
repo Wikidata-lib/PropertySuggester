@@ -1,10 +1,18 @@
 <?php
 
+namespace PropertySuggester\Suggesters;
+
 use Wikibase\DataModel\Entity\PropertyId;
 
 class Suggestion {
 
+	/**
+	 * @var PropertyId
+	 */
 	private $propertyId;
+	/**
+	 * @var float
+	 */
 	private $probability;
 
 	/**
