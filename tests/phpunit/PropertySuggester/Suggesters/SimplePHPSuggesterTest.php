@@ -6,6 +6,9 @@ use DatabaseBase;
 use MediaWikiTestCase;
 
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Claim\Statement;
+use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 
 /**
  *
@@ -65,6 +68,18 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		$ids = array( PropertyId::newFromNumber( 1 ) );
 
 		$res = $this->suggester->suggestByPropertyIds($ids);
+
+		$this->assertEquals(PropertyId::newFromNumber(2), $res[0]->getPropertyId());
+		$this->assertEquals(PropertyId::newFromNumber(3), $res[1]->getPropertyId());
+	}
+
+	public function testSuggestByItem() {
+		$item = Item::newFromArray( array( 'entity' => 'q42' ) );
+		$statement = new Statement( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) );
+		$statement->setGuid( 'claim0' );
+		$item->addClaim( $statement );
+
+		$res = $this->suggester->suggestByItem($item);
 
 		$this->assertEquals(PropertyId::newFromNumber(2), $res[0]->getPropertyId());
 		$this->assertEquals(PropertyId::newFromNumber(3), $res[1]->getPropertyId());
