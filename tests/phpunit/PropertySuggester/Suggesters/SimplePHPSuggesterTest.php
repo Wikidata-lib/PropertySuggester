@@ -25,12 +25,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var DatabaseBase
-	 */
-	protected $dbr;
-
-	/**
-	 * @var SuggesterEngine
+	 * @var SimplePHPSuggester
 	 */
 	protected $suggester;
 
@@ -47,20 +42,18 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		$rows[] = $this->row( 2, 4, 200, 0.2 );
 		$rows[] = $this->row( 3, 1, 100, 0.5 );
 
-		$dbw = wfGetDB( DB_MASTER );
-		$dbw->delete( 'wbs_propertypairs', "*" );
-		$dbw->insert( 'wbs_propertypairs', $rows );
+		$this->db->delete( 'wbs_propertypairs', "*" );
+		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
 
 	public function setUp() {
 		parent::setUp();
-		$this->dbr = wfGetDB( DB_SLAVE );
-		$this->suggester = new SimplePHPSuggester( $this->dbr );
+		$this->suggester = new SimplePHPSuggester( $this->db );
 
 	}
 
 	public function testDatabaseHasRows() {
-		$res = $this->dbr->select( 'wbs_propertypairs', array( 'pid1', 'pid2') );
+		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2') );
 		$this->assertEquals( 5, $res->numRows() );
 	}
 
@@ -94,6 +87,8 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 		$resIds = array_map( function( $r ) { return $r->getPropertyId()->getSerialization(); }, $res );
 		$this->assertNotContains( "P2", $resIds );
+		$this->assertContains( "P3", $resIds );
+
 	}
 
 	public function tearDown() {
