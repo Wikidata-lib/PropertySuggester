@@ -6,21 +6,29 @@ originalDirectory=$(pwd)
 
 cd ..
 
+# checkout mediawiki
 wget https://github.com/wikimedia/mediawiki-core/archive/$MW.tar.gz
 tar -zxf $MW.tar.gz
-mv mediawiki-core-$MW phase3
+rm $MW.tar.gz
+mv mediawiki-core-$MW wiki
 
-cd phase3
+# checkout wikibase
+wget https://github.com/wikimedia/mediawiki-extensions-Wikibase/archive/master.tar.gz
+tar -zxf master.tar.gz
+rm master.tar.gz
+mv mediawiki-extensions-Wikibase-master wiki/extensions/Wikibase
 
-git checkout $MW
+cd wiki
+
+# git checkout $MW -- zip doesnt contain a .git?!
 
 mysql -e 'create database its_a_mw;'
 php maintenance/install.php --dbtype $DBTYPE --dbuser root --dbname its_a_mw --dbpath $(pwd) --pass nyan TravisWiki admin
 
 cd extensions
 
+# what is this used for??
 git clone https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Scribunto.git --depth 1
-git clone https://git.wikimedia.org/git/mediawiki/extensions/Wikibase.git
 
 cp -r $originalDirectory PropertySuggester
 

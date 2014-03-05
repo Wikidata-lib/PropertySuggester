@@ -2,6 +2,9 @@
 
 set -x
 
-cd ../phase3/tests/phpunit
+cd ../wiki/tests/phpunit
 
-php phpunit.php --group Extensions/PropertySuggester
+#php phpunit.php --group PropertySuggester
+
+# groups don't work?!
+php phpunit.php ../../extensions/PropertySuggester/tests/phpunit/PropertySuggester/Suggesters/SimplePHPSuggesterTest.php

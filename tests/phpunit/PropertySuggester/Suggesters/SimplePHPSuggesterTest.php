@@ -14,7 +14,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
  *
  * @covers PropertySuggester\Suggesters\SimplePHPSuggester
  *
- * @group Extensions/PropertySuggester
+ * @group PropertySuggester
  *
  * @group API
  * @group Database
