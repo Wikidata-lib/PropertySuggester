@@ -12,7 +12,6 @@ use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\EntityLookup;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Utils;
