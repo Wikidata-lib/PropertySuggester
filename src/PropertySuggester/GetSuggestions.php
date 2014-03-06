@@ -5,18 +5,12 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
-
-use PropertySuggester\Suggesters\SimplePHPSuggester;
-use PropertySuggester\Suggesters\Suggestion;
-
-use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\EntityLookup;
-use Wikibase\Repo\WikibaseRepo;
-use Wikibase\StoreFactory;
 use Wikibase\Utils;
-
+use PropertySuggester\GetSuggestionsHelper;
+use Wikibase\Repo\WikibaseRepo;
+use PropertySuggester\Suggesters\Suggestion;
+use Wikibase\StoreFactory;
 
 /**
  * API module to get property suggestions.
@@ -54,8 +48,16 @@ class GetSuggestions extends ApiBase {
 		$language = $params['language'];
 
 		$resultSize = $params['continue'] + $params['limit'];
+                
+                $helper = new GetSuggestionsHelper();
 
-		$entries = $this->generateSuggestions( $params["entity"], $params['properties'], $search, $language );
+		$suggestions = $helper->generateSuggestions( $params["entity"], $params['properties']);
+                
+                // Build result Array
+                $entries = $this->createJSON( $suggestions, $language ); //ToDo: Put in generate entries
+                if ( $search ) {
+			$entries = $helper->filterByPrefix( $entries, $search );
+		}
 
 		if ( count( $entries ) < $resultSize && $search !== '' ) {
 			$entries = $this->mergeWithTraditionalSearchResults( $entries, $resultSize, $search, $language );
@@ -70,131 +72,8 @@ class GetSuggestions extends ApiBase {
 		}
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
 	}
-
-	/**
-	 * @param string $entity
-	 * @param string $propertyList
-	 * @param string $search
-	 * @param string $language
-	 * @return array
-	 */
-	public function generateSuggestions( $entity, $propertyList, $search, $language ) {
-		$suggester = new SimplePHPSuggester( wfGetDB( DB_SLAVE ) );
-		$lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		if ( $entity !== null ) {
-			$id = new  ItemId( $entity );
-			$entity = $lookup->getEntity( $id );
-			$suggestions = $suggester->suggestByItem( $entity );
-		} else {
-			$splitList = explode( ',', $propertyList );
-			$properties = array();
-			foreach ( $splitList as $id ) {
-				$properties[] = PropertyId::newFromNumber( $this->cleanPropertyId( $id ) );
-			}
-			$suggestions = $suggester->suggestByPropertyIds( $properties );
-		}
-		// Build result Array
-		$entries = $this->createJSON( $suggestions, $language );
-		if ( $search ) {
-			$entries = $this->filterByPrefix( $entries, $search );
-		}
-		return $entries;
-	}
-
-	/**
-	 * accepts strings of the format "P123" or "123" and returns
-	 * the id as int. returns 0 if the string is not of the specified format
-	 *
-	 * @param string $propertyId
-	 * @return int
-	 */
-	protected function cleanPropertyId( $propertyId ) {
-		if ( $propertyId[0] === 'P' ) {
-			return (int)substr( $propertyId, 1 );
-		}
-		return (int)$propertyId;
-	}
-
-	/**
-	 * @param array $entries
-	 * @param int $resultSize
-	 * @param string $search
-	 * @param string $language
-	 * @return array
-	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, $resultSize, $search, $language ) {
-		$searchEntitiesParameters = new DerivativeRequest(
-			$this->getRequest(),
-			array(
-				'limit' => $resultSize + 1,
-				'continue' => 0,
-				'search' => $search,
-				'action' => 'wbsearchentities',
-				'language' => $language,
-				'type' => Property::ENTITY_TYPE )
-		);
-		$api = new ApiMain( $searchEntitiesParameters );
-		$api->execute();
-		$apiResult = $api->getResultData();
-		$searchResult = $apiResult['search'];
-
-		// Avoid duplicates
-		$existingKeys = array();
-		foreach ( $entries as $entry ) {
-			$existingKeys[$entry['id']] = true;
-		}
-
-		$distinctCount = count( $entries );
-		foreach ( $searchResult as $sr ) {
-			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
-				$entries[] = $sr;
-				$distinctCount++;
-				if ( $distinctCount > $resultSize ) {
-					break;
-				}
-			}
-		}
-		return $entries;
-	}
-
-	/**
-	 * Filter for entries whose label or alias starts with $search
-	 * @param array $entries
-	 * @param string $search
-	 * @return array
-	 */
-	protected function filterByPrefix( array &$entries, $search ) {
-		$matchingEntries = array();
-		foreach ( $entries as $entry ) {
-			if ( $this->isMatch( $entry, $search ) ) {
-				$matchingEntries[] = $entry;
-			}
-		}
-		return $matchingEntries;
-	}
-
-	/**
-	 * Check if entry['label'] or entry['aliases'] starts with $search
-	 *
-	 * @param array $entry
-	 * @param string $search
-	 * @return bool
-	 */
-	protected function isMatch( array $entry, $search ) {
-		if ( stripos( $entry['label'], $search ) === 0 ) {
-			return true;
-		}
-		if ( $entry['aliases'] ) {
-			foreach ( $entry['aliases'] as $alias ) {
-				if ( stripos( $alias, $search ) === 0 ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
+        
+        /**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
 	 * @return array
@@ -237,6 +116,48 @@ class GetSuggestions extends ApiBase {
 			}
 
 			$entries[] = $entry;
+		}
+		return $entries;
+	}
+
+	/**
+	 * @param array $entries
+	 * @param int $resultSize
+	 * @param string $search
+	 * @param string $language
+	 * @return array
+	 */
+	public function mergeWithTraditionalSearchResults( array &$entries, $resultSize, $search, $language ) {
+		$searchEntitiesParameters = new DerivativeRequest(
+			$this->getRequest(),
+			array(
+				'limit' => $resultSize + 1,
+				'continue' => 0,
+				'search' => $search,
+				'action' => 'wbsearchentities',
+				'language' => $language,
+				'type' => Property::ENTITY_TYPE )
+		);
+		$api = new ApiMain( $searchEntitiesParameters );
+		$api->execute();
+		$apiResult = $api->getResultData();
+		$searchResult = $apiResult['search'];
+
+		// Avoid duplicates
+		$existingKeys = array();
+		foreach ( $entries as $entry ) {
+			$existingKeys[$entry['id']] = true;
+		}
+
+		$distinctCount = count( $entries );
+		foreach ( $searchResult as $sr ) {
+			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
+				$entries[] = $sr;
+				$distinctCount++;
+				if ( $distinctCount > $resultSize ) {
+					break;
+				}
+			}
 		}
 		return $entries;
 	}
