@@ -1,9 +1,10 @@
 language: php
 
 env:
-  - DBTYPE=mysql LANG=en; MW=master
+  - DBTYPE=mysql
+  - DBTYPE=sqlite
 php:
-  - 5.5
+  - 5.3
 
 before_script:
   - bash ./build/travis/before_script.sh
