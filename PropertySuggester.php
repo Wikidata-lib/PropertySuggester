@@ -25,6 +25,7 @@ $wgAutoloadClasses['PropertySuggester\GetSuggestions'] = $src . '/GetSuggestions
 $wgAutoloadClasses['PropertySuggester\Suggesters\Suggestion'] = $src . '/Suggesters/Suggestion.php';
 $wgAutoloadClasses['PropertySuggester\Suggesters\SuggesterEngine'] = $src . '/Suggesters/SuggesterEngine.php';
 $wgAutoloadClasses['PropertySuggester\Suggesters\SimplePHPSuggester'] = $src . '/Suggesters/SimplePHPSuggester.php';
+$wgAutoloadClasses['PropertySuggester\Maintenance\UpdateTable'] = __DIR__ . '/maintenance/UpdateTable.php';
 
 $wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
 $wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';

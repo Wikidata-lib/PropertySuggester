@@ -1,8 +1,9 @@
 <?php
 
-namespace PropertySuggester;
+namespace PropertySuggester\Maintenance;
 
 use Maintenance;
+
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 require_once $basePath . '/maintenance/Maintenance.php';
@@ -18,6 +19,7 @@ class UpdateTable extends Maintenance {
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
 		$this->addOption( 'use-insert', 'Avoid DBS specific import. Use INSERTs.', false, false );
+		$this->addOption( 'silent', 'Don not show information', false, false );
 	}
 
 
@@ -30,34 +32,35 @@ class UpdateTable extends Maintenance {
 			$csv = $this->getOption( 'file' );
 		}
 		$useInsert = $this->getOption( 'use-insert' );
+		$showInfo = !$this->getOption( 'silent' );
 
 		wfWaitForSlaves( 5 ); // let's not kill previos data, shall we? ;) --tor
 
 		# Attempt to connect to the database as a privileged user
 		# This will vomit up an error if there are permissions problems
 		$db = wfGetDB( DB_MASTER );
+
 		global $wgDBtype;
 		$tablename = 'wbs_propertypairs';
+		$dbtablename = $db->tableName($tablename);
 		if( $db->tableExists($tablename))
 		{
-			$this->output( "removing old entries\n" );
-
-			$db->delete( $tablename, "*" );
-			$this->output( "... Done removing\n" );
+			if($showInfo)$this->output( "removing old entries\n" );
+			$db->delete( $tablename, '*');
+			if($showInfo)$this->output( "... Done removing\n" );
 		} else
 		{
-			$this->error( "$tablename table does not exist.\nExecuting core/maintenance/update.php may help.\n", true);
+			$this->error( "$dbtablename table does not exist.\nExecuting core/maintenance/update.php may help.\n", true);
 		}
 
-		$this->output( "loading new entries from file\n" );
+		if($showInfo)$this->output( "loading new entries from file\n" );
 		$wholePath = str_replace( '\\', '/', __DIR__ . "/" . $csv);
 
 		if($wgDBtype == 'mysql' and !$useInsert)
 		{
-			$this->output("DBType = mysql. 'LOAD DATA INFILE'\n");
 			$db->query("
 				LOAD DATA INFILE '$wholePath'
-				INTO TABLE $tablename
+				INTO TABLE $dbtablename
 				FIELDS
 					TERMINATED BY ';'
 				LINES
@@ -66,13 +69,12 @@ class UpdateTable extends Maintenance {
 		}elseif($wgDBtype == 'postgres' and !$useInsert) //not tested yet
 		{
 			$db->query("
-				COPY $tablename
+				COPY $dbtablename
 				FROM '$wholePath'
 				WITH
 					DELIMITER ';'
 			");
 		}else{
-			$this->output("Importing using sql INSERT\n");
 			$fhandle = fopen($wholePath, "r");
 			if($fhandle !== false)
 			{
@@ -96,9 +98,9 @@ class UpdateTable extends Maintenance {
 			}
 			fclose($fhandle);
 		}
-		$this->output( "... Done loading\n" );
+		if($showInfo)$this->output( "... Done loading\n" );
 	}
 }
 
-$maintClass = 'PropertySuggester\UpdateTable';
+$maintClass = 'PropertySuggester\Maintenance\UpdateTable';
 require_once RUN_MAINTENANCE_IF_MAIN;
