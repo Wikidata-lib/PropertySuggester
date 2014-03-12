@@ -14,7 +14,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
  *
  * @covers PropertySuggester\Suggesters\SimplePHPSuggester
  *
- * @group Extensions/PropertySuggester
+ * @group PropertySuggester
  *
  * @group API
  * @group Database
@@ -42,25 +42,27 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		$rows[] = $this->row( 2, 4, 200, 0.2 );
 		$rows[] = $this->row( 3, 1, 100, 0.5 );
 
-		$this->db->delete( 'wbs_propertypairs', "*" );
 		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
 
 	public function setUp() {
 		parent::setUp();
-		$this->suggester = new SimplePHPSuggester( $this->db );
 
+		$this->tablesUsed[] = 'wbs_propertypairs';
+
+		$this->suggester = new SimplePHPSuggester( $this->db );
 	}
 
 	public function testDatabaseHasRows() {
-		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2') );
+		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2' ) );
 		$this->assertEquals( 5, $res->numRows() );
 	}
+
 
 	public function testSuggestByPropertyIds() {
 		$ids = array( PropertyId::newFromNumber( 1 ) );
 
-		$res = $this->suggester->suggestByPropertyIds($ids);
+		$res = $this->suggester->suggestByPropertyIds( $ids );
 
 		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
 		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
@@ -72,7 +74,7 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
 
-		$res = $this->suggester->suggestByItem($item);
+		$res = $this->suggester->suggestByItem( $item );
 
 		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
 		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
@@ -85,10 +87,9 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 		$res = $this->suggester->suggestByPropertyIds( $ids );
 
-		$resIds = array_map( function( $r ) { return $r->getPropertyId()->getSerialization(); }, $res );
-		$this->assertNotContains( "P2", $resIds );
-		$this->assertContains( "P3", $resIds );
-
+		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
+		$this->assertNotContains( 2 , $resultIds );
+		$this->assertContains( 3 , $resultIds );
 	}
 
 	public function tearDown() {
