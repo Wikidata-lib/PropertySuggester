@@ -53,7 +53,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 		$maint->execute();
 		$row = $this->db->select( 'wbs_propertypairs', array('rowcount' => 'COUNT(*)') )->fetchRow();
 		$this->assertEquals( 5, $row['rowcount'] );
-		$rows = $this->db->select(
+		$row = $this->db->select(
 			'wbs_propertypairs',
 			'*',
 			'1=1',
@@ -61,8 +61,8 @@ class UpdateTableTest extends MediaWikiTestCase {
 			array(
 				'ORDER BY' => 'pid1 DESC',
 				'LIMIT' => 1
-			) );
-		$this->assertEquals( 123, $rows->fetchRow()["count"] );
+			) )->fetchRow();
+		$this->assertEquals( 123, $row["count"] );
 	}
 
 	public function tearDown() {
