@@ -5,10 +5,12 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
+use PropertySuggester\Suggesters\SimplePHPSuggester;
+use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
+use Wikibase\Utils;
 
 /**
  * API module to get property suggestions.
@@ -16,8 +18,6 @@ use Wikibase\StoreFactory;
  * @since 0.1
  * @licence GNU GPL v2+
  */
-
-
 class GetSuggestions extends ApiBase {
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
@@ -44,19 +44,18 @@ class GetSuggestions extends ApiBase {
 		}
 
 		$language = $params['language'];
-
 		$resultSize = $params['continue'] + $params['limit'];
-                
-                $helper = new GetSuggestionsHelper();
 
-		$suggestions = $helper->generateSuggestions( $params["entity"], $params['properties']);
-                
-                // Build result Array
-                $entries = $this->createJSON( $suggestions, $language ); //ToDo: Put in generate entries
-                if ( $search ) {
+		$helper = new GetSuggestionsHelper( StoreFactory::getStore( 'sqlstore' )->getEntityLookup(), new SimplePHPSuggester( wfGetDB( DB_SLAVE )) );
+		$suggestions = $helper->generateSuggestions( $params["entity"], $params['properties'] );
+
+		// Build result Array
+		$entries = $this->createJSON( $suggestions, $language );
+		if ( $search ) {
 			$entries = $helper->filterByPrefix( $entries, $search );
 		}
 
+		// merge with search result
 		if ( count( $entries ) < $resultSize && $search !== '' ) {
 			$entries = $this->mergeWithTraditionalSearchResults( $entries, $resultSize, $search, $language );
 		}
@@ -70,8 +69,8 @@ class GetSuggestions extends ApiBase {
 		}
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
 	}
-        
-        /**
+
+	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
 	 * @return array
@@ -96,15 +95,15 @@ class GetSuggestions extends ApiBase {
 			$aliases = array();
 			foreach ( $terms as $term ) {
 				if ( $term->getEntityId() === $id->getNumericId() ) {
-					if ( $term->getType() === 'label' ) {
-						$entry['label'] = $term->getText();
-					}
-					if ( $term->getType() === 'description' ) {
-						$entry['description'] = $term->getText();
-					}
-					if ( $term->getType() === 'alias' ) {
-						$aliases[] = $term->getText();
-					}
+			if ( $term->getType() === 'label' ) {
+				$entry['label'] = $term->getText();
+			}
+			if ( $term->getType() === 'description' ) {
+				$entry['description'] = $term->getText();
+			}
+			if ( $term->getType() === 'alias' ) {
+				$aliases[] = $term->getText();
+			}
 				}
 			}
 
