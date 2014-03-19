@@ -23,8 +23,18 @@ final class PropertySuggesterHooks {
 	 * @return bool
 	 */
 	public static function onUnitTestsList( &$files ) {
-		$files = array_merge( $files, glob( __DIR__ . '/tests/phpunit/*Test.php' ) );
+		// @codeCoverageIgnoreStart
+		$directoryIterator = new RecursiveDirectoryIterator( __DIR__ . '/tests/phpunit/' );
+		/**
+		 * @var SplFileInfo $fileInfo
+		 */
+		foreach ( new RecursiveIteratorIterator( $directoryIterator ) as $fileInfo ) {
+			if ( substr( $fileInfo->getFilename(), -8 ) === 'Test.php' ) {
+				$files[] = $fileInfo->getPathname();
+			}
+		}
 		return true;
+		// @codeCoverageIgnoreEnd
 	}
 
 	/**

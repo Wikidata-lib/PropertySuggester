@@ -6,10 +6,8 @@ use ApiBase;
 use ApiMain;
 use DerivativeRequest;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\Utils;
-use PropertySuggester\GetSuggestionsHelper;
+use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\Repo\WikibaseRepo;
-use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\StoreFactory;
 
 /**
