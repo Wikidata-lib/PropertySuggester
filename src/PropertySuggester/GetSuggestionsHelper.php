@@ -98,16 +98,25 @@ class GetSuggestionsHelper {
 	 * @return bool
 	 */
 	protected function isMatch( array $entry, $search ) {
-		if ( stripos( $entry['label'], $search ) === 0 ) {
+		if ( $this->startsWith( $entry['label'], $search )) {
 			return true;
 		}
 		if ( $entry['aliases'] ) {
 			foreach ( $entry['aliases'] as $alias ) {
-				if ( stripos( $alias, $search ) === 0 ) {
+				if ( $this->startsWith( $alias, $search ) ) {
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param string $string
+	 * @param string $search
+	 * @return bool
+	 */
+	public function startsWith( $string, $search ) {
+		return stripos( $string, $search ) === 0;
 	}
 }

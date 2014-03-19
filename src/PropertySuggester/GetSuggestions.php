@@ -10,6 +10,7 @@ use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
+use Wikibase\Term;
 use Wikibase\Utils;
 
 /**
@@ -46,11 +47,11 @@ class GetSuggestions extends ApiBase {
 		$language = $params['language'];
 		$resultSize = $params['continue'] + $params['limit'];
 
-		$helper = new GetSuggestionsHelper( StoreFactory::getStore( 'sqlstore' )->getEntityLookup(), new SimplePHPSuggester( wfGetDB( DB_SLAVE )) );
+		$helper = new GetSuggestionsHelper( StoreFactory::getStore( 'sqlstore' )->getEntityLookup(), new SimplePHPSuggester( wfGetDB( DB_SLAVE ) ) );
 		$suggestions = $helper->generateSuggestions( $params["entity"], $params['properties'] );
 
 		// Build result Array
-		$entries = $this->createJSON( $suggestions, $language );
+		$entries = $this->createJSON( $suggestions, $language, $helper, $search );
 		if ( $search ) {
 			$entries = $helper->filterByPrefix( $entries, $search );
 		}
@@ -73,9 +74,11 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
+	 * @param GetSuggestionsHelper $helper
+	 * @param string $search
 	 * @return array
 	 */
-	public function createJSON( $suggestions, $language ) {
+	public function createJSON( $suggestions, $language, $helper, $search ) {
 		$entries = array();
 		$ids = array();
 		$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
@@ -85,31 +88,43 @@ class GetSuggestions extends ApiBase {
 		}
 		//See SearchEntities
 		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );
-		foreach ( $suggestions as $suggestion ) {
+		$clusteredTerms = array();
+
+		foreach ( $terms as &$term ) {
+			$id = $term->getEntityId()->getSerialization();
+			if ( !$clusteredTerms[$id] ) {
+				$clusteredTerms[$id] = array();
+			}
+			$clusteredTerms[$id][] = $term;
+		}
+
+		foreach ( $suggestions as &$suggestion ) {
 			$id = $suggestion->getPropertyId();
 			$entry = array();
 			$entry['id'] = $id->getPrefixedId();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
 			$entry['rating'] = $suggestion->getPropertyId();
 
-			$aliases = array();
-			foreach ( $terms as $term ) {
-				if ( $term->getEntityId() === $id->getNumericId() ) {
-			if ( $term->getType() === 'label' ) {
-				$entry['label'] = $term->getText();
-			}
-			if ( $term->getType() === 'description' ) {
-				$entry['description'] = $term->getText();
-			}
-			if ( $term->getType() === 'alias' ) {
-				$aliases[] = $term->getText();
-			}
+			foreach ( $clusteredTerms[$id->getSerialization()] as &$term ) {
+				/** @var $term Term */
+				switch ( $term->getType() ) {
+					case Term::TYPE_LABEL:
+						$entry['label'] = $term->getText();
+						break;
+					case Term::TYPE_DESCRIPTION:
+						$entry['description'] = $term->getText();
+						break;
+					case Term::TYPE_ALIAS:
+						// Only include matching aliases
+						if ( $helper->startsWith( $term->getText(), $search ) ) {
+							if ( !isset( $entry['aliases'] ) ) {
+								$entry['aliases'] = array();
+								$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
+							}
+							$entry['aliases'][] = $term->getText();
+						}
+						break;
 				}
-			}
-
-			if ( count( $aliases ) > 0 ) {
-				$entry['aliases'] = $aliases;
-				$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 
 			$entries[] = $entry;
