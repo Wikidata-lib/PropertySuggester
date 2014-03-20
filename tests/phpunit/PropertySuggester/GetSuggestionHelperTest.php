@@ -57,6 +57,31 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 		$this->assertContains( $result[1], $filtered );
 	}
 
+	public function testMergeWithTraditionalSearchResults() {
+		$suggesterResult = array();
+		$suggesterResult[0] = array( 'id' => '8' );
+		$suggesterResult[1] = array( 'id' => '14');
+
+		$searchResult = array();
+		$searchResult[0] = array( 'id' => '7' );
+		$searchResult[1] = array( 'id' => '8');
+		$searchResult[2] = array( 'id' => '13');
+		$searchResult[3] = array( 'id' => '14');
+		$searchResult[4] = array( 'id' => '15');
+		$searchResult[5] = array( 'id' => '16');
+
+		$mergedResult = $this->helper->mergeWithTraditionalSearchResults( $suggesterResult, $searchResult, 5 );
+
+		$expected = array();
+		$expected[0] = array( 'id' => '8' );
+		$expected[1] = array( 'id' => '14');
+		$expected[2] = array( 'id' => '7');
+		$expected[3] = array( 'id' => '13');
+		$expected[4] = array( 'id' => '15');
+
+		$this->assertEquals( $mergedResult, $expected );
+	}
+
 	public function tearDown() {
 		parent::tearDown();
 	}

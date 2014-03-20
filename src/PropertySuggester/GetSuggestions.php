@@ -56,9 +56,28 @@ class GetSuggestions extends ApiBase {
 			$entries = $helper->filterByPrefix( $entries, $search );
 		}
 
-		// merge with search result
+		// merge with search result if possible and necessary
+
 		if ( count( $entries ) < $resultSize && $search !== '' ) {
-			$entries = $this->mergeWithTraditionalSearchResults( $entries, $resultSize, $search, $language );
+
+			//Do search api request
+
+			$searchEntitiesParameters = new DerivativeRequest(
+			$this->getRequest(),
+			array(
+				'limit' => $resultSize + 1,
+				'continue' => 0,
+				'search' => $search,
+				'action' => 'wbsearchentities',
+				'language' => $language,
+				'type' => Property::ENTITY_TYPE )
+			);
+			$api = new ApiMain( $searchEntitiesParameters );
+			$api->execute();
+			$apiResult = $api->getResultData();
+			$searchResult = $apiResult['search'];
+
+			$entries = $helper->mergeWithTraditionalSearchResults( $entries, $searchResult, $resultSize );
 		}
 
 		// Define Result
@@ -128,48 +147,6 @@ class GetSuggestions extends ApiBase {
 			}
 
 			$entries[] = $entry;
-		}
-		return $entries;
-	}
-
-	/**
-	 * @param array $entries
-	 * @param int $resultSize
-	 * @param string $search
-	 * @param string $language
-	 * @return array
-	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, $resultSize, $search, $language ) {
-		$searchEntitiesParameters = new DerivativeRequest(
-			$this->getRequest(),
-			array(
-				'limit' => $resultSize + 1,
-				'continue' => 0,
-				'search' => $search,
-				'action' => 'wbsearchentities',
-				'language' => $language,
-				'type' => Property::ENTITY_TYPE )
-		);
-		$api = new ApiMain( $searchEntitiesParameters );
-		$api->execute();
-		$apiResult = $api->getResultData();
-		$searchResult = $apiResult['search'];
-
-		// Avoid duplicates
-		$existingKeys = array();
-		foreach ( $entries as $entry ) {
-			$existingKeys[$entry['id']] = true;
-		}
-
-		$distinctCount = count( $entries );
-		foreach ( $searchResult as $sr ) {
-			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
-				$entries[] = $sr;
-				$distinctCount++;
-				if ( $distinctCount > $resultSize ) {
-					break;
-				}
-			}
 		}
 		return $entries;
 	}

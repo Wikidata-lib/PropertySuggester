@@ -119,4 +119,31 @@ class GetSuggestionsHelper {
 	public function startsWith( $string, $search ) {
 		return stripos( $string, $search ) === 0;
 	}
+
+	/**
+	 * @param array $entries
+	 * @param array $searchResult
+	 * @param int $resultSize
+	 * @return array
+	 */
+	public function mergeWithTraditionalSearchResults( array &$entries, $searchResult, $resultSize ) {
+
+		// Avoid duplicates
+		$existingKeys = array();
+		foreach ( $entries as $entry ) {
+			$existingKeys[$entry['id']] = true;
+		}
+
+		$distinctCount = count( $entries );
+		foreach ( $searchResult as $sr ) {
+			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
+				$entries[] = $sr;
+				$distinctCount++;
+				if ( $distinctCount >= $resultSize ) {
+					break;
+				}
+			}
+		}
+		return $entries;
+	}
 }
