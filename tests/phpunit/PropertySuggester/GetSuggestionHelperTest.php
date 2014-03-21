@@ -8,6 +8,7 @@ use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
+use Wikibase\DataModel\Entity\ItemId;
 
 /**
  *
@@ -30,8 +31,8 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$lookup = $this->getMock( "Wikibase\EntityLookup" );
-		$suggester = $this->getMock( "PropertySuggester\Suggesters\SuggesterEngine" );
+		$lookup = $this->getMock( 'Wikibase\EntityLookup' );
+		$suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
 		$this->helper = new GetSuggestionsHelper( $lookup, $suggester );
 
@@ -80,6 +81,54 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 		$expected[4] = array( 'id' => '15');
 
 		$this->assertEquals( $mergedResult, $expected );
+	}
+
+	public function testGenerateSuggestions() {
+
+		$lookup = $this->getMock( 'Wikibase\EntityLookup' );
+		$suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
+
+		//Test 'generateSuggestion' with propertyList
+
+		$properties = array();
+		$properties[] = PropertyId::newFromNumber( 12 );
+
+		$suggester->expects($this->any())
+			->method('suggestByPropertyIds')
+			->with($this->equalTo($properties))
+			->will($this->returnValue('foo'));
+
+		$this->helper = new GetSuggestionsHelper( $lookup, $suggester );
+
+		//implictly also tests protected method 'cleanPropertyId'
+		
+		$result1 = $this->helper->generateSuggestions(null, 'P12');
+		$result2 = $this->helper->generateSuggestions(null, '12');
+
+		$this->assertEquals( $result1, 'foo' );
+		$this->assertEquals( $result1, $result2 );
+
+		//Test 'generateSuggestion' with item
+
+		$item = Item::newFromArray( array( 'entity' => 'Q42' ) );
+		$statement = new Statement( new PropertySomeValueSnak( new PropertyId( 'P12' ) ) );
+		$statement->setGuid( 'claim0' );
+		$item->addClaim( $statement );
+
+		$itemId = new ItemId( 'Q42' );
+
+		$lookup->expects($this->once())
+			->method('getEntity')
+			->with($this->equalTo($itemId))
+			->will($this->returnValue($item));
+
+		$suggester->expects($this->any())
+			->method('suggestByItem')
+			->with($this->equalTo($item))
+			->will($this->returnValue('foo'));
+
+		$result3 = $this->helper->generateSuggestions('Q42', null);
+		$this->assertEquals( $result3, 'foo' );
 	}
 
 	public function tearDown() {
