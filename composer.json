@@ -1,0 +1,22 @@
+{
+	"name": "propertysuggester/propertysuggester",
+	"type": "mediawiki-extension",
+	"description": "Extension for Wikibase to provide usefull suggestions for new properties",
+	"keywords": ["propertysuggester", "wikibase", "wikidata"],
+	"homepage": "https://github.com/Wikidata-lib/PropertySuggester",
+	"license": "GPL-2.0+",
+	"authors": [ ],
+	"support": {
+		"issues": "https://github.com/Wikidata-lib/PropertySuggester/issues"
+	},
+	"require": {
+		"php": ">=5.3.0"
+	},
+	"require-dev": {
+	},
+	"autoload": {
+		"files" : [
+			"PropertySuggester.php"
+		]
+	}
+}
