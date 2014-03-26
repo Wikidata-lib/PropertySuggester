@@ -3,6 +3,14 @@
  * PropertySuggester extension.
  * License: WTFPL 2.0
  */
+
+if ( defined( 'PropertySuggester_VERSION' ) ) {
+	// Do not initialize more then once.
+	return;
+}
+
+define( 'PropertySuggester_VERSION', '0.9' );
+
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'PropertySuggester',
@@ -11,21 +19,18 @@ $wgExtensionCredits['other'][] = array(
 	'descriptionmsg' => 'propertysuggester-desc',
 );
 
+spl_autoload_register( function ( $className ) {
+	static $classes = false;
+	if ( $classes === false ) {
+		$classes = include( __DIR__ . '/' . 'PropertySuggester.classes.php' );
+	}
+	if ( array_key_exists( $className, $classes ) ) {
+		include_once __DIR__ . '/' . $classes[$className];
+	}
+});
 
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
 $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
-
-// TODO use composer for autoloading
-$wgAutoloadClasses['PropertySuggesterHooks'] = __DIR__ . '/PropertySuggesterHooks.php';
-
-$src = __DIR__ . '/src/PropertySuggester';
-$wgAutoloadClasses['PropertySuggester\SpecialSuggester'] = $src . '/SpecialSuggester.php';
-$wgAutoloadClasses['PropertySuggester\GetSuggestions'] = $src . '/GetSuggestions.php';
-
-$wgAutoloadClasses['PropertySuggester\Suggesters\Suggestion'] = $src . '/Suggesters/Suggestion.php';
-$wgAutoloadClasses['PropertySuggester\Suggesters\SuggesterEngine'] = $src . '/Suggesters/SuggesterEngine.php';
-$wgAutoloadClasses['PropertySuggester\Suggesters\SimplePHPSuggester'] = $src . '/Suggesters/SimplePHPSuggester.php';
-$wgAutoloadClasses['PropertySuggester\Maintenance\UpdateTable'] = __DIR__ . '/maintenance/UpdateTable.php';
 
 $wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
 $wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
