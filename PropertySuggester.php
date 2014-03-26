@@ -21,6 +21,7 @@ $wgAutoloadClasses['PropertySuggesterHooks'] = __DIR__ . '/PropertySuggesterHook
 $src = __DIR__ . '/src/PropertySuggester';
 $wgAutoloadClasses['PropertySuggester\SpecialSuggester'] = $src . '/SpecialSuggester.php';
 $wgAutoloadClasses['PropertySuggester\GetSuggestions'] = $src . '/GetSuggestions.php';
+$wgAutoloadClasses['PropertySuggester\GetSuggestionsHelper'] = $src . '/GetSuggestionsHelper.php';
 
 $wgAutoloadClasses['PropertySuggester\Suggesters\Suggestion'] = $src . '/Suggesters/Suggestion.php';
 $wgAutoloadClasses['PropertySuggester\Suggesters\SuggesterEngine'] = $src . '/Suggesters/SuggesterEngine.php';
