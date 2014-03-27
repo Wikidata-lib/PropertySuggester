@@ -11,6 +11,7 @@ if ( defined( 'PropertySuggester_VERSION' ) ) {
 
 define( 'PropertySuggester_VERSION', '0.9' );
 
+global $wgExtensionCredits;
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'PropertySuggester',
@@ -29,18 +30,25 @@ spl_autoload_register( function ( $className ) {
 	}
 });
 
+global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
 $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
 
+global $wgSpecialPages;
 $wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
+
+global $wgSpecialPagesGroups;
 $wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
 
+global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions']				= 'PropertySuggester\GetSuggestions';
 
+global $wgHooks;
 $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 $wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
 
+global $wgResourceModules;
 $wgResourceModules['ext.PropertySuggester'] = array(
 		'scripts'		=> array( 'modules/ext.PropertySuggester.js' ),
 		'styles'		=> 'modules/ext.PropertySuggester.css',
