@@ -5,6 +5,8 @@
  */
 return array(
 	'PropertySuggesterHooks' => 'PropertySuggesterHooks.php',
+	
+	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdateTable.php',
 
 	'PropertySuggester\SpecialSuggester' => 'src/PropertySuggester/SpecialSuggester.php',
 
