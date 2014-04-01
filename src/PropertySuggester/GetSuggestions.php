@@ -122,7 +122,7 @@ class GetSuggestions extends ApiBase {
 			$entry = array();
 			$entry['id'] = $id->getPrefixedId();
 			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry['rating'] = $suggestion->getPropertyId();
+			$entry['rating'] = $suggestion->getProbability();
 
 			foreach ( $clusteredTerms[$id->getSerialization()] as &$term ) {
 				/** @var $term Term */

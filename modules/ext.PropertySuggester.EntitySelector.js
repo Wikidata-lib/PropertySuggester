@@ -62,6 +62,6 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 	}, 
 
 	__useSuggester: function() {
-		return this.options.type === 'property' && typeof mw.config.get('wbEntityId') !== 'undefined';
+		return this.options.type === 'property' && mw.config.get('wbEntityId');
 	}
  });
