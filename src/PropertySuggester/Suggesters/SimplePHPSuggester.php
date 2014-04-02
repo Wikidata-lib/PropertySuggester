@@ -52,13 +52,13 @@ class SimplePHPSuggester implements SuggesterEngine {
 			return array();
 		}
 
-		$excludedIds = array_merge( $idTuples, $this->getDeprecatedPropertyIds() );
+		$excludedIds = array_merge( /*$idTuples,*/ $this->getDeprecatedPropertyIds() );
 
 		$res = $this->dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $this->dbr->makeList( $idTuples ) . ')',
-				   'pid2 NOT IN (' . $this->dbr->makeList( $excludedIds ) . ')' ),
+			array( '(pid1, qid1) IN (' . str_replace( "'", '', $this->dbr->makeList( $idTuples ) ) . ')',
+				   'pid2 NOT IN (' . str_replace( "'", '', $this->dbr->makeList( $excludedIds ) ) . ')' ),
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
@@ -103,8 +103,9 @@ class SimplePHPSuggester implements SuggesterEngine {
 		foreach ( $snaks as $snak ) {
 			$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), 0);
 			if( $snak->getType() === "value" ){
-
-				$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), $snak->getValue());
+				$dataValue = $snak->getDataValue();
+				$id = (int)substr( $dataValue->getEntityId()->getSerialization(), 1 );
+				$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), $id);
 
 			}
 		}
