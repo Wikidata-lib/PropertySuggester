@@ -52,7 +52,7 @@ class UpdateTable extends Maintenance {
 		}
 
 		if ( $showInfo ) $this->output( "loading new entries from file\n" );
-		$wholePath = str_replace( '\\', '/', __DIR__ . "/" . $csv );
+		$wholePath = realpath( $csv );
 
 		if ( $wgDBtype == 'mysql' and !$useInsert ) {
 			$db->query( "
