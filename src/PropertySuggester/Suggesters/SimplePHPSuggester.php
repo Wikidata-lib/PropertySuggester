@@ -43,21 +43,21 @@ class SimplePHPSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param int[] $propertyIds
+	 * @param int[] $idTuples
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $propertyIds ) {
-		if ( !$propertyIds ) {
+	protected function getSuggestions( array $idTuples, $count ) {
+		if ( !$idTuples ) {
 			return array();
 		}
-		$excludedIds = array_merge( $propertyIds, $this->getDeprecatedPropertyIds() );
-		$count = count( $propertyIds );
+
+		$excludedIds = array_merge( $idTuples, $this->getDeprecatedPropertyIds() );
 
 		$res = $this->dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $this->dbr->makeList( $propertyIds ) . ')',
+			array( 'pid1 IN (' . $this->dbr->makeList( $idTuples ) . ')',
 				   'pid2 NOT IN (' . $this->dbr->makeList( $excludedIds ) . ')' ),
 			__METHOD__,
 			array(
@@ -83,11 +83,11 @@ class SimplePHPSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByPropertyIds( array $propertyIds ) {
-		$numericIds = array();
+		$idTuples = array();
 		foreach ( $propertyIds as $id ) {
-			$numericIds[] = $id->getNumericId();
+			$idTuples[] = $this->buildTuple($id->getNumericId(), 0);
 		}
-		return $this->getSuggestions( $numericIds );
+		return $this->getSuggestions( $idTuples, count($propertyIds) );
 	}
 
 	/**
@@ -96,13 +96,26 @@ class SimplePHPSuggester implements SuggesterEngine {
 	 * @param Item $item
 	 * @return Suggestion[]
 	 */
+
 	public function suggestByItem( Item $item ) {
 		$snaks = $item->getAllSnaks();
-		$numericIds = array();
+		$idTuples = array();
 		foreach ( $snaks as $snak ) {
-			$numericIds[] = $snak->getPropertyId()->getNumericId();
+			$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), 0);
+			if( $snak->getType() === "value" ){
+
+				$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), $snak->getValue());
+
+			}
 		}
-		return $this->getSuggestions( $numericIds );
+		return $this->getSuggestions( $idTuples, count($snaks) );
 	}
+
+	public function buildTuple( $a, $b ){
+		$tuple = '( '. $a .', '. $b .')';
+		return $tuple;
+	}
+
+
 
 }
