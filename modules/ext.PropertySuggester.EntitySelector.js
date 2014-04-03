@@ -14,19 +14,19 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 
 		self._oldCreate.apply(self, arguments);
 
-        var inputHandler = function() {
-            if ( self.__useSuggester() && self.value() === '' ) {
-                self.search( '*' );
-            }
-        };
-        self.element.on( 'input.' + this.widgetName, inputHandler );
+		var inputHandler = function() {
+			if ( self.__useSuggester() && self.value() === '' ) {
+				self.search( '*' );
+			}
+		};
+		self.element.on( 'input.' + this.widgetName, inputHandler );
 
-        var focusHandler = function() {
-            if ( self.__useSuggester() && self.value() === '' && !self.menu.element.is( ':visible' ) ) {
-                self.search( '*' );
-            }
-        };
-        self.element.on( 'focus', focusHandler );
+		var focusHandler = function() {
+			if ( self.__useSuggester() && self.value() === '' && !self.menu.element.is( ':visible' ) ) {
+				self.search( '*' );
+			}
+		};
+		self.element.on( 'focus', focusHandler );
 
 	},
 
@@ -39,22 +39,12 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 					this.offset = 0;
 			}
 
-			$.extend( this.options.ajax, {
-				url: this.options.url,
-				timeout: this.options.timeout,
-				params: {
-					action: 'wbsgetsuggestions',
-					entity: this.__getEntityId(),
-					format: 'json',
-					language: this.options.language,
-					type: this.options.type,
-					'continue': this.offset
-				}
-			} );
+			$.extend( this.options.ajax, this.__buildOptions() );
 			if ( this.options.limit !== null ) {
 				this.options.ajax.params.limit = this.options.limit;
 			}
 			$.ui.suggester.prototype._request.apply( this, arguments );
+
 		} else {
 			this._oldRequest.apply( this, arguments );
 		}
@@ -64,15 +54,30 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 		return this.options.type === 'property' && this.__getEntityId();
 	},
 
-    __getEntityId: function() {
-        var $entityView = this.element.closest( ':wikibase-entityview');
-        entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
-        if( entity ) {
-            return entity.getId();
-        } else {
-            return null;
-        }
-    }
+	__getEntityId: function() {
+		var $entityView = this.element.closest( ':wikibase-entityview');
+		entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
+		if( entity ) {
+			return entity.getId();
+		} else {
+			return null;
+		}
+	},
 
+	__buildOptions: function() {
+		var params = {
+			url: this.options.url,
+			timeout: this.options.timeout,
+			params: {
+				action: 'wbsgetsuggestions',
+				entity: this.__getEntityId(),
+				format: 'json',
+				language: this.options.language,
+				type: this.options.type,
+				'continue': this.offset
+			}
+		}
+		return params;
+	}
 
  });
