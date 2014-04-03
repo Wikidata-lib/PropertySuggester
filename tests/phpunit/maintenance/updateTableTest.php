@@ -2,11 +2,6 @@
 
 use PropertySuggester\Maintenance\UpdateTable;
 
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Claim\Statement;
-use Wikibase\DataModel\Snak\PropertySomeValueSnak;
-
 /**
  *
  * @covers PropertySuggester\maintenance\updateTableTest

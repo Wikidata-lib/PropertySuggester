@@ -9,7 +9,7 @@ if ( defined( 'PropertySuggester_VERSION' ) ) {
 	return;
 }
 
-define( 'PropertySuggester_VERSION', '0.9' );
+define( 'PropertySuggester_VERSION', '0.1' );
 
 global $wgExtensionCredits;
 $wgExtensionCredits['other'][] = array(
@@ -34,12 +34,6 @@ global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
 $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
 
-global $wgSpecialPages;
-$wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
-
-global $wgSpecialPagesGroups;
-$wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
-
 global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions']				= 'PropertySuggester\GetSuggestions';
 
@@ -48,20 +42,8 @@ $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 $wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
 
-global $wgResourceModules;
-$wgResourceModules['ext.PropertySuggester'] = array(
-		'scripts'		=> array( 'modules/ext.PropertySuggester.js' ),
-		'styles'		=> 'modules/ext.PropertySuggester.css',
-		'messages'		=> array(),
-		'dependencies'	=> array( 'ext.PropertySuggester.EntitySelector' ),
-		'localBasePath'	=> __DIR__,
-		'remoteExtPath'	=> 'PropertySuggester',
-);
-
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 		'scripts'		=> array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
-		'styles'		=> array(),
-		'messages'		=> array(),
 		'dependencies'	=> array( 'jquery.wikibase.entityselector' ),
 		'localBasePath'	=> __DIR__,
 		'remoteExtPath'	=> 'PropertySuggester',

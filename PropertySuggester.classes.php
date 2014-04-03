@@ -8,8 +8,6 @@ return array(
 	
 	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdateTable.php',
 
-	'PropertySuggester\SpecialSuggester' => 'src/PropertySuggester/SpecialSuggester.php',
-
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
 	'PropertySuggester\GetSuggestionsHelper' => 'src/PropertySuggester/GetSuggestionsHelper.php',
 	

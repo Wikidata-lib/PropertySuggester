@@ -24,7 +24,6 @@ class UpdateTable extends Maintenance {
 
 
 	function execute() {
-		global $wgVersion, $wgTitle, $wgLang;
 		$csv = null;
 		if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
 			$this->error( "The --file option requires a file as an argument.\n", true );
