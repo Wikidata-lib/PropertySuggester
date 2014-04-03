@@ -42,15 +42,22 @@ class UpdateTable extends Maintenance {
 		global $wgDBtype;
 		$tablename = 'wbs_propertypairs';
 		$dbtablename = $db->tableName( $tablename );
+
 		if ( $db->tableExists( $tablename ) ) {
-			if ( $showInfo ) $this->output( "removing old entries\n" );
+			if ( $showInfo ) {
+                $this->output( "removing old entries\n" );
+            }
 			$db->delete( $tablename, '*' );
-			if ( $showInfo ) $this->output( "... Done removing\n" );
+			if ( $showInfo ) {
+                $this->output( "... Done removing\n" );
+            }
 		} else {
 			$this->error( "$dbtablename table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
 
-		if ( $showInfo ) $this->output( "loading new entries from file\n" );
+		if ( $showInfo ) {
+            $this->output( "loading new entries from file\n" );
+        }
 
 		$wholePath = realpath( $csv );
 		$wholePath = str_replace( '\\', '/', $wholePath );
@@ -68,8 +75,7 @@ class UpdateTable extends Maintenance {
 			$db->query( "
 				COPY $dbtablename
 				FROM '$wholePath'
-				WITH
-					DELIMITER ';'
+				WITH DELIMITER ';'
 			" );
 		} else {
 			$fhandle = fopen( $wholePath, "r" );
@@ -92,7 +98,9 @@ class UpdateTable extends Maintenance {
 			}
 			fclose( $fhandle );
 		}
-		if ( $showInfo ) $this->output( "... Done loading\n" );
+		if ( $showInfo ) {
+            $this->output( "... Done loading\n" );
+        }
 	}
 }
 

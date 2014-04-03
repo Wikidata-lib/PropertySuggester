@@ -48,7 +48,12 @@ class GetSuggestions extends ApiBase {
 		$resultSize = $params['continue'] + $params['limit'];
 
 		$helper = new GetSuggestionsHelper( StoreFactory::getStore( 'sqlstore' )->getEntityLookup(), new SimplePHPSuggester( wfGetDB( DB_SLAVE ) ) );
-		$suggestions = $helper->generateSuggestions( $params["entity"], $params['properties'] );
+
+        if( $params["entity"] !== null ) {
+            $suggestions = $helper->generateSuggestionsByItem( $params["entity"] );
+        } else {
+            $suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'] );
+        }
 
 		// Build result Array
 		$entries = $this->createJSON( $suggestions, $language, $helper, $search );
@@ -109,7 +114,7 @@ class GetSuggestions extends ApiBase {
 		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );
 		$clusteredTerms = array();
 
-		foreach ( $terms as &$term ) {
+		foreach ( $terms as $term ) {
 			$id = $term->getEntityId()->getSerialization();
 			if ( !$clusteredTerms[$id] ) {
 				$clusteredTerms[$id] = array();
@@ -117,7 +122,7 @@ class GetSuggestions extends ApiBase {
 			$clusteredTerms[$id][] = $term;
 		}
 
-		foreach ( $suggestions as &$suggestion ) {
+		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
 			$entry = array();
 			$entry['id'] = $id->getPrefixedId();

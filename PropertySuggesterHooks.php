@@ -11,7 +11,7 @@ final class PropertySuggesterHooks {
 	 * @return bool
 	 */
 	public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
-		if ( isset( $_GET['nosuggestions'] ) ) {
+		if ( $out->getRequest()->getCheck( 'nosuggestions' ) ) {
 			return true;
 		}
 		$out->addModules( 'ext.PropertySuggester.EntitySelector' );
@@ -25,10 +25,9 @@ final class PropertySuggesterHooks {
 	public static function onUnitTestsList( &$files ) {
 		// @codeCoverageIgnoreStart
 		$directoryIterator = new RecursiveDirectoryIterator( __DIR__ . '/tests/phpunit/' );
-		/**
-		 * @var SplFileInfo $fileInfo
-		 */
-		foreach ( new RecursiveIteratorIterator( $directoryIterator ) as $fileInfo ) {
+
+		/* @var SplFileInfo $fileInfo */
+        foreach ( new RecursiveIteratorIterator( $directoryIterator ) as $fileInfo ) {
 			if ( substr( $fileInfo->getFilename(), -8 ) === 'Test.php' ) {
 				$files[] = $fileInfo->getPathname();
 			}
