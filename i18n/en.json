@@ -1,0 +1,8 @@
+{
+    "@metadata": {
+        "authors": []
+    },
+    "propertysuggester-desc": "Shows suggested properties",
+    "propertysuggester": "Property Suggester",
+    "propertysuggester-intro": "This is the PropertySuggester."
+}

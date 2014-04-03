@@ -1,7 +1,7 @@
 <?php
 /**
  * PropertySuggester extension.
- * License: WTFPL 2.0
+ * License: GNU GPL v2+
  */
 
 if ( defined( 'PropertySuggester_VERSION' ) ) {
@@ -33,6 +33,9 @@ spl_autoload_register( function ( $className ) {
 global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
 $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
+
+global $wgMessagesDirs
+$wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions']				= 'PropertySuggester\GetSuggestions';
