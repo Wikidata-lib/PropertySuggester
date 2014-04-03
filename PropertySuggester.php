@@ -34,7 +34,7 @@ global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
 $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
 
-global $wgMessagesDirs
+global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgAPIModules;
