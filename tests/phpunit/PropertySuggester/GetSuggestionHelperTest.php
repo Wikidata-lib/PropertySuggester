@@ -33,6 +33,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 	 * @var PHPUnit_Framework_MockObject_MockObject
 	 */
 	protected $suggester;
+
 	/**
 	 * @var PHPUnit_Framework_MockObject_MockObject
 	 */
@@ -105,8 +106,8 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 		//implictly also tests protected method 'cleanPropertyId'
 
-		$result1 = $this->helper->generateSuggestions( null, 'P12' );
-		$result2 = $this->helper->generateSuggestions( null, '12' );
+		$result1 = $this->helper->generateSuggestionsByPropertyList( 'P12' );
+		$result2 = $this->helper->generateSuggestionsByPropertyList( '12' );
 
 		$this->assertEquals( $result1, array( 'foo' ) );
 		$this->assertEquals( $result1, $result2 );
@@ -131,7 +132,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $item ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result3 = $this->helper->generateSuggestions( 'Q42', null );
+		$result3 = $this->helper->generateSuggestionsByItem( 'Q42' );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
 

@@ -28,7 +28,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * default is 107 (DEPRECATED main type)
+	 * default is 107 ( DEPRECATED main type )
 	 * @return int[]
 	 */
 	public function getDeprecatedPropertyIds() {
@@ -38,7 +38,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	/**
 	 * @param int[] $deprecatedPropertyIds
 	 */
-	public function setDeprecatedPropertyIds(array $deprecatedPropertyIds) {
+	public function setDeprecatedPropertyIds( array $deprecatedPropertyIds ) {
 		$this->deprecatedPropertyIds = $deprecatedPropertyIds;
 	}
 
@@ -62,7 +62,6 @@ class SimplePHPSuggester implements SuggesterEngine {
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
-				//'HAVING' => "sum(probability)/$count > $threshold",
 				'ORDER BY' => 'prob DESC'
 			)
 		);

@@ -23,5 +23,5 @@ interface SuggesterEngine {
 	 *
 	 * @return Suggestion[]
 	 */
-	public function suggestByItem( Item $item);
+	public function suggestByItem( Item $item );
 }

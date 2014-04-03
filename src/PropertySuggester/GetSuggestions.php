@@ -68,14 +68,15 @@ class GetSuggestions extends ApiBase {
 			//Do search api request
 
 			$searchEntitiesParameters = new DerivativeRequest(
-			$this->getRequest(),
-			array(
-				'limit' => $resultSize + 1,
-				'continue' => 0,
-				'search' => $search,
-				'action' => 'wbsearchentities',
-				'language' => $language,
-				'type' => Property::ENTITY_TYPE )
+			    $this->getRequest(),
+			    array (
+				    'limit' => $resultSize + 1,
+				    'continue' => 0,
+				    'search' => $search,
+				    'action' => 'wbsearchentities',
+				    'language' => $language,
+				    'type' => Property::ENTITY_TYPE
+                )
 			);
 			$api = new ApiMain( $searchEntitiesParameters );
 			$api->execute();

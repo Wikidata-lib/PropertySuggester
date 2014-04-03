@@ -10,6 +10,7 @@ class Suggestion {
 	 * @var PropertyId
 	 */
 	private $propertyId;
+
 	/**
 	 * @var float
 	 */
