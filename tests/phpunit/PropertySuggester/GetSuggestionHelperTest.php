@@ -51,7 +51,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 	public function testFilterByPrefix() {
 		$result = array();
-		$result[0] = array( 'label' => 'abc', 'aliases' => array() );
+		$result[0] = array( 'label' => 'Abc', 'aliases' => array() );
 		$result[1] = array( 'label' => 'def', 'aliases' => array() );
 
 		$filtered = $this->helper->filterByPrefix( $result, 'ab' );
@@ -61,13 +61,24 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 	public function testFilterByPrefixWithAlias() {
 		$result = array();
-		$result[0] = array( 'label' => 'abc', 'aliases' => array() );
-		$result[1] = array( 'label' => 'def', 'aliases' => array( 'ghi', 'jkl' ) );
+		$result[0] = array( 'label' => 'Abc', 'aliases' => array() );
+		$result[1] = array( 'label' => 'def', 'aliases' => array( 'Ghi', 'Jkl' ) );
 
 		$filtered = $this->helper->filterByPrefix( $result, 'gh' );
 		$this->assertNotContains( $result[0], $filtered );
 		$this->assertContains( $result[1], $filtered );
 	}
+
+    /* TODO!
+	public function testFilterByPrefixWithNonAscii() {
+		$result = array();
+		$result[0] = array( 'label' => 'Öüü', 'aliases' => array() );
+		$result[1] = array( 'label' => 'xxx', 'aliases' => array( 'Äöö', 'jkl' ) );
+
+		$filtered = $this->helper->filterByPrefix( $result, 'äö' );
+		$this->assertNotContains( $result[0], $filtered );
+		$this->assertContains( $result[1], $filtered );
+	} */
 
 	public function testMergeWithTraditionalSearchResults() {
 		$suggesterResult = array();
@@ -104,13 +115,11 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		//implictly also tests protected method 'cleanPropertyId'
-
 		$result1 = $this->helper->generateSuggestionsByPropertyList( 'P12' );
 		$result2 = $this->helper->generateSuggestionsByPropertyList( '12' );
 
 		$this->assertEquals( $result1, array( 'foo' ) );
-		$this->assertEquals( $result1, $result2 );
+		$this->assertEquals( $result2, array( 'foo' ) );
 
 	}
 

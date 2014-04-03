@@ -121,7 +121,7 @@ class GetSuggestionsHelper {
 	 * @return bool
 	 */
 	public function startsWith( $string, $search ) {
-		return stripos( $string, $search ) === 0;
+		return strncasecmp( $string, $search, strlen( $search ) ) === 0;
 	}
 
 	/**
