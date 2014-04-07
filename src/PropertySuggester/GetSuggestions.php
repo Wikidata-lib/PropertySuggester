@@ -37,6 +37,9 @@ class GetSuggestions extends ApiBase {
 		parent::__construct( $main, $name, $prefix );
 		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->suggester = new SimplePHPSuggester( wfGetLB( DB_SLAVE ) );
+
+		global $wgPropertySuggesterDeprecatedIds;
+		$this->suggester->setDeprecatedPropertyIds($wgPropertySuggesterDeprecatedIds);
 	}
 
 	/**
@@ -244,6 +247,13 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::getExamples()
 	 */
 	protected function getExamples() {
-		return array();
+		return array(
+			'api.php?action=wbsgetsuggestions&format=json&entity=Q4'
+			=> 'Get suggestions for entity 4',
+			'api.php?action=wbsgetsuggestions&format=json&entity=Q4&continue=10&limit=5'
+			=> 'Get suggestions for entity 4 from rank 10 to 15',
+			'api.php?action=wbsgetsuggestions&format=json&properties=P31,P21'
+			=> 'Get suggestions for the property combination P21 and P31'
+		);
 	}
 }
