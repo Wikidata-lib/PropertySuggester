@@ -3,15 +3,19 @@
 namespace PropertySuggester\Maintenance;
 
 use Maintenance;
+use PropertySuggester\UpdateTable\Inserter\InsertInserter;
+use PropertySuggester\UpdateTable\Inserter\MySQLInserter;
+use PropertySuggester\UpdateTable\InserterContext;
 
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 require_once $basePath . '/maintenance/Maintenance.php';
 
 /**
- * Maintenance script to load probability table from given csv file
+ * Maintenance script to load property pair occurrence probability table from given csv file
  *
- * @ingroup Maintenance
+ * @licence GNU GPL v2+
+ * @author 2014BPN2
  */
 class UpdateTable extends Maintenance {
 	function __construct() {
@@ -22,14 +26,17 @@ class UpdateTable extends Maintenance {
 		$this->addOption( 'silent', 'Do not show information', false, false );
 	}
 
-
 	function execute() {
 		$csv = null;
-		if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
-			$this->error( "The --file option requires a file as an argument.\n", true );
-		} elseif ( $this->hasOption( 'file' ) ) {
+
+		if ( $this->hasOption( 'file' ) )
+		{
+			if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
+				$this->error( "The --file option requires a file as an argument.\n", true );
+			}
 			$csv = $this->getOption( 'file' );
 		}
+
 		$useInsert = $this->getOption( 'use-insert' );
 		$showInfo = !$this->getOption( 'silent' );
 
@@ -39,21 +46,11 @@ class UpdateTable extends Maintenance {
 		# This will vomit up an error if there are permissions problems
 		$db = wfGetDB( DB_MASTER );
 
-		global $wgDBtype;
-		$tablename = 'wbs_propertypairs';
-		$dbtablename = $db->tableName( $tablename );
+		global $wgDbType;
+		$tableName = 'wbs_propertypairs';
+		$dbTableName = $db->tableName( $tableName );
 
-		if ( $db->tableExists( $tablename ) ) {
-			if ( $showInfo ) {
-                $this->output( "removing old entries\n" );
-            }
-			$db->delete( $tablename, '*' );
-			if ( $showInfo ) {
-                $this->output( "... Done removing\n" );
-            }
-		} else {
-			$this->error( "$dbtablename table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
-		}
+		$this->clearTable($db, $tableName, $dbTableName, $showInfo);
 
 		if ( $showInfo ) {
             $this->output( "loading new entries from file\n" );
@@ -62,45 +59,40 @@ class UpdateTable extends Maintenance {
 		$wholePath = realpath( $csv );
 		$wholePath = str_replace( '\\', '/', $wholePath );
 
-		if ( $wgDBtype == 'mysql' and !$useInsert ) {
-			$db->query( "
-				LOAD DATA INFILE '$wholePath'
-				INTO TABLE $dbtablename
-				FIELDS
-					TERMINATED BY ';'
-				LINES
-					TERMINATED BY '\\n'
-			" );
-		} elseif ( $wgDBtype == 'postgres' and !$useInsert ) {
-			$db->query( "
-				COPY $dbtablename
-				FROM '$wholePath'
-				WITH DELIMITER ';'
-			" );
+		if ( $wgDbType == 'mysql' and !$useInsert ) {
+			$insertionStrategy = new MySQLInserter();
+		} elseif ( $wgDbType == 'postgres' and !$useInsert ) {
+			$insertionStrategy = new PostgresInserter();
 		} else {
-			$fhandle = fopen( $wholePath, "r" );
-			if ( $fhandle !== false ) {
-				$accuSize = 0;
-				$accu = Array();
-				$data = fgetcsv( $fhandle, 0, ';' );
-				while ( $data !== false ) {
-					$accu[] = array( 'pid1' => $data[0], 'pid2' => $data[1], 'count' => $data[2], 'probability' => $data[3] );
-					$accuSize++;
-
-					$data = fgetcsv( $fhandle, 0, ';' );
-
-					if ( $data === false or $accuSize > 1000 ) {
-						$db->insert( $tablename, $accu );
-						$accu = Array();
-						$accuSize = 0;
-					}
-				}
-			}
-			fclose( $fhandle );
+			$insertionStrategy = new InsertInserter();
 		}
+
+		$insertionContext = new InserterContext();
+		$insertionContext->setDb($db);
+		$insertionContext->setDbTableName($dbTableName);
+		$insertionContext->setTableName($tableName);
+		$insertionContext->setShowInfo($showInfo);
+		$insertionContext->setWholePath($wholePath);
+		$insertionStrategy->setContext($insertionContext);
+		$insertionStrategy->execute();
+
 		if ( $showInfo ) {
             $this->output( "... Done loading\n" );
         }
+	}
+
+	private function clearTable($db, $tableName, $dbTableName, $showInfo) {
+		if ( $db->tableExists( $tableName ) ) {
+		if ( $showInfo ) {
+		$this->output( "removing old entries\n" );
+		}
+		$db->delete( $tableName, '*' );
+		if ( $showInfo ) {
+			$this->output( "... Done removing\n" );
+		}
+		} else {
+			$this->error( "$dbTableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
+		}
 	}
 }
 
