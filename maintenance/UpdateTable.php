@@ -5,6 +5,7 @@ namespace PropertySuggester\Maintenance;
 use Maintenance;
 use PropertySuggester\UpdateTable\Inserter\InsertInserter;
 use PropertySuggester\UpdateTable\Inserter\MySQLInserter;
+use PropertySuggester\UpdateTable\Inserter\PostgresInserter;
 use PropertySuggester\UpdateTable\InserterContext;
 
 

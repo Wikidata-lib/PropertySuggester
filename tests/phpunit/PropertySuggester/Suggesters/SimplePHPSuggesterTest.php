@@ -25,7 +25,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var SimplePHPSuggester
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 

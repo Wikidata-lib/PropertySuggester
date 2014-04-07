@@ -15,7 +15,14 @@ use PropertySuggester\Maintenance\UpdateTable;
  */
 class UpdateTableTest extends MediaWikiTestCase {
 
+	/**
+	 * @var string
+	 */
 	protected $testfilename;
+
+	/**
+	 * @var array
+	 */
 	protected $rows;
 
 	private function row( $pid1, $pid2, $count, $probability ) {
@@ -60,7 +67,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 	}
 
 	/**
-	 * @param UpdateTable $maintScript
+	 * @param UpdateTable $maintenanceScript
 	 */
 	private function runScriptAndAssert( UpdateTable $maintenanceScript ) {
 		$maintenanceScript->execute();

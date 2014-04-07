@@ -24,4 +24,10 @@ interface SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item );
+
+	/**
+	 * @param int[] $numericIds
+	 * @return void
+	 */
+	public function setDeprecatedPropertyIds( array $numericIds );
 }
