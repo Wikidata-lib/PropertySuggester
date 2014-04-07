@@ -47,18 +47,30 @@ class UpdateTableTest extends MediaWikiTestCase {
 		fclose( $fhandle );
 	}
 
-	public function testRewrite() {
+	public function testRewriteNativeStrategy() {
 		$maint = new UpdateTable();
 		$maint->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1 ), null );
-		$maint->execute();
+		$this->helperRunScriptAndAssert($maint);
+	}
 
+	public function testRewriteWithSQLInserts() {
+		$maint = new UpdateTable();
+		$maint->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 1 ), null );
+		$this->helperRunScriptAndAssert($maint);
+	}
+
+	/**
+	 * @param UpdateTable $maintScript
+	 */
+	private function helperRunScriptAndAssert(UpdateTable $maintScript)
+	{
+		$maintScript->execute();
 		$this->assertSelect(
 			'wbs_propertypairs',
 			array( 'pid1', 'pid2', 'count', 'probability' ),
 			array(),
 			$this->rows
 		);
-
 	}
 
 	public function tearDown() {
