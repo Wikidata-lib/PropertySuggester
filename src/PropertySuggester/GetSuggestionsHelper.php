@@ -2,12 +2,11 @@
 
 namespace PropertySuggester;
 
-use PropertySuggester\Suggesters\SimplePHPSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
+use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
-use Wikibase\StoreFactory;
 
 
 /**
@@ -76,78 +75,4 @@ class GetSuggestionsHelper {
 		return (int)$propertyId;
 	}
 
-	/**
-	 * Filters for entries whose label or alias starts with $search
-	 * An entry needs to have a field 'label' and an array 'aliases'.
-	 *
-	 * @param array $entries
-	 * @param string $search
-	 * @return array representing Json
-	 */
-	public function filterByPrefix( array &$entries, $search ) {
-		$matchingEntries = array();
-		foreach ( $entries as $entry ) {
-			if ( $this->isMatch( $entry, $search ) ) {
-				$matchingEntries[] = $entry;
-			}
-		}
-		return $matchingEntries;
-	}
-
-	/**
-	 * Checks if entry['label'] or entry['aliases'] starts with $search
-	 *
-	 * @param array $entry in Json representation
-	 * @param string $search
-	 * @return bool
-	 */
-	protected function isMatch( array $entry, $search ) {
-		if ( $this->startsWith( $entry['label'], $search )) {
-			return true;
-		}
-		if ( $entry['aliases'] ) {
-			foreach ( $entry['aliases'] as $alias ) {
-				if ( $this->startsWith( $alias, $search ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param string $string
-	 * @param string $search
-	 * @return bool
-	 */
-	public function startsWith( $string, $search ) {
-		return strncasecmp( $string, $search, strlen( $search ) ) === 0;
-	}
-
-	/**
-	 * @param array $entries
-	 * @param array $searchResult
-	 * @param int $resultSize
-	 * @return array representing Json
-	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, $searchResult, $resultSize ) {
-
-		// Avoid duplicates
-		$existingKeys = array();
-		foreach ( $entries as $entry ) {
-			$existingKeys[$entry['id']] = true;
-		}
-
-		$distinctCount = count( $entries );
-		foreach ( $searchResult as $sr ) {
-			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
-				$entries[] = $sr;
-				$distinctCount++;
-				if ( $distinctCount >= $resultSize ) {
-					break;
-				}
-			}
-		}
-		return $entries;
-	}
 }

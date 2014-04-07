@@ -10,6 +10,7 @@ return array(
 
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
 	'PropertySuggester\GetSuggestionsHelper' => 'src/PropertySuggester/GetSuggestionsHelper.php',
+	'PropertySuggester\ResultBuilder' => 'src/PropertySuggester/ResultBuilder.php',
 	
 	'PropertySuggester\Suggesters\Suggestion' => 'src/PropertySuggester/Suggesters/Suggestion.php',
 	'PropertySuggester\Suggesters\SuggesterEngine' => 'src/PropertySuggester/Suggesters/SuggesterEngine.php',

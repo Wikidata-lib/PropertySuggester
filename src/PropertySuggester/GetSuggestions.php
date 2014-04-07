@@ -6,12 +6,10 @@ use ApiBase;
 use ApiMain;
 use DerivativeRequest;
 use PropertySuggester\Suggesters\SimplePHPSuggester;
-use PropertySuggester\Suggesters\Suggestion;
+use PropertySuggester\ResultBuilder;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
-use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
-use Wikibase\Term;
 use Wikibase\Utils;
 
 /**
@@ -28,7 +26,7 @@ class GetSuggestions extends ApiBase {
 	protected $lookup;
 
 	/**
-	 * @var SimplePHPSuggester
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 
@@ -46,7 +44,7 @@ class GetSuggestions extends ApiBase {
 		$params = $this->extractRequestParams();
 
 		// parse params
-		if ( !( $params['entity'] xor $params['properties'] ) ) {
+		if ( !( $params['entity'] XOR $params['properties'] ) ) {
 			wfProfileOut( __METHOD__ );
 			$this->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
 		}
@@ -69,9 +67,15 @@ class GetSuggestions extends ApiBase {
         }
 
 		// Build result Array
-		$entries = $this->createJSON( $suggestions, $language, $helper, $search );
+		$resultBuilder = new ResultBuilder();
+		$entries = $resultBuilder->createJSON( $suggestions, $language, $search );
+		foreach ( $entries as $entry ) {
+			if ( !isset( $entry['aliases'] ) ) {
+				$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
+			}
+		}
 		if ( $search ) {
-			$entries = $helper->filterByPrefix( $entries, $search );
+			$entries = $resultBuilder->filterByPrefix( $entries, $search ); //refactor do in create Json
 		}
 
 		// merge with search result if possible and necessary
@@ -95,8 +99,7 @@ class GetSuggestions extends ApiBase {
 			$api->execute();
 			$apiResult = $api->getResultData();
 			$searchResult = $apiResult['search'];
-
-			$entries = $helper->mergeWithTraditionalSearchResults( $entries, $searchResult, $resultSize );
+			$entries = $resultBuilder->mergeWithTraditionalSearchResults( $entries, $searchResult, $resultSize );
 		}
 
 		// Define Result
@@ -107,67 +110,6 @@ class GetSuggestions extends ApiBase {
 			$this->getResult()->addValue( null, 'search-continue', $resultSize );
 		}
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
-	}
-
-	/**
-	 * @param Suggestion[] $suggestions
-	 * @param string $language
-	 * @param GetSuggestionsHelper $helper
-	 * @param string $search
-	 * @return array
-	 */
-	public function createJSON( $suggestions, $language, $helper, $search ) {
-		$entries = array();
-		$ids = array();
-		$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
-		foreach ( $suggestions as $suggestion ) {
-			$id = $suggestion->getPropertyId();
-			$ids[] = $id;
-		}
-		//See SearchEntities
-		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );
-		$clusteredTerms = array();
-
-		foreach ( $terms as $term ) {
-			$id = $term->getEntityId()->getSerialization();
-			if ( !$clusteredTerms[$id] ) {
-				$clusteredTerms[$id] = array();
-			}
-			$clusteredTerms[$id][] = $term;
-		}
-
-		foreach ( $suggestions as $suggestion ) {
-			$id = $suggestion->getPropertyId();
-			$entry = array();
-			$entry['id'] = $id->getPrefixedId();
-			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry['rating'] = $suggestion->getProbability();
-
-			foreach ( $clusteredTerms[$id->getSerialization()] as &$term ) {
-				/** @var $term Term */
-				switch ( $term->getType() ) {
-					case Term::TYPE_LABEL:
-						$entry['label'] = $term->getText();
-						break;
-					case Term::TYPE_DESCRIPTION:
-						$entry['description'] = $term->getText();
-						break;
-					case Term::TYPE_ALIAS:
-						// Only include matching aliases
-						if ( $helper->startsWith( $term->getText(), $search ) ) {
-							if ( !isset( $entry['aliases'] ) ) {
-								$entry['aliases'] = array();
-								$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
-							}
-							$entry['aliases'][] = $term->getText();
-						}
-						break;
-				}
-			}
-
-			$entries[] = $entry;
-		}
-		return $entries;
 	}
 
 	/**
