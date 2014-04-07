@@ -15,7 +15,7 @@ require_once $basePath . '/maintenance/Maintenance.php';
  * Maintenance script to load property pair occurrence probability table from given csv file
  *
  * @licence GNU GPL v2+
- * @author 2014BPN2
+ * @author BP2013N2
  */
 class UpdateTable extends Maintenance {
 
@@ -31,13 +31,14 @@ class UpdateTable extends Maintenance {
 	 * loads property pair occurrence probability table from given csv file
 	 */
 	function execute() {
-		$csv = null;
+		if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
+			$this->error( "The --file option requires a file as an argument.\n", true );
+		}
+		$wholePath = realpath( $this->getOption( 'file' ) );
+		$wholePath = str_replace( '\\', '/', $wholePath );
 
-		if ( $this->hasOption( 'file' ) ) {
-			if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
-				$this->error( "The --file option requires a file as an argument.\n", true );
-			}
-			$csv = $this->getOption( 'file' );
+		if ( !file_exists( $wholePath ) ) {
+			$this->error( "Cant find $wholePath \n", true );
 		}
 
 		$useInsert = $this->getOption( 'use-insert' );
@@ -58,9 +59,6 @@ class UpdateTable extends Maintenance {
 			$this->output( "loading new entries from file\n" );
 		}
 
-		$wholePath = realpath( $csv );
-		$wholePath = str_replace( '\\', '/', $wholePath );
-
 		if ( $wgDbType == 'mysql' and !$useInsert ) {
 			$insertionStrategy = new MySQLInserter();
 		} elseif ( $wgDbType == 'postgres' and !$useInsert ) {
@@ -75,7 +73,10 @@ class UpdateTable extends Maintenance {
 		$insertionContext->setShowInfo( $showInfo );
 		$insertionContext->setWholePath( $wholePath );
 
-		$insertionStrategy->execute( $insertionContext );
+		$success = $insertionStrategy->execute( $insertionContext );
+		if ( !$success ) {
+			$this->error( "Failed to run import to db" );
+		}
 
 		if ( $showInfo ) {
 			$this->output( "... Done loading\n" );

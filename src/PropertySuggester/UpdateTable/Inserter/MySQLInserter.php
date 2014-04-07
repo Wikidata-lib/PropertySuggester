@@ -8,6 +8,7 @@ class MySQLInserter implements Inserter {
 
 	/**
 	 * @param InserterContext $insertionContext
+	 * @return bool
 	 */
 	function execute( InserterContext $insertionContext ) {
 		$db = $insertionContext->getDb();
@@ -21,5 +22,6 @@ class MySQLInserter implements Inserter {
 				LINES
 					TERMINATED BY '\\n'
 			" );
+		return true;
 	}
 } 

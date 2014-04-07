@@ -9,7 +9,7 @@ class PostgresInserter implements Inserter {
 	/**
 	 * Insert using Postgres' 'COPY' statement
 	 * @param InserterContext $insertionContext
-	 * @return mixed|void
+	 * @return bool
 	 */
 	function execute( InserterContext $insertionContext ) {
 		$db = $insertionContext->getDb();
@@ -20,5 +20,6 @@ class PostgresInserter implements Inserter {
 			FROM '$wholePath'
 			WITH DELIMITER ';'
 		" );
+		return true;
 	}
 } 

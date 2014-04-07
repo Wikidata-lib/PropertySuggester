@@ -9,7 +9,7 @@ class InsertInserter implements Inserter {
 	/**
 	 * Import using SQL Insert
 	 * @param InserterContext $insertionContext
-	 * @return void
+	 * @return bool
 	 */
 	function execute( InserterContext $insertionContext ) {
 		$fileHandle = fopen( $insertionContext->getWholePath(), "r" );
@@ -26,7 +26,10 @@ class InsertInserter implements Inserter {
 					$accumulator = Array();
 				}
 			}
+		} else {
+			return false;
 		}
 		fclose( $fileHandle );
+		return true;
 	}
 } 
