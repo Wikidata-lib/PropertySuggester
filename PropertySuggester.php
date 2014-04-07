@@ -52,3 +52,8 @@ $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 		'remoteExtPath'	=> 'PropertySuggester',
 );
 
+
+global $wgPropertySuggesterDeprecatedIds;
+$wgPropertySuggesterDeprecatedIds = array(
+	107  // ( DEPRECATED main type )
+);

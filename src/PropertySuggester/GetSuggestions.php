@@ -6,6 +6,8 @@ use ApiBase;
 use ApiMain;
 use DerivativeRequest;
 use PropertySuggester\Suggesters\SimplePHPSuggester;
+use PropertySuggester\Suggesters\SuggesterEngine;
+use PropertySuggester\Suggesters\Suggestion;
 use PropertySuggester\ResultBuilder;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
@@ -34,6 +36,9 @@ class GetSuggestions extends ApiBase {
 		parent::__construct( $main, $name, $prefix );
 		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->suggester = new SimplePHPSuggester( wfGetLB( DB_SLAVE ) );
+
+		global $wgPropertySuggesterDeprecatedIds;
+		$this->suggester->setDeprecatedPropertyIds($wgPropertySuggesterDeprecatedIds);
 	}
 
 	/**
@@ -49,6 +54,7 @@ class GetSuggestions extends ApiBase {
 			$this->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
 		}
 
+		// The entityselector doesn't allow a search for '' so '*' gets mapped to ''
 		if ( $params['search'] !== '*' ) {
 			$search = $params['search'];
 		} else {
@@ -60,11 +66,11 @@ class GetSuggestions extends ApiBase {
 
 		$helper = new GetSuggestionsHelper( $this->lookup, $this->suggester );
 
-        if( $params["entity"] !== null ) {
-            $suggestions = $helper->generateSuggestionsByItem( $params["entity"] );
-        } else {
-            $suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'] );
-        }
+		if ( $params["entity"] !== null ) {
+			$suggestions = $helper->generateSuggestionsByItem( $params["entity"] );
+		} else {
+			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'] );
+		}
 
 		// Build result Array
 		$resultBuilder = new ResultBuilder();
@@ -79,21 +85,19 @@ class GetSuggestions extends ApiBase {
 		}
 
 		// merge with search result if possible and necessary
-
 		if ( count( $entries ) < $resultSize && $search !== '' ) {
 
 			//Do search api request
-
 			$searchEntitiesParameters = new DerivativeRequest(
-			    $this->getRequest(),
-			    array (
-				    'limit' => $resultSize + 1,
-				    'continue' => 0,
-				    'search' => $search,
-				    'action' => 'wbsearchentities',
-				    'language' => $language,
-				    'type' => Property::ENTITY_TYPE
-                )
+				$this->getRequest(),
+				array(
+					'limit' => $resultSize + 1,
+					'continue' => 0,
+					'search' => $search,
+					'action' => 'wbsearchentities',
+					'language' => $language,
+					'type' => Property::ENTITY_TYPE
+				)
 			);
 			$api = new ApiMain( $searchEntitiesParameters );
 			$api->execute();
@@ -186,6 +190,13 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::getExamples()
 	 */
 	protected function getExamples() {
-		return array();
+		return array(
+			'api.php?action=wbsgetsuggestions&format=json&entity=Q4'
+			=> 'Get suggestions for entity 4',
+			'api.php?action=wbsgetsuggestions&format=json&entity=Q4&continue=10&limit=5'
+			=> 'Get suggestions for entity 4 from rank 10 to 15',
+			'api.php?action=wbsgetsuggestions&format=json&properties=P31,P21'
+			=> 'Get suggestions for the property combination P21 and P31'
+		);
 	}
 }

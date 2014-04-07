@@ -2,7 +2,7 @@
 
 namespace PropertySuggester\Suggesters;
 
-use DatabaseBase;
+use LoadBalancerSingle;
 use MediaWikiTestCase;
 
 use Wikibase\DataModel\Entity\PropertyId;
@@ -25,7 +25,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var SimplePHPSuggester
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 
@@ -49,8 +49,8 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		parent::setUp();
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
-
-		$this->suggester = new SimplePHPSuggester( $this->db );
+		$lb = new LoadBalancerSingle( array("connection" => $this->db ) );
+		$this->suggester = new SimplePHPSuggester( $lb );
 	}
 
 	public function testDatabaseHasRows() {

@@ -5,11 +5,13 @@ namespace PropertySuggester;
 use MediaWikiTestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 
+use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\EntityLookup;
 
 /**
  *
@@ -30,12 +32,12 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 	protected $helper;
 
 	/**
-	 * @var PHPUnit_Framework_MockObject_MockObject
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 
 	/**
-	 * @var PHPUnit_Framework_MockObject_MockObject
+	 * @var EntityLookup
 	 */
 	protected $lookup;
 

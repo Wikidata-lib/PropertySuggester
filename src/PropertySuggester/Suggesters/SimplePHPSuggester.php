@@ -17,7 +17,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 	/**
 	 * @var int[]
 	 */
-	private $deprecatedPropertyIds = array( 107 );
+	private $deprecatedPropertyIds = array();
 
 	/**
 	 * @var LoadBalancer
@@ -32,7 +32,6 @@ class SimplePHPSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * default is 107 ( DEPRECATED main type )
 	 * @return int[]
 	 */
 	public function getDeprecatedPropertyIds() {
