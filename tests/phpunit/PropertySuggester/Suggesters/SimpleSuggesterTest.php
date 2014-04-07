@@ -22,7 +22,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
  * @group medium
  *
  */
-class SimplePHPSuggesterTest extends MediaWikiTestCase {
+class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	/**
 	 * @var SuggesterEngine
@@ -50,7 +50,7 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
 		$lb = new LoadBalancerSingle( array("connection" => $this->db ) );
-		$this->suggester = new SimplePHPSuggester( $lb );
+		$this->suggester = new SimpleSuggester( $lb );
 	}
 
 	public function testDatabaseHasRows() {

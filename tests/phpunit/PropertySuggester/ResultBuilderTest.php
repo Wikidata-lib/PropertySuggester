@@ -3,7 +3,6 @@
 namespace PropertySuggester;
 
 use MediaWikiTestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 
 /**
  *
@@ -16,31 +15,16 @@ use PHPUnit_Framework_MockObject_MockObject;
  * @group medium
  *
  */
-class GetSuggestionHelperTest extends MediaWikiTestCase {
+class ResultBuilderTest extends MediaWikiTestCase {
 
 	/**
 	 * @var ResultBuilder
 	 */
 	protected $resultBuilder;
 
-	/**
-	 * @var PHPUnit_Framework_MockObject_MockObject
-	 */
-	protected $suggester;
-
-	/**
-	 * @var PHPUnit_Framework_MockObject_MockObject
-	 */
-	protected $lookup;
-
 	public function setUp() {
 		parent::setUp();
-
-		$this->lookup = $this->getMock( 'Wikibase\EntityLookup' );
-		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
-
 		$this->resultBuilder = new ResultBuilder( );
-
 	}
 
 	public function testFilterByPrefix() {

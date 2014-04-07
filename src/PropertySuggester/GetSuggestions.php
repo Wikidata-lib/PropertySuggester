@@ -5,9 +5,8 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
-use PropertySuggester\Suggesters\SimplePHPSuggester;
+use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
-use PropertySuggester\Suggesters\Suggestion;
 use PropertySuggester\ResultBuilder;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
@@ -25,17 +24,17 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @var EntityLookup
 	 */
-	protected $lookup;
+	private $lookup;
 
 	/**
 	 * @var SuggesterEngine
 	 */
-	protected $suggester;
+	private $suggester;
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
 		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$this->suggester = new SimplePHPSuggester( wfGetLB( DB_SLAVE ) );
+		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
 
 		global $wgPropertySuggesterDeprecatedIds;
 		$this->suggester->setDeprecatedPropertyIds($wgPropertySuggesterDeprecatedIds);

@@ -8,11 +8,11 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 
 /**
- * Class SimplePHPSuggester
+ * Class SimpleSuggester
  * a Suggester implementation that creates suggestion via MySQL
  * Needs the wbs_propertypairs table filled with pair probabilities.
  */
-class SimplePHPSuggester implements SuggesterEngine {
+class SimpleSuggester implements SuggesterEngine {
 
 	/**
 	 * @var int[]

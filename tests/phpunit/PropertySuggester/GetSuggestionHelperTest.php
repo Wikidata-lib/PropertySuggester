@@ -3,8 +3,6 @@
 namespace PropertySuggester;
 
 use MediaWikiTestCase;
-use PHPUnit_Framework_MockObject_MockObject;
-
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;

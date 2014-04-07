@@ -7,8 +7,22 @@ use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
 
-
+/**
+ * ResultBuilder builds Json-compatible array structure from suggestions
+ *
+ * @since 0.1
+ * @licence GNU GPL v2+
+ */
 class ResultBuilder {
+
+	/**
+	 * @var $EntityTitleLookup
+	 */
+	private $entityTitleLookup;
+
+	public function __construct() {
+		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
+	}
 
 	/**
 	 * @param Suggestion[] $suggestions
@@ -19,7 +33,6 @@ class ResultBuilder {
 	public function createJSON( $suggestions, $language, $search ) {
 		$entries = array();
 		$ids = array();
-		$entityContentFactory = WikibaseRepo::getDefaultInstance()->getEntityContentFactory();
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
 			$ids[] = $id;
@@ -30,33 +43,7 @@ class ResultBuilder {
 
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
-			$entry = array();
-			$entry['id'] = $id->getPrefixedId();
-			$entry['url'] = $entityContentFactory->getTitleForId( $id )->getFullUrl();
-			$entry['rating'] = $suggestion->getProbability();
-
-			foreach ( $clusteredTerms[$id->getSerialization()] as &$term ) {
-				/** @var $term Term */
-				switch ( $term->getType() ) {
-					case Term::TYPE_LABEL:
-						$entry['label'] = $term->getText();
-						break;
-					case Term::TYPE_DESCRIPTION:
-						$entry['description'] = $term->getText();
-						break;
-					case Term::TYPE_ALIAS:
-						// Only include matching aliases
-						if ( $this->startsWith( $term->getText(), $search ) ) {
-							if ( !isset( $entry['aliases'] ) ) {
-								$entry['aliases'] = array();
-							}
-							$entry['aliases'][] = $term->getText();
-						}
-						break;
-				}
-			}
-
-			$entries[] = $entry;
+			$entries[] = $this->buildEntry( $id, $clusteredTerms, $suggestion, $search );
 		}
 		return $entries;
 	}
@@ -113,7 +100,7 @@ class ResultBuilder {
 	 * @param string $search
 	 * @return bool
 	 */
-	protected function isMatch( array $entry, $search ) {
+	private function isMatch( array $entry, $search ) {
 		if ( $this->startsWith( $entry['label'], $search )) {
 			return true;
 		}
@@ -132,12 +119,12 @@ class ResultBuilder {
 	 * @param string $search
 	 * @return bool
 	 */
-	public function startsWith( $string, $search ) {
+	private function startsWith( $string, $search ) {
 		return strncasecmp( $string, $search, strlen( $search ) ) === 0;
 	}
 
 	/**
-	 * @param $terms Term[]
+	 * @param Term[] $terms
 	 * @return Term[][]
 	 */
 	private function clusterTerms( $terms ) {
@@ -151,6 +138,50 @@ class ResultBuilder {
 			$clusteredTerms[$id][] = $term;
 		}
 		return $clusteredTerms;
+	}
+
+	/**
+	 * @param array $entry
+	 * @param Term $term
+	 * @param string $search
+	 */
+	private function checkAndSetAlias( &$entry, $term, $search ) {
+		if ( $this->startsWith( $term->getText(), $search ) ) {
+			if ( !isset( $entry['aliases'] ) ) {
+				$entry['aliases'] = array();
+			}
+			$entry['aliases'][] = $term->getText();
+		}
+	}
+
+	/**
+	 * @param \Wikibase\EntityId $id
+	 * @param array $clusteredTerms
+	 * @param Suggestion $suggestion
+	 * @param string $search
+	 * @return array $entry
+	 */
+	private function buildEntry( $id, $clusteredTerms, $suggestion, $search ){
+		$entry = array();
+		$entry['id'] = $id->getPrefixedId();
+		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
+		$entry['rating'] = $suggestion->getProbability();
+
+		foreach ( $clusteredTerms[$id->getSerialization()] as $term ) {
+			/** @var $term Term */
+			switch ( $term->getType() ) {
+				case Term::TYPE_LABEL:
+					$entry['label'] = $term->getText();
+					break;
+				case Term::TYPE_DESCRIPTION:
+					$entry['description'] = $term->getText();
+					break;
+				case Term::TYPE_ALIAS:
+					$this->checkAndSetAlias( $entry, $term, $search );
+					break;
+			}
+		}
+		return $entry;
 	}
 
 }
