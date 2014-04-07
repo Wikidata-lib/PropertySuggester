@@ -2,9 +2,8 @@
 
 namespace PropertySuggester\Suggesters;
 
-use DatabaseBase;
+use LoadBalancer;
 use InvalidArgumentException;
-
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 
@@ -21,10 +20,15 @@ class SimplePHPSuggester implements SuggesterEngine {
 	private $deprecatedPropertyIds = array( 107 );
 
 	/**
-	 * @param DatabaseBase $dbr
+	 * @var LoadBalancer
 	 */
-	public function __construct( DatabaseBase $dbr ) {
-		$this->dbr = $dbr;
+	private $lb;
+
+	/**
+	 * @param LoadBalancer $lb
+	 */
+	public function __construct( LoadBalancer $lb ) {
+		$this->lb = $lb;
 	}
 
 	/**
@@ -54,17 +58,19 @@ class SimplePHPSuggester implements SuggesterEngine {
 		$excludedIds = array_merge( $propertyIds, $this->getDeprecatedPropertyIds() );
 		$count = count( $propertyIds );
 
-		$res = $this->dbr->select(
+		$dbr = $this->lb->getConnection( DB_SLAVE );
+		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $this->dbr->makeList( $propertyIds ) . ')',
-				   'pid2 NOT IN (' . $this->dbr->makeList( $excludedIds ) . ')' ),
+			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
+				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
 				'ORDER BY' => 'prob DESC'
 			)
 		);
+		$this->lb->reuseConnection( $dbr );
 
 		$resultArray = array();
 		foreach ( $res as $row ) {

@@ -8,6 +8,7 @@ use DerivativeRequest;
 use PropertySuggester\Suggesters\SimplePHPSuggester;
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\Property;
+use Wikibase\EntityLookup;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
@@ -21,8 +22,20 @@ use Wikibase\Utils;
  */
 class GetSuggestions extends ApiBase {
 
+	/**
+	 * @var EntityLookup
+	 */
+	protected $lookup;
+
+	/**
+	 * @var SimplePHPSuggester
+	 */
+	protected $suggester;
+
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
+		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->suggester = new SimplePHPSuggester( wfGetLB( DB_SLAVE ) );
 	}
 
 	/**
@@ -47,7 +60,7 @@ class GetSuggestions extends ApiBase {
 		$language = $params['language'];
 		$resultSize = $params['continue'] + $params['limit'];
 
-		$helper = new GetSuggestionsHelper( StoreFactory::getStore( 'sqlstore' )->getEntityLookup(), new SimplePHPSuggester( wfGetDB( DB_SLAVE ) ) );
+		$helper = new GetSuggestionsHelper( $this->lookup, $this->suggester );
 
         if( $params["entity"] !== null ) {
             $suggestions = $helper->generateSuggestionsByItem( $params["entity"] );

@@ -36,7 +36,7 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 		if ( this.__useSuggester() ) {
 			this._term = request.term;
 			if ( !this._continueSearch ) {
-					this.offset = 0;
+				this.offset = 0;
 			}
 
 			$.extend( this.options.ajax, this.__buildOptions() );
