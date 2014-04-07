@@ -4,15 +4,10 @@ namespace PropertySuggester\UpdateTable\Inserter;
 
 use PropertySuggester\UpdateTable\InserterContext;
 
-abstract class Inserter{
+interface Inserter {
 	/**
-	 * @var InserterContext
+	 * run specific algorithm to import data to wbs_propertypairs db table from csv
+	 * @param InserterContext $insertionContext
 	 */
-	protected $context = null;
-
-	function setContext(InserterContext $insertionContext) {
-		$this->context = $insertionContext;
-	}
-
-	abstract function execute();
+	function execute( InserterContext $insertionContext );
 } 

@@ -1,40 +1,31 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: felix.niemeyer
- * Date: 4/7/14
- * Time: 11:41 AM
- */
 
 namespace PropertySuggester\UpdateTable;
 
-
 class InserterContext {
 	/**
-	 * @var string
 	 * Path to CSV file
+	 * @var string
 	 */
 	private $wholePath = "";
+
 	/**
-	 * @var string
 	 * relative table name
+	 * @var string
 	 */
 	private $tableName = "";
-	/**
-	 * @var string
-	 * absolute table name (with prefix)
-	 */
-	private $dbTableName = "";
+
 	/**
 	 * @var DatabaseBase
 	 */
 	private $db = "";
 
 	/**
-	 * @var bool
 	 * if true, show info while processing
+	 * @var bool
 	 */
 	private $showInfo = true;
+
 
 	/**
 	 * @param DatabaseBase $db
@@ -48,20 +39,6 @@ class InserterContext {
 	 */
 	public function getDb() {
 		return $this->db;
-	}
-
-	/**
-	 * @param string $dbTableName
-	 */
-	public function setDbTableName( $dbtablename ) {
-		$this->dbTableName = $dbtablename;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDbTableName() {
-		return $this->dbTableName;
 	}
 
 	/**

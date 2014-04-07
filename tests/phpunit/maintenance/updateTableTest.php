@@ -48,23 +48,22 @@ class UpdateTableTest extends MediaWikiTestCase {
 	}
 
 	public function testRewriteNativeStrategy() {
-		$maint = new UpdateTable();
-		$maint->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1 ), null );
-		$this->helperRunScriptAndAssert($maint);
+		$maintenanceScript = new UpdateTable();
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1 ), null );
+		$this->runScriptAndAssert( $maintenanceScript );
 	}
 
 	public function testRewriteWithSQLInserts() {
-		$maint = new UpdateTable();
-		$maint->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 1 ), null );
-		$this->helperRunScriptAndAssert($maint);
+		$maintenanceScript = new UpdateTable();
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 1 ), null );
+		$this->runScriptAndAssert( $maintenanceScript );
 	}
 
 	/**
 	 * @param UpdateTable $maintScript
 	 */
-	private function helperRunScriptAndAssert(UpdateTable $maintScript)
-	{
-		$maintScript->execute();
+	private function runScriptAndAssert( UpdateTable $maintenanceScript ) {
+		$maintenanceScript->execute();
 		$this->assertSelect(
 			'wbs_propertypairs',
 			array( 'pid1', 'pid2', 'count', 'probability' ),

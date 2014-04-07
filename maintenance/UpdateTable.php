@@ -18,6 +18,7 @@ require_once $basePath . '/maintenance/Maintenance.php';
  * @author 2014BPN2
  */
 class UpdateTable extends Maintenance {
+
 	function __construct() {
 		parent::__construct();
 		$this->mDescription = "Read CSV Dump and refill probability table";
@@ -26,11 +27,13 @@ class UpdateTable extends Maintenance {
 		$this->addOption( 'silent', 'Do not show information', false, false );
 	}
 
+	/**
+	 * loads property pair occurrence probability table from given csv file
+	 */
 	function execute() {
 		$csv = null;
 
-		if ( $this->hasOption( 'file' ) )
-		{
+		if ( $this->hasOption( 'file' ) ) {
 			if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
 				$this->error( "The --file option requires a file as an argument.\n", true );
 			}
@@ -48,13 +51,12 @@ class UpdateTable extends Maintenance {
 
 		global $wgDbType;
 		$tableName = 'wbs_propertypairs';
-		$dbTableName = $db->tableName( $tableName );
 
-		$this->clearTable($db, $tableName, $dbTableName, $showInfo);
+		$this->clearTable( $db, $tableName, $showInfo );
 
 		if ( $showInfo ) {
-            $this->output( "loading new entries from file\n" );
-        }
+			$this->output( "loading new entries from file\n" );
+		}
 
 		$wholePath = realpath( $csv );
 		$wholePath = str_replace( '\\', '/', $wholePath );
@@ -68,30 +70,34 @@ class UpdateTable extends Maintenance {
 		}
 
 		$insertionContext = new InserterContext();
-		$insertionContext->setDb($db);
-		$insertionContext->setDbTableName($dbTableName);
-		$insertionContext->setTableName($tableName);
-		$insertionContext->setShowInfo($showInfo);
-		$insertionContext->setWholePath($wholePath);
-		$insertionStrategy->setContext($insertionContext);
-		$insertionStrategy->execute();
+		$insertionContext->setDb( $db );
+		$insertionContext->setTableName( $tableName );
+		$insertionContext->setShowInfo( $showInfo );
+		$insertionContext->setWholePath( $wholePath );
+
+		$insertionStrategy->execute( $insertionContext );
 
 		if ( $showInfo ) {
-            $this->output( "... Done loading\n" );
-        }
+			$this->output( "... Done loading\n" );
+		}
 	}
 
-	private function clearTable($db, $tableName, $dbTableName, $showInfo) {
+	/**
+	 * @param $db
+	 * @param $tableName
+	 * @param $showInfo
+	 */
+	private function clearTable( $db, $tableName, $showInfo ) {
 		if ( $db->tableExists( $tableName ) ) {
-		if ( $showInfo ) {
-		$this->output( "removing old entries\n" );
-		}
-		$db->delete( $tableName, '*' );
-		if ( $showInfo ) {
-			$this->output( "... Done removing\n" );
-		}
+			if ( $showInfo ) {
+				$this->output( "removing old entries\n" );
+			}
+			$db->delete( $tableName, '*' );
+			if ( $showInfo ) {
+				$this->output( "... Done removing\n" );
+			}
 		} else {
-			$this->error( "$dbTableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
+			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
 	}
 }

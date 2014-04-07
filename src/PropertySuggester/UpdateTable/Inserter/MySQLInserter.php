@@ -1,21 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: felix.niemeyer
- * Date: 4/7/14
- * Time: 11:27 AM
- */
 
 namespace PropertySuggester\UpdateTable\Inserter;
 
+use PropertySuggester\UpdateTable\InserterContext;
 
-class MySQLInserter extends Inserter {
-	function execute()
-	{
-		$myContext = $this->context;
-		$dbTableName = $myContext->getDbTableName();
-		$wholePath = $myContext->getWholePath();
-		$myContext->getDb()->query( "
+class MySQLInserter implements Inserter {
+
+	/**
+	 * @param InserterContext $insertionContext
+	 */
+	function execute( InserterContext $insertionContext ) {
+		$db = $insertionContext->getDb();
+		$dbTableName = $db->tableName( $insertionContext->getTableName() );
+		$wholePath = $insertionContext->getWholePath();
+		$db->query( "
 				LOAD DATA INFILE '$wholePath'
 				INTO TABLE $dbTableName
 				FIELDS
