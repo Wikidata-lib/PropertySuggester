@@ -2,7 +2,9 @@
 
 namespace PropertySuggester;
 
+use ApiResult;
 use MediaWikiTestCase;
+
 
 /**
  *
@@ -24,7 +26,10 @@ class ResultBuilderTest extends MediaWikiTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->resultBuilder = new ResultBuilder( );
+		$apiMain =  $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
+		$result = new ApiResult( $apiMain );
+
+		$this->resultBuilder = new ResultBuilder( $result, '' );
 	}
 
 	public function testMergeWithTraditionalSearchResults() {

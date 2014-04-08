@@ -2,6 +2,7 @@
 
 namespace PropertySuggester;
 
+use ApiResult;
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
@@ -25,18 +26,29 @@ class ResultBuilder {
 	 */
 	private $termIndex;
 
-	public function __construct() {
+	/**
+	 * @var ApiResult
+	 */
+	private $result;
+
+	/**
+	 * @var string
+	 */
+	private $searchPattern;
+
+	public function __construct( $result, $search ) {
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
+		$this->result = $result;
+		$this->searchPattern = '/^' . preg_quote( $search, '/' ) . '/i';
 	}
 
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
-	 * @param string $search
 	 * @return array
 	 */
-	public function createJSON( $suggestions, $language, $search ) {
+	public function createJSON( $suggestions, $language ) {
 		$entries = array();
 		$ids = array();
 		foreach ( $suggestions as $suggestion ) {
@@ -49,7 +61,7 @@ class ResultBuilder {
 
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
-			$entries[] = $this->buildEntry( $id, $clusteredTerms, $suggestion, $search );
+			$entries[] = $this->buildEntry( $id, $clusteredTerms, $suggestion );
 		}
 		return $entries;
 	}
@@ -58,10 +70,9 @@ class ResultBuilder {
 	 * @param \Wikibase\EntityId $id
 	 * @param array $clusteredTerms
 	 * @param Suggestion $suggestion
-	 * @param string $search
 	 * @return array $entry
 	 */
-	private function buildEntry( $id, $clusteredTerms, $suggestion, $search ){
+	private function buildEntry( $id, $clusteredTerms, $suggestion ){
 		$entry = array();
 		$entry['id'] = $id->getPrefixedId();
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
@@ -77,38 +88,11 @@ class ResultBuilder {
 					$entry['description'] = $term->getText();
 					break;
 				case Term::TYPE_ALIAS:
-					$this->checkAndSetAlias( $entry, $term, $search );
+					$this->checkAndSetAlias( $entry, $term );
 					break;
 			}
 		}
 		return $entry;
-	}
-
-	/**
-	 * @param array $entries
-	 * @param array $searchResult
-	 * @param int $resultSize
-	 * @return array representing Json
-	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, $searchResult, $resultSize ) {
-
-		// Avoid duplicates
-		$existingKeys = array();
-		foreach ( $entries as $entry ) {
-			$existingKeys[$entry['id']] = true;
-		}
-
-		$distinctCount = count( $entries );
-		foreach ( $searchResult as $sr ) {
-			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
-				$entries[] = $sr;
-				$distinctCount++;
-				if ( $distinctCount >= $resultSize ) {
-					break;
-				}
-			}
-		}
-		return $entries;
 	}
 
 	/**
@@ -131,23 +115,40 @@ class ResultBuilder {
 	/**
 	 * @param array $entry
 	 * @param Term $term
-	 * @param string $search
 	 */
-	private function checkAndSetAlias( &$entry, $term, $search ) {
-		if ( $this->startsWith( $term->getText(), $search ) ) {
+	private function checkAndSetAlias( &$entry, $term ) {
+		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();
+				$this->result->setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 			$entry['aliases'][] = $term->getText();
 		}
 	}
 
 	/**
-	 * @param string $string
-	 * @param string $search
-	 * @return bool
+	 * @param array $entries
+	 * @param array $searchResult
+	 * @param int $resultSize
+	 * @return array representing Json
 	 */
-	private function startsWith( $string, $search ) {
-		return strncasecmp( $string, $search, strlen( $search ) ) === 0;
+	public function mergeWithTraditionalSearchResults( array &$entries, $searchResult, $resultSize ) {
+		// Avoid duplicates
+		$existingKeys = array();
+		foreach ( $entries as $entry ) {
+			$existingKeys[$entry['id']] = true;
+		}
+
+		$distinctCount = count( $entries );
+		foreach ( $searchResult as $sr ) {
+			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
+				$entries[] = $sr;
+				$distinctCount++;
+				if ( $distinctCount >= $resultSize ) {
+					break;
+				}
+			}
+		}
+		return $entries;
 	}
 }

@@ -86,6 +86,9 @@ class GetSuggestionsHelper {
 	 * @return Suggestion[]
 	 */
 	public function filterSuggestions( $suggestions, $search, $language, $resultSize ) {
+		if ( !$search ) {
+			return $suggestions;
+		}
 		$ids = StoreFactory::getStore()->getTermIndex()->getMatchingIDs(
 			array(
 				new \Wikibase\Term( array(
@@ -106,7 +109,11 @@ class GetSuggestionsHelper {
 			)
 		);
 
-		$id_map = array_flip($ids);
+		$id_map = array();
+		foreach ( $ids as $id ) {
+			/** @var PropertyId $id */
+			$id_map[$id->getNumericId()] = true;
+		}
 
 		$matching_suggestions = array();
 		foreach ( $suggestions as $suggestion ) {

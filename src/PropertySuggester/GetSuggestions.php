@@ -78,37 +78,15 @@ class GetSuggestions extends ApiBase {
 		} else {
 			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit );
 		}
-
-		if ( $search ) {
-			$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize ); //refactor do in create Json
-		}
+		$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize );
 
 		// Build result Array
-		$resultBuilder = new ResultBuilder();
+		$resultBuilder = new ResultBuilder( $this->getResult(), $search);
 		$entries = $resultBuilder->createJSON( $suggestions, $language, $search );
-		foreach ( $entries as $entry ) {
-			if ( !isset( $entry['aliases'] ) ) {
-				$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
-			}
-		}
 
 		// merge with search result if possible and necessary
 		if ( count( $entries ) < $resultSize && $search !== '' ) {
-			$searchEntitiesParameters = new DerivativeRequest(
-				$this->getRequest(),
-				array(
-					'limit' => $resultSize + 1,
-					'continue' => 0,
-					'search' => $search,
-					'action' => 'wbsearchentities',
-					'language' => $language,
-					'type' => Property::ENTITY_TYPE
-				)
-			);
-			$api = new ApiMain( $searchEntitiesParameters );
-			$api->execute();
-			$apiResult = $api->getResultData();
-			$searchResult = $apiResult['search'];
+			$searchResult = $this->querySearchApi( $resultSize, $search, $language );
 			$entries = $resultBuilder->mergeWithTraditionalSearchResults( $entries, $searchResult, $resultSize );
 		}
 
@@ -120,6 +98,32 @@ class GetSuggestions extends ApiBase {
 			$this->getResult()->addValue( null, 'search-continue', $resultSize );
 		}
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
+	}
+
+
+	/**
+	 * @param int $resultSize
+	 * @param string $search
+	 * @param string $language
+	 * @return array
+	 */
+	private function querySearchApi( $resultSize, $search, $language ) {
+		$searchEntitiesParameters = new DerivativeRequest(
+			$this->getRequest(),
+			array(
+				'limit' => $resultSize + 1,
+				'continue' => 0,
+				'search' => $search,
+				'action' => 'wbsearchentities',
+				'language' => $language,
+				'type' => Property::ENTITY_TYPE
+			)
+		);
+		$api = new ApiMain( $searchEntitiesParameters );
+		$api->execute();
+		$apiResult = $api->getResultData();
+		$searchResult = $apiResult['search'];
+		return $searchResult;
 	}
 
 	/**
