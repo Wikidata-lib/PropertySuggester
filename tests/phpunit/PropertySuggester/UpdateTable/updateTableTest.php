@@ -1,5 +1,8 @@
 <?php
 
+namespace PropertySuggester\UpdateTable;
+
+use MediaWikiTestCase;
 use PropertySuggester\Maintenance\UpdateTable;
 
 /**
