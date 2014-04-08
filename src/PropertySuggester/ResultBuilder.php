@@ -6,11 +6,11 @@ use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
+use Wikibase\TermIndex;
 
 /**
  * ResultBuilder builds Json-compatible array structure from suggestions
  *
- * @since 0.1
  * @licence GNU GPL v2+
  */
 class ResultBuilder {
@@ -20,8 +20,14 @@ class ResultBuilder {
 	 */
 	private $entityTitleLookup;
 
+	/**
+	 * @var TermIndex
+	 */
+	private $termIndex;
+
 	public function __construct() {
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
+		$this->termIndex = StoreFactory::getStore()->getTermIndex();
 	}
 
 	/**
@@ -38,7 +44,7 @@ class ResultBuilder {
 			$ids[] = $id;
 		}
 		//See SearchEntities
-		$terms = StoreFactory::getStore()->getTermIndex()->getTermsOfEntities( $ids, 'property', $language );
+		$terms = $this->termIndex->getTermsOfEntities( $ids, 'property', $language );
 		$clusteredTerms = $this->clusterTerms( $terms );
 
 		foreach ( $suggestions as $suggestion ) {
@@ -46,6 +52,36 @@ class ResultBuilder {
 			$entries[] = $this->buildEntry( $id, $clusteredTerms, $suggestion, $search );
 		}
 		return $entries;
+	}
+
+	/**
+	 * @param \Wikibase\EntityId $id
+	 * @param array $clusteredTerms
+	 * @param Suggestion $suggestion
+	 * @param string $search
+	 * @return array $entry
+	 */
+	private function buildEntry( $id, $clusteredTerms, $suggestion, $search ){
+		$entry = array();
+		$entry['id'] = $id->getPrefixedId();
+		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
+		$entry['rating'] = $suggestion->getProbability();
+
+		foreach ( $clusteredTerms[$id->getSerialization()] as $term ) {
+			/** @var $term Term */
+			switch ( $term->getType() ) {
+				case Term::TYPE_LABEL:
+					$entry['label'] = $term->getText();
+					break;
+				case Term::TYPE_DESCRIPTION:
+					$entry['description'] = $term->getText();
+					break;
+				case Term::TYPE_ALIAS:
+					$this->checkAndSetAlias( $entry, $term, $search );
+					break;
+			}
+		}
+		return $entry;
 	}
 
 	/**
@@ -73,54 +109,6 @@ class ResultBuilder {
 			}
 		}
 		return $entries;
-	}
-
-	/**
-	 * Filters for entries whose label or alias starts with $search
-	 * An entry needs to have a field 'label' and an array 'aliases'.
-	 *
-	 * @param array $entries
-	 * @param string $search
-	 * @return array representing Json
-	 */
-	public function filterByPrefix( array &$entries, $search ) {
-		$matchingEntries = array();
-		foreach ( $entries as $entry ) {
-			if ( $this->isMatch( $entry, $search ) ) {
-				$matchingEntries[] = $entry;
-			}
-		}
-		return $matchingEntries;
-	}
-
-	/**
-	 * Checks if entry['label'] or entry['aliases'] starts with $search
-	 *
-	 * @param array $entry in Json representation
-	 * @param string $search
-	 * @return bool
-	 */
-	private function isMatch( array $entry, $search ) {
-		if ( $this->startsWith( $entry['label'], $search )) {
-			return true;
-		}
-		if ( $entry['aliases'] ) {
-			foreach ( $entry['aliases'] as $alias ) {
-				if ( $this->startsWith( $alias, $search ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param string $string
-	 * @param string $search
-	 * @return bool
-	 */
-	private function startsWith( $string, $search ) {
-		return strncasecmp( $string, $search, strlen( $search ) ) === 0;
 	}
 
 	/**
@@ -155,33 +143,11 @@ class ResultBuilder {
 	}
 
 	/**
-	 * @param \Wikibase\EntityId $id
-	 * @param array $clusteredTerms
-	 * @param Suggestion $suggestion
+	 * @param string $string
 	 * @param string $search
-	 * @return array $entry
+	 * @return bool
 	 */
-	private function buildEntry( $id, $clusteredTerms, $suggestion, $search ){
-		$entry = array();
-		$entry['id'] = $id->getPrefixedId();
-		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
-		$entry['rating'] = $suggestion->getProbability();
-
-		foreach ( $clusteredTerms[$id->getSerialization()] as $term ) {
-			/** @var $term Term */
-			switch ( $term->getType() ) {
-				case Term::TYPE_LABEL:
-					$entry['label'] = $term->getText();
-					break;
-				case Term::TYPE_DESCRIPTION:
-					$entry['description'] = $term->getText();
-					break;
-				case Term::TYPE_ALIAS:
-					$this->checkAndSetAlias( $entry, $term, $search );
-					break;
-			}
-		}
-		return $entry;
+	private function startsWith( $string, $search ) {
+		return strncasecmp( $string, $search, strlen( $search ) ) === 0;
 	}
-
 }

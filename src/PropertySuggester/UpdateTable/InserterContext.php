@@ -2,6 +2,8 @@
 
 namespace PropertySuggester\UpdateTable;
 
+use DatabaseBase;
+
 class InserterContext {
 	/**
 	 * Path to CSV file

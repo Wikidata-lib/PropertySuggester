@@ -16,7 +16,6 @@ use Wikibase\Utils;
 /**
  * API module to get property suggestions.
  *
- * @since 0.1
  * @licence GNU GPL v2+
  */
 class GetSuggestions extends ApiBase {
@@ -63,12 +62,25 @@ class GetSuggestions extends ApiBase {
 		$language = $params['language'];
 		$resultSize = $params['continue'] + $params['limit'];
 
+		if ( $search ) {
+			// the results matching '$search' can be at the bottom of the list
+			// however very low ranked properties are not interesting and can
+			// still be found during the merge with search result later.
+			$suggesterLimit = 500;
+		} else {
+			$suggesterLimit = $resultSize;
+		}
+
 		$helper = new GetSuggestionsHelper( $this->lookup, $this->suggester );
 
 		if ( $params["entity"] !== null ) {
-			$suggestions = $helper->generateSuggestionsByItem( $params["entity"] );
+			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit );
 		} else {
-			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'] );
+			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit );
+		}
+
+		if ( $search ) {
+			$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize ); //refactor do in create Json
 		}
 
 		// Build result Array
@@ -79,14 +91,9 @@ class GetSuggestions extends ApiBase {
 				$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 		}
-		if ( $search ) {
-			$entries = $resultBuilder->filterByPrefix( $entries, $search ); //refactor do in create Json
-		}
 
 		// merge with search result if possible and necessary
 		if ( count( $entries ) < $resultSize && $search !== '' ) {
-
-			//Do search api request
 			$searchEntitiesParameters = new DerivativeRequest(
 				$this->getRequest(),
 				array(

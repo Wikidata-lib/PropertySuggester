@@ -62,7 +62,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	public function testSuggestByPropertyIds() {
 		$ids = array( PropertyId::newFromNumber( 1 ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
 
 		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
 		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
@@ -74,7 +74,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
 
-		$res = $this->suggester->suggestByItem( $item );
+		$res = $this->suggester->suggestByItem( $item, 100 );
 
 		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
 		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
@@ -85,7 +85,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$this->suggester->setDeprecatedPropertyIds( array( 2 ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
 
 		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
 		$this->assertNotContains( 2 , $resultIds );

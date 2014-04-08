@@ -32,13 +32,6 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @return int[]
-	 */
-	public function getDeprecatedPropertyIds() {
-		return $this->deprecatedPropertyIds;
-	}
-
-	/**
 	 * @param int[] $deprecatedPropertyIds
 	 */
 	public function setDeprecatedPropertyIds( array $deprecatedPropertyIds ) {
@@ -47,14 +40,17 @@ class SimpleSuggester implements SuggesterEngine {
 
 	/**
 	 * @param int[] $propertyIds
-	 * @throws InvalidArgumentException
+	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $propertyIds ) {
+	protected function getSuggestions( array $propertyIds, $limit ) {
 		if ( !$propertyIds ) {
 			return array();
 		}
-		$excludedIds = array_merge( $propertyIds, $this->getDeprecatedPropertyIds() );
+		if ( !is_int( $limit ) ) {
+			throw new InvalidArgumentException('$limit must be int!');
+		}
+		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
@@ -66,7 +62,8 @@ class SimpleSuggester implements SuggesterEngine {
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
-				'ORDER BY' => 'prob DESC'
+				'ORDER BY' => 'prob DESC',
+				'LIMIT'	   => $limit
 			)
 		);
 		$this->lb->reuseConnection( $dbr );
@@ -84,29 +81,31 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @see SuggesterEngine::suggestByPropertyIds
 	 *
 	 * @param PropertyId[] $propertyIds
+	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-	public function suggestByPropertyIds( array $propertyIds ) {
+	public function suggestByPropertyIds( array $propertyIds, $limit ) {
 		$numericIds = array();
 		foreach ( $propertyIds as $id ) {
 			$numericIds[] = $id->getNumericId();
 		}
-		return $this->getSuggestions( $numericIds );
+		return $this->getSuggestions( $numericIds, $limit );
 	}
 
 	/**
 	 * @see SuggesterEngine::suggestByEntity
 	 *
 	 * @param Item $item
+	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-	public function suggestByItem( Item $item ) {
+	public function suggestByItem( Item $item, $limit ) {
 		$snaks = $item->getAllSnaks();
 		$numericIds = array();
 		foreach ( $snaks as $snak ) {
 			$numericIds[] = $snak->getPropertyId()->getNumericId();
 		}
-		return $this->getSuggestions( $numericIds );
+		return $this->getSuggestions( $numericIds, $limit );
 	}
 
 }
