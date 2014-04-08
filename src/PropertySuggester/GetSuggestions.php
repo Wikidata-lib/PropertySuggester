@@ -11,6 +11,7 @@ use PropertySuggester\ResultBuilder;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
+use Wikibase\TermIndex;
 use Wikibase\Utils;
 
 /**
@@ -30,9 +31,15 @@ class GetSuggestions extends ApiBase {
 	 */
 	private $suggester;
 
+	/**
+	 * @var TermIndex
+	 */
+	private $termIndex;
+
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
 		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
 
 		global $wgPropertySuggesterDeprecatedIds;
@@ -71,7 +78,7 @@ class GetSuggestions extends ApiBase {
 			$suggesterLimit = $resultSize;
 		}
 
-		$helper = new GetSuggestionsHelper( $this->lookup, $this->suggester );
+		$helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
 
 		if ( $params["entity"] !== null ) {
 			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit );

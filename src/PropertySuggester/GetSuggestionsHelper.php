@@ -9,6 +9,7 @@ use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
+use Wikibase\TermIndex;
 
 /**
  * API module helper to get property suggestions
@@ -22,14 +23,21 @@ class GetSuggestionsHelper {
 	 */
 	private $lookup;
 
+
+	/**
+	 * @var TermIndex
+	 */
+	private $termIndex;
+
 	/**
 	 * @var SuggesterEngine
 	 */
 	private $suggester;
 
-	public function __construct( EntityLookup $lookup, SuggesterEngine $suggester ) {
+	public function __construct( EntityLookup $lookup, TermIndex $termIndex, SuggesterEngine $suggester ) {
 		$this->lookup = $lookup;
 		$this->suggester = $suggester;
+		$this->termIndex = $termIndex;
 	}
 
 	/**
@@ -89,7 +97,7 @@ class GetSuggestionsHelper {
 		if ( !$search ) {
 			return $suggestions;
 		}
-		$ids = StoreFactory::getStore()->getTermIndex()->getMatchingIDs(
+		$ids = $this->termIndex->getMatchingIDs(
 			array(
 				new \Wikibase\Term( array(
 					'termType' 		=> \Wikibase\Term::TYPE_LABEL,
