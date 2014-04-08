@@ -101,7 +101,7 @@ class GetSuggestions extends ApiBase {
 		$slicedEntries = array_slice( $entries, $params['continue'], $params['limit'] );
 		$this->getResult()->addValue( null, 'search', $slicedEntries );
 		$this->getResult()->addValue( null, 'success', 1 );
-		if ( count( $entries ) > $resultSize ) {
+		if ( count( $entries ) >= $resultSize ) {
 			$this->getResult()->addValue( null, 'search-continue', $resultSize );
 		}
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
