@@ -15,9 +15,9 @@ global $wgExtensionCredits;
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'PropertySuggester',
-	'author' => array( 'BP2013N2' ),
-	'url' => 'https://mediawiki.org/wiki/Extension:PropertySuggester',
-	'descriptionmsg' => 'propertysuggester-desc',
+	'author' => array( 'Christian Dullweber', 'Moritz Finke', 'Felix Niemeyer', 'Virginia Weidhaas' ),
+	'url' => 'https://github.com/Wikidata-lib/PropertySuggester',
+	'descriptionmsg' => 'propertysuggester-desc'
 );
 
 spl_autoload_register( function ( $className ) {
@@ -38,7 +38,7 @@ global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgAPIModules;
-$wgAPIModules['wbsgetsuggestions']				= 'PropertySuggester\GetSuggestions';
+$wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
 
 global $wgHooks;
 $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
@@ -46,10 +46,10 @@ $wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
 
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
-		'scripts'		=> array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
-		'dependencies'	=> array( 'jquery.wikibase.entityselector' ),
-		'localBasePath'	=> __DIR__,
-		'remoteExtPath'	=> 'PropertySuggester',
+		'scripts'       => array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
+		'dependencies'  => array( 'jquery.wikibase.entityselector' ),
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'PropertySuggester',
 );
 
 
