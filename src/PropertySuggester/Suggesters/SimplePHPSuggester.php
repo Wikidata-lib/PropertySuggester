@@ -103,10 +103,11 @@ class SimplePHPSuggester implements SuggesterEngine {
 		foreach ( $snaks as $snak ) {
 			$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), 0);
 			if( $snak->getType() === "value" ){
-				$dataValue = $snak->getDataValue();
-				$id = (int)substr( $dataValue->getEntityId()->getSerialization(), 1 );
-				$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), $id);
-
+				if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
+					$dataValue = $snak->getDataValue();
+					$id = (int)substr( $dataValue->getEntityId()->getSerialization(), 1 );
+					$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), $id);
+				}
 			}
 		}
 		return $this->getSuggestions( $idTuples, count($snaks) );
