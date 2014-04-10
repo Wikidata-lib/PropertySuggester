@@ -2,18 +2,18 @@
 
 namespace PropertySuggester;
 
-use PropertySuggester\Suggesters\SimplePHPSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
+use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
-
+use Wikibase\TermIndex;
 
 /**
- * API module helper to get property suggestions.
+ * API module helper to get property suggestions
  *
- * @since 0.1
  * @licence GNU GPL v2+
  */
 class GetSuggestionsHelper {
@@ -23,127 +23,116 @@ class GetSuggestionsHelper {
 	 */
 	private $lookup;
 
+
+	/**
+	 * @var TermIndex
+	 */
+	private $termIndex;
+
 	/**
 	 * @var SuggesterEngine
 	 */
 	private $suggester;
 
-	public function __construct(EntityLookup $lookup, SuggesterEngine $suggester) {
+	public function __construct( EntityLookup $lookup, TermIndex $termIndex, SuggesterEngine $suggester ) {
 		$this->lookup = $lookup;
 		$this->suggester = $suggester;
+		$this->termIndex = $termIndex;
 	}
 
-
 	/**
-	 * Provide either an entity id or a comma separated list of property ids
+	 * Provide either an item id
 	 *
 	 * @param string $item
-	 * @param string $propertyList
+	 * @param int $limit
 	 * @return array
 	 */
-	public function generateSuggestions( $item, $propertyList ) {
-		if ( $item !== null ) {
-			$id = new  ItemId( $item );
-			$item = $this->lookup->getEntity( $id );
-			$suggestions = $this->suggester->suggestByItem( $item );
-			return $suggestions;
-		} else {
-			$splitList = explode( ',', $propertyList );
-			$properties = array();
-			foreach ( $splitList as $id ) {
-				$properties[] = PropertyId::newFromNumber( $this->cleanPropertyId( $id ) );
-			}
-			$suggestions = $this->suggester->suggestByPropertyIds( $properties );
-			return $suggestions;
-		}
-	}
+    public function generateSuggestionsByItem( $item, $limit ) {
+        $id = new  ItemId( $item );
+        $item = $this->lookup->getEntity( $id );
+        $suggestions = $this->suggester->suggestByItem( $item, $limit );
+        return $suggestions;
+    }
 
 	/**
-	 * accepts strings of the format "P123" or "123" and returns
-	 * the id as int. returns 0 if the string is not of the specified format
+	 * Provide comma separated list of property ids
+	 *
+	 * @param string $propertyList
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+    public function generateSuggestionsByPropertyList( $propertyList, $limit ) {
+        $splitList = explode( ',', $propertyList );
+        $properties = array();
+        foreach ( $splitList as $id ) {
+            $properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
+        }
+        $suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit );
+        return $suggestions;
+    }
+
+	/**
+	 * Accepts strings of the format "P123" or "123" and returns
+	 * the id as int. Returns 0 if the string is not of the specified format.
 	 *
 	 * @param string $propertyId
 	 * @return int
 	 */
-	protected function cleanPropertyId( $propertyId ) {
+	protected function getNumericPropertyId( $propertyId ) {
 		if ( $propertyId[0] === 'P' ) {
 			return (int)substr( $propertyId, 1 );
 		}
 		return (int)$propertyId;
 	}
 
-	/**
-	 * Filter for entries whose label or alias starts with $search
-	 * An entry needs to have a field 'label' and an array 'aliases'
-	 *
-	 * @param array $entries
-	 * @param string $search
-	 * @return array
-	 */
-	public function filterByPrefix( array &$entries, $search ) {
-		$matchingEntries = array();
-		foreach ( $entries as $entry ) {
-			if ( $this->isMatch( $entry, $search ) ) {
-				$matchingEntries[] = $entry;
-			}
-		}
-		return $matchingEntries;
-	}
 
 	/**
-	 * Check if entry['label'] or entry['aliases'] starts with $search
-	 *
-	 * @param array $entry
+	 * @param Suggestion[] $suggestions
 	 * @param string $search
-	 * @return bool
-	 */
-	protected function isMatch( array $entry, $search ) {
-		if ( $this->startsWith( $entry['label'], $search )) {
-			return true;
-		}
-		if ( $entry['aliases'] ) {
-			foreach ( $entry['aliases'] as $alias ) {
-				if ( $this->startsWith( $alias, $search ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param string $string
-	 * @param string $search
-	 * @return bool
-	 */
-	public function startsWith( $string, $search ) {
-		return stripos( $string, $search ) === 0;
-	}
-
-	/**
-	 * @param array $entries
-	 * @param array $searchResult
+	 * @param string $language
 	 * @param int $resultSize
-	 * @return array
+	 * @return Suggestion[]
 	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, $searchResult, $resultSize ) {
+	public function filterSuggestions( $suggestions, $search, $language, $resultSize ) {
+		if ( !$search ) {
+			return $suggestions;
+		}
+		$ids = $this->termIndex->getMatchingIDs(
+			array(
+				new \Wikibase\Term( array(
+					'termType' 		=> \Wikibase\Term::TYPE_LABEL,
+					'termLanguage' 	=> $language,
+					'termText' 		=> $search
+				) ),
+				new \Wikibase\Term( array(
+					'termType' 		=> \Wikibase\Term::TYPE_ALIAS,
+					'termLanguage' 	=> $language,
+					'termText' 		=> $search
+				) )
+			),
+			Property::ENTITY_TYPE,
+			array(
+				'caseSensitive' => false,
+				'prefixSearch' => true,
+			)
+		);
 
-		// Avoid duplicates
-		$existingKeys = array();
-		foreach ( $entries as $entry ) {
-			$existingKeys[$entry['id']] = true;
+		$id_map = array();
+		foreach ( $ids as $id ) {
+			/** @var PropertyId $id */
+			$id_map[$id->getNumericId()] = true;
 		}
 
-		$distinctCount = count( $entries );
-		foreach ( $searchResult as $sr ) {
-			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
-				$entries[] = $sr;
-				$distinctCount++;
-				if ( $distinctCount >= $resultSize ) {
-					break;
-				}
+		$matching_suggestions = array();
+		foreach ( $suggestions as $suggestion ) {
+			if ( array_key_exists( $suggestion->getPropertyId()->getNumericId(), $id_map ) ) {
+				$matching_suggestions[] = $suggestion;
+			}
+			if ( count( $matching_suggestions ) == $resultSize ) {
+				break;
 			}
 		}
-		return $entries;
+		return $matching_suggestions;
 	}
+
 }

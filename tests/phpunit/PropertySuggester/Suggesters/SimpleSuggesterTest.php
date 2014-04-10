@@ -2,7 +2,7 @@
 
 namespace PropertySuggester\Suggesters;
 
-use DatabaseBase;
+use LoadBalancerSingle;
 use MediaWikiTestCase;
 
 use Wikibase\DataModel\Entity\PropertyId;
@@ -22,10 +22,10 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
  * @group medium
  *
  */
-class SimplePHPSuggesterTest extends MediaWikiTestCase {
+class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var SimplePHPSuggester
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 
@@ -49,8 +49,8 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		parent::setUp();
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
-
-		$this->suggester = new SimplePHPSuggester( $this->db );
+		$lb = new LoadBalancerSingle( array("connection" => $this->db ) );
+		$this->suggester = new SimpleSuggester( $lb );
 	}
 
 	public function testDatabaseHasRows() {
@@ -62,7 +62,7 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 	public function testSuggestByPropertyIds() {
 		$ids = array( PropertyId::newFromNumber( 1 ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
 
 		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
 		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
@@ -74,7 +74,7 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
 
-		$res = $this->suggester->suggestByItem( $item );
+		$res = $this->suggester->suggestByItem( $item, 100 );
 
 		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
 		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
@@ -85,7 +85,7 @@ class SimplePHPSuggesterTest extends MediaWikiTestCase {
 
 		$this->suggester->setDeprecatedPropertyIds( array( 2 ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
 
 		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
 		$this->assertNotContains( 2 , $resultIds );

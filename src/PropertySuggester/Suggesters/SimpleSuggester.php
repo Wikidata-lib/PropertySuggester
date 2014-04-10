@@ -2,70 +2,70 @@
 
 namespace PropertySuggester\Suggesters;
 
-use DatabaseBase;
+use LoadBalancer;
 use InvalidArgumentException;
-
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 
 /**
- * Class SimplePHPSuggester
+ * Class SimpleSuggester
  * a Suggester implementation that creates suggestion via MySQL
  * Needs the wbs_propertypairs table filled with pair probabilities.
  */
-class SimplePHPSuggester implements SuggesterEngine {
+class SimpleSuggester implements SuggesterEngine {
 
 	/**
 	 * @var int[]
 	 */
-	private $deprecatedPropertyIds = array( 107 );
+	private $deprecatedPropertyIds = array();
 
 	/**
-	 * @param DatabaseBase $dbr
+	 * @var LoadBalancer
 	 */
-	public function __construct( DatabaseBase $dbr ) {
-		$this->dbr = $dbr;
-	}
+	private $lb;
 
 	/**
-	 * default is 107 (DEPRECATED main type)
-	 * @return int[]
+	 * @param LoadBalancer $lb
 	 */
-	public function getDeprecatedPropertyIds() {
-		return $this->deprecatedPropertyIds;
+	public function __construct( LoadBalancer $lb ) {
+		$this->lb = $lb;
 	}
 
 	/**
 	 * @param int[] $deprecatedPropertyIds
 	 */
-	public function setDeprecatedPropertyIds(array $deprecatedPropertyIds) {
+	public function setDeprecatedPropertyIds( array $deprecatedPropertyIds ) {
 		$this->deprecatedPropertyIds = $deprecatedPropertyIds;
 	}
 
 	/**
 	 * @param int[] $idTuples
-	 * @throws InvalidArgumentException
+	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $idTuples, $count ) {
+	protected function getSuggestions( array $idTuples, $count, $limit ) {
 		if ( !$idTuples ) {
 			return array();
 		}
+		if ( !is_int( $limit ) ) {
+			throw new InvalidArgumentException('$limit must be int!');
+		}
+		$excludedIds = array_merge(/* $propertyIds,*/ $this->deprecatedPropertyIds );
 
-		$excludedIds = array_merge( /*$idTuples,*/ $this->getDeprecatedPropertyIds() );
-
-		$res = $this->dbr->select(
+		$dbr = $this->lb->getConnection( DB_SLAVE );
+		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( '(pid1, qid1) IN (' . str_replace( "'", '', $this->dbr->makeList( $idTuples ) ) . ')',
-				   'pid2 NOT IN (' . str_replace( "'", '', $this->dbr->makeList( $excludedIds ) ) . ')' ),
+			array( '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')',
+				   'pid2 NOT IN (' . str_replace( "'", '', $dbr->makeList( $excludedIds ) ) . ')' ),
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
-				//'HAVING' => "sum(probability)/$count > $threshold",
-				'ORDER BY' => 'prob DESC'
+				'ORDER BY' => 'prob DESC',
+				'LIMIT'	   => $limit
 			)
 		);
+		$this->lb->reuseConnection( $dbr );
 
 		$resultArray = array();
 		foreach ( $res as $row ) {
@@ -80,24 +80,26 @@ class SimplePHPSuggester implements SuggesterEngine {
 	 * @see SuggesterEngine::suggestByPropertyIds
 	 *
 	 * @param PropertyId[] $propertyIds
+	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-	public function suggestByPropertyIds( array $propertyIds ) {
+	public function suggestByPropertyIds( array $propertyIds, $limit ) {
 		$idTuples = array();
 		foreach ( $propertyIds as $id ) {
 			$idTuples[] = $this->buildTuple($id->getNumericId(), 0);
 		}
-		return $this->getSuggestions( $idTuples, count($propertyIds) );
+		return $this->getSuggestions( $idTuples, count($propertyIds), $limit );
 	}
 
 	/**
 	 * @see SuggesterEngine::suggestByEntity
 	 *
 	 * @param Item $item
+	 * @param int $limit
 	 * @return Suggestion[]
 	 */
 
-	public function suggestByItem( Item $item ) {
+	public function suggestByItem( Item $item, $limit ) {
 		$snaks = $item->getAllSnaks();
 		$idTuples = array();
 		foreach ( $snaks as $snak ) {
@@ -110,7 +112,7 @@ class SimplePHPSuggester implements SuggesterEngine {
 				}
 			}
 		}
-		return $this->getSuggestions( $idTuples, count($snaks) );
+		return $this->getSuggestions( $idTuples, count($snaks), $limit );
 	}
 
 	public function buildTuple( $a, $b ){

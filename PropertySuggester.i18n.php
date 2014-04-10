@@ -1,24 +1,20 @@
 <?php
-/**
- * Internationalization file for the API sandbox extension.
- *
- * @file
- * @ingroup Extensions
-*/
-
 $messages = array();
+$GLOBALS['wgHooks']['LocalisationCacheRecache'][] = function ( $cache, $code, &$cachedData ) {
+	$codeSequence = array_merge( array( $code ), $cachedData['fallbackSequence'] );
+	foreach ( $codeSequence as $csCode ) {
+		$fileName = __DIR__ . "/i18n/$csCode.json";
+		if ( is_readable( $fileName ) ) {
+			$data = FormatJson::decode( file_get_contents( $fileName ), true );
+			foreach ( array_keys( $data ) as $key ) {
+				if ( $key === '' || $key[0] === '@' ) {
+					unset( $data[$key] );
+				}
+			}
+			$cachedData['messages'] = array_merge( $data, $cachedData['messages'] );
+		}
 
-$messages['en'] = array(
-	'propertysuggester-desc'		=> 'Shows suggested properties',
-	'propertysuggester'				=> 'Property Suggester',
-	'propertysuggester-intro'		=> 'This is a prototype of the PropertySuggester.',
-);
-
-/** 
- * Message documentation (Message documentation)
- */
-$messages['qqq'] = array(
-	'propertysuggester-desc'		=> '{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}',
-	'propertysuggester'				=> 'Property Suggester',
-	'propertysuggester-intro'		=> 'introduces suggester',
-);
+		$cachedData['deps'][] = new FileDependency( $fileName );
+	}
+	return true;
+};

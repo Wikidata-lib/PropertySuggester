@@ -3,13 +3,15 @@
 namespace PropertySuggester;
 
 use MediaWikiTestCase;
-use PHPUnit_Framework_MockObject_MockObject;
-
+use PropertySuggester\Suggesters\SuggesterEngine;
+use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\EntityLookup;
+use Wikibase\TermIndex;
 
 /**
  *
@@ -30,68 +32,54 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 	protected $helper;
 
 	/**
-	 * @var PHPUnit_Framework_MockObject_MockObject
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
+
 	/**
-	 * @var PHPUnit_Framework_MockObject_MockObject
+	 * @var EntityLookup
 	 */
 	protected $lookup;
+
+	/**
+	 * @var TermIndex
+	 */
+	protected $termIndex;
 
 	public function setUp() {
 		parent::setUp();
 
 		$this->lookup = $this->getMock( 'Wikibase\EntityLookup' );
+		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
-		$this->helper = new GetSuggestionsHelper( $this->lookup, $this->suggester );
-
+		$this->helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
 	}
 
-	public function testFilterByPrefix() {
-		$result = array();
-		$result[0] = array( 'label' => 'abc', 'aliases' => array() );
-		$result[1] = array( 'label' => 'def', 'aliases' => array() );
+	public function testFilterSuggestions() {
+		$p7 = PropertyId::newFromNumber( 7 );
+		$p10 = PropertyId::newFromNumber( 10 );
+		$p12 = PropertyId::newFromNumber( 12 );
+		$p15 = PropertyId::newFromNumber( 15 );
+		$p23 = PropertyId::newFromNumber( 23 );
 
-		$filtered = $this->helper->filterByPrefix( $result, 'ab' );
-		$this->assertContains( $result[0], $filtered );
-		$this->assertNotContains( $result[1], $filtered );
-	}
+		$suggestions = array(
+			new Suggestion( $p12, 0.9 ), // this will stay at pos 0
+			new Suggestion( $p23, 0.8 ), // this doesn't match
+			new Suggestion( $p7, 0.7 ), // this will go to pos 1
+			new Suggestion( $p15, 0.6 ) // this is outside of resultSize
+		);
 
-	public function testFilterByPrefixWithAlias() {
-		$result = array();
-		$result[0] = array( 'label' => 'abc', 'aliases' => array() );
-		$result[1] = array( 'label' => 'def', 'aliases' => array( 'ghi', 'jkl' ) );
+		$resultSize = 2;
 
-		$filtered = $this->helper->filterByPrefix( $result, 'gh' );
-		$this->assertNotContains( $result[0], $filtered );
-		$this->assertContains( $result[1], $filtered );
-	}
+		$this->termIndex->expects( $this->any() )
+			->method( 'getMatchingIDs' )
+			->will( $this->returnValue( array( $p7, $p10, $p15, $p12 ) ) );
 
-	public function testMergeWithTraditionalSearchResults() {
-		$suggesterResult = array();
-		$suggesterResult[0] = array( 'id' => '8' );
-		$suggesterResult[1] = array( 'id' => '14' );
-		$suggesterResult[2] = array( 'id' => '20' );
+		$result = $this->helper->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
 
-		$searchResult = array();
-		$searchResult[0] = array( 'id' => '7' );
-		$searchResult[1] = array( 'id' => '8' );
-		$searchResult[2] = array( 'id' => '13' );
-		$searchResult[3] = array( 'id' => '14' );
-		$searchResult[4] = array( 'id' => '15' );
-		$searchResult[5] = array( 'id' => '16' );
+		$this->assertEquals( array( $suggestions[0], $suggestions[2] ), $result );
 
-		$mergedResult = $this->helper->mergeWithTraditionalSearchResults( $suggesterResult, $searchResult, 5 );
-
-		$expected = array();
-		$expected[0] = array( 'id' => '8' );
-		$expected[1] = array( 'id' => '14' );
-		$expected[2] = array( 'id' => '20' );
-		$expected[3] = array( 'id' => '7' );
-		$expected[4] = array( 'id' => '13' );
-
-		$this->assertEquals( $mergedResult, $expected );
 	}
 
 	public function testGenerateSuggestionsWithPropertyList() {
@@ -103,13 +91,11 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		//implictly also tests protected method 'cleanPropertyId'
-
-		$result1 = $this->helper->generateSuggestions( null, 'P12' );
-		$result2 = $this->helper->generateSuggestions( null, '12' );
-
+		$result1 = $this->helper->generateSuggestionsByPropertyList( 'P12', 100 );
 		$this->assertEquals( $result1, array( 'foo' ) );
-		$this->assertEquals( $result1, $result2 );
+
+		$result2 = $this->helper->generateSuggestionsByPropertyList( '12', 100 );
+		$this->assertEquals( $result2, array( 'foo' ) );
 
 	}
 
@@ -131,7 +117,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $item ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result3 = $this->helper->generateSuggestions( 'Q42', null );
+		$result3 = $this->helper->generateSuggestionsByItem( 'Q42', 100 );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
 

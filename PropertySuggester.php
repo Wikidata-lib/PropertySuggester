@@ -1,7 +1,7 @@
 <?php
 /**
  * PropertySuggester extension.
- * License: WTFPL 2.0
+ * License: GNU GPL v2+
  */
 
 if ( defined( 'PropertySuggester_VERSION' ) ) {
@@ -9,15 +9,15 @@ if ( defined( 'PropertySuggester_VERSION' ) ) {
 	return;
 }
 
-define( 'PropertySuggester_VERSION', '0.9' );
+define( 'PropertySuggester_VERSION', '0.1' );
 
 global $wgExtensionCredits;
 $wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'PropertySuggester',
-	'author' => array( 'BP2013N2' ),
-	'url' => 'https://mediawiki.org/wiki/Extension:PropertySuggester',
-	'descriptionmsg' => 'propertysuggester-desc',
+	'author' => array( 'Christian Dullweber', 'Moritz Finke', 'Felix Niemeyer', 'Virginia Weidhaas' ),
+	'url' => 'https://github.com/Wikidata-lib/PropertySuggester',
+	'descriptionmsg' => 'propertysuggester-desc'
 );
 
 spl_autoload_register( function ( $className ) {
@@ -34,36 +34,26 @@ global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
 $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySuggester.alias.php';
 
-global $wgSpecialPages;
-$wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
-
-global $wgSpecialPagesGroups;
-$wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
+global $wgMessagesDirs;
+$wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgAPIModules;
-$wgAPIModules['wbsgetsuggestions']				= 'PropertySuggester\GetSuggestions';
+$wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
 
 global $wgHooks;
 $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 $wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
 
-global $wgResourceModules;
-$wgResourceModules['ext.PropertySuggester'] = array(
-		'scripts'		=> array( 'modules/ext.PropertySuggester.js' ),
-		'styles'		=> 'modules/ext.PropertySuggester.css',
-		'messages'		=> array(),
-		'dependencies'	=> array( 'ext.PropertySuggester.EntitySelector' ),
-		'localBasePath'	=> __DIR__,
-		'remoteExtPath'	=> 'PropertySuggester',
-);
-
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
-		'scripts'		=> array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
-		'styles'		=> array(),
-		'messages'		=> array(),
-		'dependencies'	=> array( 'jquery.wikibase.entityselector' ),
-		'localBasePath'	=> __DIR__,
-		'remoteExtPath'	=> 'PropertySuggester',
+		'scripts'       => array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
+		'dependencies'  => array( 'jquery.wikibase.entityselector' ),
+		'localBasePath' => __DIR__,
+		'remoteExtPath' => 'PropertySuggester',
 );
 
+
+global $wgPropertySuggesterDeprecatedIds;
+$wgPropertySuggesterDeprecatedIds = array(
+	107  // ( DEPRECATED main type )
+);

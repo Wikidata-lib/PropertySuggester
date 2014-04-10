@@ -1,0 +1,8 @@
+{
+    "@metadata": {
+        "authors": []
+    },
+    "propertysuggester-desc": "{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}",
+    "propertysuggester": "Property Suggester",
+    "propertysuggester-intro": "introduces suggester"
+}

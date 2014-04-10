@@ -1,11 +1,9 @@
 <?php
 
-use PropertySuggester\Maintenance\UpdateTable;
+namespace PropertySuggester\UpdateTable;
 
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Claim\Statement;
-use Wikibase\DataModel\Snak\PropertySomeValueSnak;
+use MediaWikiTestCase;
+use PropertySuggester\Maintenance\UpdateTable;
 
 /**
  *
@@ -20,7 +18,14 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
  */
 class UpdateTableTest extends MediaWikiTestCase {
 
+	/**
+	 * @var string
+	 */
 	protected $testfilename;
+
+	/**
+	 * @var array
+	 */
 	protected $rows;
 
 	private function row( $pid1, $pid2, $count, $probability ) {
@@ -52,18 +57,29 @@ class UpdateTableTest extends MediaWikiTestCase {
 		fclose( $fhandle );
 	}
 
-	public function testRewrite() {
-		$maint = new UpdateTable();
-		$maint->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1 ), null );
-		$maint->execute();
+	public function testRewriteNativeStrategy() {
+		$maintenanceScript = new UpdateTable();
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1 ), null );
+		$this->runScriptAndAssert( $maintenanceScript );
+	}
 
+	public function testRewriteWithSQLInserts() {
+		$maintenanceScript = new UpdateTable();
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 1 ), null );
+		$this->runScriptAndAssert( $maintenanceScript );
+	}
+
+	/**
+	 * @param UpdateTable $maintenanceScript
+	 */
+	private function runScriptAndAssert( UpdateTable $maintenanceScript ) {
+		$maintenanceScript->execute();
 		$this->assertSelect(
 			'wbs_propertypairs',
 			array( 'pid1', 'pid2', 'count', 'probability' ),
 			array(),
 			$this->rows
 		);
-
 	}
 
 	public function tearDown() {

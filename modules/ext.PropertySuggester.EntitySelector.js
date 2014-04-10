@@ -1,11 +1,11 @@
 
+/**
+ * override usual entityselector and replace _request and _create
+ * if a property is requested and we are on an Entity page.
+ *
+ * @see ui.suggester._request
+ */
 $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
-	/**
-	 * override usual entityselector and replace _request and _create 
-	 * if a property is requested and we are on an Entity page.
-	 * 
-	 * @see ui.suggester._request
-	 */
 
 	_oldCreate: $.wikibase.entityselector.prototype._create,
 
@@ -14,21 +14,20 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 
 		self._oldCreate.apply(self, arguments);
 
-		if ( self.__useSuggester() ) {
-			var inputHandler = function() {
-				if ( self.value() === '' ) {
-					self.search( '*' );
-				}
-			};
-			self.element.bind('input', inputHandler);
+		var inputHandler = function() {
+			if ( self.__useSuggester() && self.value() === '' ) {
+				self.search( '*' );
+			}
+		};
+		self.element.on( 'input.' + this.widgetName, inputHandler );
 
-			var focusHandler = function() {
-				if ( self.value() === '' && !self.menu.element.is( ':visible' ) ) {
-					self.search( '*' );
-				}
-			};
-			self.element.focus(focusHandler);
-		}
+		var focusHandler = function() {
+			if ( self.__useSuggester() && self.value() === '' && !self.menu.element.is( ':visible' ) ) {
+				self.search( '*' );
+			}
+		};
+		self.element.on( 'focus', focusHandler );
+
 	},
 
 	_oldRequest: $.wikibase.entityselector.prototype._request,
@@ -37,31 +36,48 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 		if ( this.__useSuggester() ) {
 			this._term = request.term;
 			if ( !this._continueSearch ) {
-					this.offset = 0;
+				this.offset = 0;
 			}
 
-			$.extend( this.options.ajax, {
-				url: this.options.url,
-				timeout: this.options.timeout,
-				params: {
-					action: 'wbsgetsuggestions',
-					entity: mw.config.get('wbEntityId'),
-					format: 'json',
-					language: this.options.language,
-					type: this.options.type,
-					'continue': this.offset
-				}
-			} );
+			$.extend( this.options.ajax, this.__buildOptions() );
 			if ( this.options.limit !== null ) {
 				this.options.ajax.params.limit = this.options.limit;
 			}
 			$.ui.suggester.prototype._request.apply( this, arguments );
+
 		} else {
 			this._oldRequest.apply( this, arguments );
 		}
 	}, 
 
 	__useSuggester: function() {
-		return this.options.type === 'property' && mw.config.get('wbEntityId');
+		return this.options.type === 'property' && this.__getEntityId();
+	},
+
+	__getEntityId: function() {
+		var $entityView = this.element.closest( ':wikibase-entityview');
+		entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
+		if( entity ) {
+			return entity.getId();
+		} else {
+			return null;
+		}
+	},
+
+	__buildOptions: function() {
+		var params = {
+			url: this.options.url,
+			timeout: this.options.timeout,
+			params: {
+				action: 'wbsgetsuggestions',
+				entity: this.__getEntityId(),
+				format: 'json',
+				language: this.options.language,
+				type: this.options.type,
+				'continue': this.offset
+			}
+		}
+		return params;
 	}
+
  });

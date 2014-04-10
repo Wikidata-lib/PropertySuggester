@@ -1,0 +1,161 @@
+<?php
+
+namespace PropertySuggester\Suggesters;
+
+use LoadBalancer;
+use InvalidArgumentException;
+use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Entity\PropertyId;
+
+/**
+ * Class SimpleSuggester
+ * a Suggester implementation that creates suggestion via MySQL
+ * Needs the wbs_propertypairs table filled with pair probabilities.
+ */
+class SimpleSuggester implements SuggesterEngine {
+
+	/**
+	 * @var int[]
+	 */
+	private $deprecatedPropertyIds = array();
+
+	/**
+	 * @var LoadBalancer
+	 */
+	private $lb;
+
+	/**
+	 * @param LoadBalancer $lb
+	 */
+	public function __construct( LoadBalancer $lb ) {
+		$this->lb = $lb;
+	}
+
+	/**
+	 * @param int[] $deprecatedPropertyIds
+	 */
+	public function setDeprecatedPropertyIds( array $deprecatedPropertyIds ) {
+		$this->deprecatedPropertyIds = $deprecatedPropertyIds;
+	}
+
+	/**
+<<<<<<< HEAD:src/PropertySuggester/Suggesters/SimplePHPSuggester.php
+	 * @param int[] $idTuples
+	 * @throws InvalidArgumentException
+	 * @return Suggestion[]
+	 */
+	protected function getSuggestions( array $idTuples, $count ) {
+		if ( !$idTuples ) {
+			return array();
+		}
+
+		$excludedIds = array_merge( /*$idTuples,*/ $this->getDeprecatedPropertyIds() );
+=======
+	 * @param int[] $propertyIds
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+	protected function getSuggestions( array $propertyIds, $limit ) {
+		if ( !$propertyIds ) {
+			return array();
+		}
+		if ( !is_int( $limit ) ) {
+			throw new InvalidArgumentException('$limit must be int!');
+		}
+		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
+		$count = count( $propertyIds );
+>>>>>>> c9c383cbe6625527349ad0c47794edaed4bdedd6:src/PropertySuggester/Suggesters/SimpleSuggester.php
+
+		$dbr = $this->lb->getConnection( DB_SLAVE );
+		$res = $dbr->select(
+			'wbs_propertypairs',
+			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
+<<<<<<< HEAD:src/PropertySuggester/Suggesters/SimplePHPSuggester.php
+			array( '(pid1, qid1) IN (' . str_replace( "'", '', $this->dbr->makeList( $idTuples ) ) . ')',
+				   'pid2 NOT IN (' . str_replace( "'", '', $this->dbr->makeList( $excludedIds ) ) . ')' ),
+=======
+			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
+				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
+>>>>>>> c9c383cbe6625527349ad0c47794edaed4bdedd6:src/PropertySuggester/Suggesters/SimpleSuggester.php
+			__METHOD__,
+			array(
+				'GROUP BY' => 'pid2',
+				'ORDER BY' => 'prob DESC',
+				'LIMIT'	   => $limit
+			)
+		);
+		$this->lb->reuseConnection( $dbr );
+
+		$resultArray = array();
+		foreach ( $res as $row ) {
+			$pid = PropertyId::newFromNumber( (int)$row->pid );
+			$suggestion = new Suggestion( $pid, $row->prob );
+			$resultArray[] = $suggestion;
+		}
+		return $resultArray;
+	}
+
+	/**
+	 * @see SuggesterEngine::suggestByPropertyIds
+	 *
+	 * @param PropertyId[] $propertyIds
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+<<<<<<< HEAD:src/PropertySuggester/Suggesters/SimplePHPSuggester.php
+	public function suggestByPropertyIds( array $propertyIds ) {
+		$idTuples = array();
+=======
+	public function suggestByPropertyIds( array $propertyIds, $limit ) {
+		$numericIds = array();
+>>>>>>> c9c383cbe6625527349ad0c47794edaed4bdedd6:src/PropertySuggester/Suggesters/SimpleSuggester.php
+		foreach ( $propertyIds as $id ) {
+			$idTuples[] = $this->buildTuple($id->getNumericId(), 0);
+		}
+<<<<<<< HEAD:src/PropertySuggester/Suggesters/SimplePHPSuggester.php
+		return $this->getSuggestions( $idTuples, count($propertyIds) );
+=======
+		return $this->getSuggestions( $numericIds, $limit );
+>>>>>>> c9c383cbe6625527349ad0c47794edaed4bdedd6:src/PropertySuggester/Suggesters/SimpleSuggester.php
+	}
+
+	/**
+	 * @see SuggesterEngine::suggestByEntity
+	 *
+	 * @param Item $item
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+<<<<<<< HEAD:src/PropertySuggester/Suggesters/SimplePHPSuggester.php
+
+	public function suggestByItem( Item $item ) {
+=======
+	public function suggestByItem( Item $item, $limit ) {
+>>>>>>> c9c383cbe6625527349ad0c47794edaed4bdedd6:src/PropertySuggester/Suggesters/SimpleSuggester.php
+		$snaks = $item->getAllSnaks();
+		$idTuples = array();
+		foreach ( $snaks as $snak ) {
+			$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), 0);
+			if( $snak->getType() === "value" ){
+				if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
+					$dataValue = $snak->getDataValue();
+					$id = (int)substr( $dataValue->getEntityId()->getSerialization(), 1 );
+					$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), $id);
+				}
+			}
+		}
+<<<<<<< HEAD:src/PropertySuggester/Suggesters/SimplePHPSuggester.php
+		return $this->getSuggestions( $idTuples, count($snaks) );
+	}
+
+	public function buildTuple( $a, $b ){
+		$tuple = '( '. $a .', '. $b .')';
+		return $tuple;
+=======
+		return $this->getSuggestions( $numericIds, $limit );
+>>>>>>> c9c383cbe6625527349ad0c47794edaed4bdedd6:src/PropertySuggester/Suggesters/SimpleSuggester.php
+	}
+
+
+
+}
