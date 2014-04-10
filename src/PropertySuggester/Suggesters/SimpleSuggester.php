@@ -43,14 +43,14 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $idTuples, $count, $limit ) {
+	protected function getSuggestions( array $ids, array $idTuples, $count, $limit ) {
 		if ( !$idTuples ) {
 			return array();
 		}
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException('$limit must be int!');
 		}
-		$excludedIds = array_merge(/* $propertyIds,*/ $this->deprecatedPropertyIds );
+		$excludedIds = array_merge( $ids, $this->deprecatedPropertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
@@ -84,11 +84,13 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit ) {
+		$ids = array();
 		$idTuples = array();
 		foreach ( $propertyIds as $id ) {
+			$ids[] = $id->getNumericId();
 			$idTuples[] = $this->buildTuple($id->getNumericId(), 0);
 		}
-		return $this->getSuggestions( $idTuples, count($propertyIds), $limit );
+		return $this->getSuggestions( $ids, $idTuples, count($propertyIds), $limit );
 	}
 
 	/**
@@ -101,9 +103,12 @@ class SimpleSuggester implements SuggesterEngine {
 
 	public function suggestByItem( Item $item, $limit ) {
 		$snaks = $item->getAllSnaks();
+		$ids = array();
 		$idTuples = array();
 		foreach ( $snaks as $snak ) {
-			$idTuples[] = $this->buildTuple($snak->getPropertyId()->getNumericId(), 0);
+			$numericId = $snak->getPropertyId()->getNumericId();
+			$ids[] = $numericId;
+			$idTuples[] = $this->buildTuple($numericId, 0);
 			if( $snak->getType() === "value" ){
 				if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
 					$dataValue = $snak->getDataValue();
@@ -112,7 +117,7 @@ class SimpleSuggester implements SuggesterEngine {
 				}
 			}
 		}
-		return $this->getSuggestions( $idTuples, count($snaks), $limit );
+		return $this->getSuggestions( $ids, $idTuples, count($snaks), $limit );
 	}
 
 	public function buildTuple( $a, $b ){
