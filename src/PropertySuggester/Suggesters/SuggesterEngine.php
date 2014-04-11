@@ -30,4 +30,5 @@ interface SuggesterEngine {
 	 * @return void
 	 */
 	public function setDeprecatedPropertyIds( array $numericIds );
+
 }

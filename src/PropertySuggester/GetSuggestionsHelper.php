@@ -83,7 +83,6 @@ class GetSuggestionsHelper {
 		return (int)$propertyId;
 	}
 
-
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $search

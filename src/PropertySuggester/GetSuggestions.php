@@ -107,7 +107,6 @@ class GetSuggestions extends ApiBase {
 		$this->getResult()->addValue( 'searchinfo', 'search', $search );
 	}
 
-
 	/**
 	 * @param int $resultSize
 	 * @param string $search
@@ -216,4 +215,5 @@ class GetSuggestions extends ApiBase {
 			=> 'Get suggestions for the property combination P21 and P31'
 		);
 	}
+
 }
