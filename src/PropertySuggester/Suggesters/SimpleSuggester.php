@@ -69,7 +69,7 @@ class SimpleSuggester implements SuggesterEngine {
 
 		$resultArray = array();
 		foreach ( $res as $row ) {
-			$pid = PropertyId::newFromNumber( (int)$row->pid );
+			$pid = new PropertyId( 'p'.(int)$row->pid );
 			$suggestion = new Suggestion( $pid, $row->prob );
 			$resultArray[] = $suggestion;
 		}
