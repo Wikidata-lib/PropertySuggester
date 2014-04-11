@@ -103,7 +103,7 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param bool|ResultWrapper
+	 * @param bool|ResultWrapper $res
 	 * @return Suggestion[]
 	 */
 	protected function buildResult( $res ) {
