@@ -23,7 +23,6 @@ class GetSuggestionsHelper {
 	 */
 	private $lookup;
 
-
 	/**
 	 * @var TermIndex
 	 */
@@ -47,12 +46,12 @@ class GetSuggestionsHelper {
 	 * @param int $limit
 	 * @return array
 	 */
-    public function generateSuggestionsByItem( $item, $limit ) {
-        $id = new  ItemId( $item );
-        $item = $this->lookup->getEntity( $id );
-        $suggestions = $this->suggester->suggestByItem( $item, $limit );
-        return $suggestions;
-    }
+	public function generateSuggestionsByItem( $item, $limit ) {
+		$id = new  ItemId( $item );
+		$item = $this->lookup->getEntity( $id );
+		$suggestions = $this->suggester->suggestByItem( $item, $limit );
+		return $suggestions;
+	}
 
 	/**
 	 * Provide comma separated list of property ids
@@ -61,15 +60,15 @@ class GetSuggestionsHelper {
 	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-    public function generateSuggestionsByPropertyList( $propertyList, $limit ) {
-        $splitList = explode( ',', $propertyList );
-        $properties = array();
-        foreach ( $splitList as $id ) {
-            $properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
-        }
-        $suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit );
-        return $suggestions;
-    }
+	public function generateSuggestionsByPropertyList( $propertyList, $limit ) {
+		$splitList = explode( ',', $propertyList );
+		$properties = array();
+		foreach ( $splitList as $id ) {
+			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
+		}
+		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit );
+		return $suggestions;
+	}
 
 	/**
 	 * Accepts strings of the format "P123" or "123" and returns

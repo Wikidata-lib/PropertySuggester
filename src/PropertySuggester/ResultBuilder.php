@@ -8,6 +8,7 @@ use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
 use Wikibase\TermIndex;
+use Wikibase\EntityId;
 
 /**
  * ResultBuilder builds Json-compatible array structure from suggestions
@@ -36,7 +37,7 @@ class ResultBuilder {
 	 */
 	private $searchPattern;
 
-	public function __construct( $result, $search ) {
+	public function __construct( ApiResult $result, $search ) {
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
 		$this->result = $result;
@@ -48,7 +49,7 @@ class ResultBuilder {
 	 * @param string $language
 	 * @return array
 	 */
-	public function createJSON( $suggestions, $language ) {
+	public function createJSON( array $suggestions, $language ) {
 		$entries = array();
 		$ids = array();
 		foreach ( $suggestions as $suggestion ) {
@@ -67,12 +68,12 @@ class ResultBuilder {
 	}
 
 	/**
-	 * @param \Wikibase\EntityId $id
+	 * @param EntityId $id
 	 * @param array $clusteredTerms
 	 * @param Suggestion $suggestion
 	 * @return array $entry
 	 */
-	private function buildEntry( $id, $clusteredTerms, $suggestion ){
+	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ){
 		$entry = array();
 		$entry['id'] = $id->getPrefixedId();
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
@@ -99,7 +100,7 @@ class ResultBuilder {
 	 * @param Term[] $terms
 	 * @return Term[][]
 	 */
-	private function clusterTerms( $terms ) {
+	private function clusterTerms( array $terms ) {
 		$clusteredTerms = array();
 
 		foreach ( $terms as $term ) {
@@ -116,7 +117,7 @@ class ResultBuilder {
 	 * @param array $entry
 	 * @param Term $term
 	 */
-	private function checkAndSetAlias( &$entry, $term ) {
+	private function checkAndSetAlias( array &$entry, Term $term ) {
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();
@@ -128,11 +129,11 @@ class ResultBuilder {
 
 	/**
 	 * @param array $entries
-	 * @param array $searchResult
+	 * @param array $searchResults
 	 * @param int $resultSize
 	 * @return array representing Json
 	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, $searchResult, $resultSize ) {
+	public function mergeWithTraditionalSearchResults( array &$entries, array $searchResults, $resultSize ) {
 		// Avoid duplicates
 		$existingKeys = array();
 		foreach ( $entries as $entry ) {
@@ -140,9 +141,9 @@ class ResultBuilder {
 		}
 
 		$distinctCount = count( $entries );
-		foreach ( $searchResult as $sr ) {
-			if ( !array_key_exists( $sr['id'], $existingKeys ) ) {
-				$entries[] = $sr;
+		foreach ( $searchResults as $result ) {
+			if ( !array_key_exists( $result['id'], $existingKeys ) ) {
+				$entries[] = $result;
 				$distinctCount++;
 				if ( $distinctCount >= $resultSize ) {
 					break;

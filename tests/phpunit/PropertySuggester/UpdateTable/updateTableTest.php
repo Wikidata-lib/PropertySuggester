@@ -6,15 +6,10 @@ use MediaWikiTestCase;
 use PropertySuggester\Maintenance\UpdateTable;
 
 /**
- *
  * @covers PropertySuggester\maintenance\updateTableTest
- *
  * @group PropertySuggester
- *
  * @group Database
- *
  * @group medium
- *
  */
 class UpdateTableTest extends MediaWikiTestCase {
 

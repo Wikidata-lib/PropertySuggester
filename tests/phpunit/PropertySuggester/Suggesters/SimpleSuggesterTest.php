@@ -4,23 +4,17 @@ namespace PropertySuggester\Suggesters;
 
 use LoadBalancerSingle;
 use MediaWikiTestCase;
-
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 
 /**
- *
  * @covers PropertySuggester\Suggesters\SimplePHPSuggester
- *
  * @group PropertySuggester
- *
  * @group API
  * @group Database
- *
  * @group medium
- *
  */
 class SimpleSuggesterTest extends MediaWikiTestCase {
 
@@ -28,7 +22,6 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	 * @var SuggesterEngine
 	 */
 	protected $suggester;
-
 
 	private function row( $pid1, $pid2, $count, $probability ) {
 		return array( 'pid1' => $pid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability );
@@ -58,14 +51,13 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$this->assertEquals( 5, $res->numRows() );
 	}
 
-
 	public function testSuggestByPropertyIds() {
-		$ids = array( PropertyId::newFromNumber( 1 ) );
+		$ids = array( new PropertyId( 'p1' ) );
 
 		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
 
-		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
-		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
 	}
 
 	public function testSuggestByItem() {
@@ -76,12 +68,12 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$res = $this->suggester->suggestByItem( $item, 100 );
 
-		$this->assertEquals( PropertyId::newFromNumber( 2 ), $res[0]->getPropertyId() );
-		$this->assertEquals( PropertyId::newFromNumber( 3 ), $res[1]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
 	}
 
 	public function testDeprecatedProperties() {
-		$ids = array( PropertyId::newFromNumber( 1 ) );
+		$ids = array( new PropertyId( 'p1' ) );
 
 		$this->suggester->setDeprecatedPropertyIds( array( 2 ) );
 
@@ -91,9 +83,4 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$this->assertNotContains( 2 , $resultIds );
 		$this->assertContains( 3 , $resultIds );
 	}
-
-	public function tearDown() {
-		parent::tearDown();
-	}
 }
-

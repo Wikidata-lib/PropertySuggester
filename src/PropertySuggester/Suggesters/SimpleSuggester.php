@@ -68,13 +68,7 @@ class SimpleSuggester implements SuggesterEngine {
 		);
 		$this->lb->reuseConnection( $dbr );
 
-		$resultArray = array();
-		foreach ( $res as $row ) {
-			$pid = PropertyId::newFromNumber( (int)$row->pid );
-			$suggestion = new Suggestion( $pid, $row->prob );
-			$resultArray[] = $suggestion;
-		}
-		return $resultArray;
+		return $this->buildResult($res);
 	}
 
 	/**
@@ -106,6 +100,20 @@ class SimpleSuggester implements SuggesterEngine {
 			$numericIds[] = $snak->getPropertyId()->getNumericId();
 		}
 		return $this->getSuggestions( $numericIds, $limit );
+	}
+
+	/**
+	 * @param bool|ResultWrapper
+	 * @return Suggestion[]
+	 */
+	protected function buildResult( $res ) {
+		$resultArray = array();
+		foreach ( $res as $row ) {
+			$pid = PropertyId::newFromNumber( ( int ) $row->pid );
+			$suggestion = new Suggestion( $pid, $row->prob );
+			$resultArray[] = $suggestion;
+		}
+		return $resultArray;
 	}
 
 }
