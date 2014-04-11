@@ -38,4 +38,5 @@ class Suggestion {
 	public function getProbability() {
 		return $this->probability;
 	}
+
 }

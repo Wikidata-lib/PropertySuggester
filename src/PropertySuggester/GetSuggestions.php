@@ -216,4 +216,5 @@ class GetSuggestions extends ApiBase {
 			=> 'Get suggestions for the property combination P21 and P31'
 		);
 	}
+
 }

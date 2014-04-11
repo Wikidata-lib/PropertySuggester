@@ -83,4 +83,5 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$this->assertNotContains( 2 , $resultIds );
 		$this->assertContains( 3 , $resultIds );
 	}
+
 }

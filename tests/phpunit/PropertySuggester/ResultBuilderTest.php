@@ -54,4 +54,5 @@ class ResultBuilderTest extends MediaWikiTestCase {
 
 		$this->assertEquals( $mergedResult, $expected );
 	}
+
 }

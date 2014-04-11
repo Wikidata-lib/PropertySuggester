@@ -102,6 +102,7 @@ class UpdateTable extends Maintenance {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
 	}
+
 }
 
 $maintClass = 'PropertySuggester\Maintenance\UpdateTable';

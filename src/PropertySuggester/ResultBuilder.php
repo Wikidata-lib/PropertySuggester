@@ -156,4 +156,5 @@ class ResultBuilder {
 		}
 		return $entries;
 	}
+
 }

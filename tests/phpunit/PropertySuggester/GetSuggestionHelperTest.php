@@ -115,4 +115,5 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 		$result3 = $this->helper->generateSuggestionsByItem( 'Q42', 100 );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
+
 }

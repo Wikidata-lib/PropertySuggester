@@ -83,5 +83,5 @@ class UpdateTableTest extends MediaWikiTestCase {
 		}
 		parent::tearDown();
 	}
-}
 
+}
