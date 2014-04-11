@@ -6,6 +6,7 @@ use LoadBalancer;
 use InvalidArgumentException;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
+use ResultWrapper;
 
 /**
  * Class SimpleSuggester
@@ -103,10 +104,10 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param bool|ResultWrapper $res
+	 * @param ResultWrapper $res
 	 * @return Suggestion[]
 	 */
-	protected function buildResult( $res ) {
+	protected function buildResult( ResultWrapper $res ) {
 		$resultArray = array();
 		foreach ( $res as $row ) {
 			$pid = PropertyId::newFromNumber( ( int ) $row->pid );
