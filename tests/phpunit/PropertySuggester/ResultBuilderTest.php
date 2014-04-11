@@ -5,17 +5,11 @@ namespace PropertySuggester;
 use ApiResult;
 use MediaWikiTestCase;
 
-
 /**
- *
  * @covers PropertySuggester\ResultBuilder
- *
  * @group PropertySuggester
- *
  * @group API
- *
  * @group medium
- *
  */
 class ResultBuilderTest extends MediaWikiTestCase {
 
@@ -59,9 +53,5 @@ class ResultBuilderTest extends MediaWikiTestCase {
 		);
 
 		$this->assertEquals( $mergedResult, $expected );
-	}
-
-	public function tearDown() {
-		parent::tearDown();
 	}
 }
