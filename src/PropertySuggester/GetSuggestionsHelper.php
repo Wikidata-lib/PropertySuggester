@@ -8,7 +8,6 @@ use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
-use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
 
 /**

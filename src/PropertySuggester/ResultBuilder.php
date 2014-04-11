@@ -8,7 +8,7 @@ use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
 use Wikibase\TermIndex;
-use Wikibase\EntityId;
+use Wikibase\DataModel\Entity\EntityId;
 
 /**
  * ResultBuilder builds Json-compatible array structure from suggestions
