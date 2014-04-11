@@ -37,6 +37,10 @@ class ResultBuilder {
 	 */
 	private $searchPattern;
 
+	/**
+	 * @param ApiResult $result
+	 * @param string $search
+	 */
 	public function __construct( ApiResult $result, $search ) {
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
