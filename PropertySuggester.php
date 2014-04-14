@@ -38,10 +38,10 @@ global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgSpecialPages;
-$wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
+$wgSpecialPages['PropertySuggester'] = 'PropertySuggester\SpecialSuggester';
 
 global $wgSpecialPagesGroups;
-$wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
+$wgSpecialPageGroups['PropertySuggester'] = 'wikibaserepo';
 
 global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
