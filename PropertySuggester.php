@@ -38,7 +38,7 @@ global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgSpecialPages;
-$wgSpecialPages['PropertySuggester'] = 'PropertySuggester\SpecialSuggester';
+$wgSpecialPages['PropertySuggester'] = 'PropertySuggester\SpecialEditItemSuggester';
 
 global $wgSpecialPagesGroups;
 $wgSpecialPageGroups['PropertySuggester'] = 'wikibaserepo';

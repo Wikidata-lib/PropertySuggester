@@ -1,60 +1,58 @@
+$(document).ready(function () {
+    var entityChooser = $('#entity-chooser');
+    entityChooser.entityselector({
+        url: mw.util.wikiScript('api'),
+        selectOnAutocomplete: true,
+        type: 'property'
+    });
 
-var selected_ids = [];
+    $(".button").on("click", function () {
+        var $this = $(this);
+        $this.siblings(".button").removeClass("selected");
+        $this.addClass("selected");
+    });
 
-function removeFromArray(arr, element) {
-	 arr.splice($.inArray(element, arr),1);
- }
- 
-function deleteFromList(evt){
-	pid = evt.data;
-	removeFromArray(selected_ids, pid);
-	$(this).closest('li').remove();
-	doQuery();
-	return false;
-}
+    $('#submit-button').on("click", function () {
+        var $selected = $(".suggestion_evaluation .selected");
+        var ratings = [];
 
-function handleInput () {
-	input_text =  $( '#property-chooser').val();
-	pid = $('#property-chooser').next('input').val();
-	if (input_text!==  '' && pid !== ''){	
-		selected_ids.push(pid);
-		delete_link = $('<a href="#"> x </a>').click(pid, deleteFromList);
-		li_element = $('<li>' + input_text + ' (' + pid + ')' + '</input></li>');
-		li_element.append(delete_link);
-		$('#selected-properties-list').append(li_element);
-		$( '#property-chooser').val('').focus();
-		doQuery();
-	}
-}
+        $selected.each(function () {
+            var $this = $(this);
+            var id = $this.parents("li").data("property");
+            var label = $this.parents("li").data('label');
+            var rating = $this.data('rating');
+            ratings.push( {'id': id, 'label':label, 'rating': rating } );
+        });
 
-function doQuery() {
-	url = mw.util.wikiScript( 'api' ) + '?action=wbsgetsuggestions&format=json&properties=' + 
-			selected_ids.map(encodeURIComponent).join(',') + '&limit=20&language=' + wgPageContentLanguage;
-	$.get(url, function( data ) {
-		$('#result').html('<h3>Suggestions:</h3>');
-		suggestions = data['search'];
-		$.each(suggestions, function (k, v) {
-			$('#result').append(JSON.stringify(v) + '<br>');
-		});
-	});
-}
+        console.log(ratings);
 
-$( document ).ready(function (){
-	$( '#property-chooser' ).entityselector({
-		url: mw.util.wikiScript( 'api' ),
-		selectOnAutocomplete: true, 
-		type: 'property'
-	});
-	
-	$( '#add-property-btn' ).click(function() {
-		handleInput();
-	});
-	
+        var properties = [];
+        $props = $(".property-entries li");
+        $props.each(function () {
+            var $this = $(this);
+            var id = $this.data("property");
+            var label = $this.data('label');
+            properties.push({'id': id,'label':label})
+        });
+        console.log(properties);
+        var  entry_id  = $(".entry").data("entry-id");
+        submitJson(  entry_id,properties,ratings);
 
-	$( '#property-chooser' ).keyup(function (e) {
-		if (e.keyCode === 13) {
-			handleInput();
-		}
-	});
-	
+
+    })
 });
+
+
+function submitJson(entry_id,properties,ratings) {
+    var evaluations = {
+        entity: entry_id,
+        properties: properties,
+        suggestions: ratings
+    };
+
+    console.log(evaluations);
+    $('input#result').val( JSON.stringify(evaluations) );
+    $('#form').submit();
+}
+
+//var id = k.parent("div").data("property");
