@@ -15,7 +15,6 @@ final class PropertySuggesterHooks {
 			return true;
 		}
 		$out->addModules( 'ext.PropertySuggester.EntitySelector' );
-		$out->addModules( 'ext.PropertySuggester' );
 		return true;
 	}
 

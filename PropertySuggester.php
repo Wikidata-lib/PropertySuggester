@@ -5,7 +5,7 @@
  */
 
 if ( defined( 'PropertySuggester_VERSION' ) ) {
-	// Do not initialize more than once.
+	// Do not initialize more then once.
 	return;
 }
 
@@ -38,7 +38,10 @@ global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgSpecialPages;
-$wgSpecialPages['PropertySuggester'] = 'PropertySuggester\SpecialSuggester';
+$wgSpecialPages['PropertySuggester']			= 'PropertySuggester\SpecialSuggester';
+
+global $wgSpecialPagesGroups;
+$wgSpecialPageGroups['PropertySuggester']		= 'wikibaserepo';
 
 global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
@@ -62,7 +65,6 @@ $wgResourceModules['ext.PropertySuggester'] = array(
 	'localBasePath'	=> __DIR__,
 	'remoteExtPath'	=> 'PropertySuggester',
 );
-
 
 global $wgPropertySuggesterDeprecatedIds;
 $wgPropertySuggesterDeprecatedIds = array(

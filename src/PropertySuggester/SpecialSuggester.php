@@ -1,7 +1,12 @@
 <?php
 
-include 'Suggesters/SimpleSuggester.php';
+namespace PropertySuggester;
 
+use Html;
+use PropertySuggester\Suggesters\SimpleSuggester;
+use PropertySuggester\Suggesters\SuggesterEngine;
+use Wikibase\Repo\Specials\SpecialWikibaseRepoPage;
+use Wikibase\Repo\WikibaseRepo;
 use Wikibase\EntityId;
 use Wikibase\Item;
 use Wikibase\Property;
@@ -9,7 +14,7 @@ use Wikibase\StoreFactory;
 
 // use Wikibase.ui.entitysearch;
 
-class SpecialSuggester extends SpecialPage {
+class SpecialSuggester extends SpecialWikibaseRepoPage {
 
 	/**
 	 * Constructor
