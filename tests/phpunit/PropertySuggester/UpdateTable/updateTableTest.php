@@ -23,7 +23,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 	 */
 	protected $rows;
 
-	private function row( $pid1, $pid2, $count, $probability ) {
+	private function newRow( $pid1, $pid2, $count, $probability ) {
 		return array( 'pid1' => $pid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability );
 	}
 
@@ -37,11 +37,11 @@ class UpdateTableTest extends MediaWikiTestCase {
 		$fhandle = fopen( $this->testfilename, "w" );
 
 		$rows = array();
-		$rows[] = $this->row( 1, 2, 100, 0.1 );
-		$rows[] = $this->row( 1, 3, 50, 0.05 );
-		$rows[] = $this->row( 2, 3, 100, 0.1 );
-		$rows[] = $this->row( 2, 4, 200, 0.2 );
-		$rows[] = $this->row( 3, 1, 123, 0.5 );
+		$rows[] = $this->newRow( 1, 2, 100, 0.1 );
+		$rows[] = $this->newRow( 1, 3, 50, 0.05 );
+		$rows[] = $this->newRow( 2, 3, 100, 0.1 );
+		$rows[] = $this->newRow( 2, 4, 200, 0.2 );
+		$rows[] = $this->newRow( 3, 1, 123, 0.5 );
 
 		$this->rows = array();
 

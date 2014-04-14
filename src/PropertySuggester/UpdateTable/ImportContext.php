@@ -4,7 +4,7 @@ namespace PropertySuggester\UpdateTable;
 
 use DatabaseBase;
 
-class InserterContext {
+class ImportContext {
 	/**
 	 * Path to CSV file
 	 * @var string
@@ -12,7 +12,7 @@ class InserterContext {
 	private $wholePath = "";
 
 	/**
-	 * relative table name
+	 * table name
 	 * @var string
 	 */
 	private $tableName = "";
@@ -21,12 +21,6 @@ class InserterContext {
 	 * @var DatabaseBase
 	 */
 	private $db = "";
-
-	/**
-	 * if true, show info while processing
-	 * @var bool
-	 */
-	private $showInfo = true;
 
 
 	/**
@@ -41,20 +35,6 @@ class InserterContext {
 	 */
 	public function getDb() {
 		return $this->db;
-	}
-
-	/**
-	 * @param bool $showInfo
-	 */
-	public function setShowInfo( $showInfo ) {
-		$this->showInfo = $showInfo;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getShowInfo() {
-		return $this->showInfo;
 	}
 
 	/**
@@ -84,4 +64,4 @@ class InserterContext {
 	public function getWholePath() {
 		return $this->wholePath;
 	}
-} 
+}

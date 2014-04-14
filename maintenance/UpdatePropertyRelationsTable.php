@@ -3,10 +3,10 @@
 namespace PropertySuggester\Maintenance;
 
 use Maintenance;
-use PropertySuggester\UpdateTable\Inserter\InsertInserter;
-use PropertySuggester\UpdateTable\Inserter\MySQLInserter;
-use PropertySuggester\UpdateTable\Inserter\PostgresInserter;
-use PropertySuggester\UpdateTable\InserterContext;
+use PropertySuggester\UpdateTable\Importer\BasicImporter;
+use PropertySuggester\UpdateTable\Importer\MySQLImporter;
+use PropertySuggester\UpdateTable\Importer\PostgresImporter;
+use PropertySuggester\UpdateTable\ImportContext;
 
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
@@ -44,60 +44,69 @@ class UpdateTable extends Maintenance {
 
 		$useInsert = $this->getOption( 'use-insert' );
 		$showInfo = !$this->getOption( 'silent' );
-
-		wfWaitForSlaves( 5 ); // let's not kill previos data, shall we? ;) --tor
-
-		# Attempt to connect to the database as a privileged user
-		# This will vomit up an error if there are permissions problems
-		$db = wfGetDB( DB_MASTER );
-
-		global $wgDbType;
 		$tableName = 'wbs_propertypairs';
 
+		wfWaitForSlaves( 5 );
+		$db = wfGetDB( DB_MASTER );
 		$this->clearTable( $db, $tableName, $showInfo );
 
 		if ( $showInfo ) {
 			$this->output( "loading new entries from file\n" );
 		}
 
-		if ( $wgDbType == 'mysql' and !$useInsert ) {
-			$insertionStrategy = new MySQLInserter();
-		} elseif ( $wgDbType == 'postgres' and !$useInsert ) {
-			$insertionStrategy = new PostgresInserter();
-		} else {
-			$insertionStrategy = new InsertInserter();
-		}
+		$importContext = $this->createImportContext( $db, $tableName, $wholePath );
+		$insertionStrategy = $this->createImportStrategy( $useInsert );
+		$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
 
-		$insertionContext = new InserterContext();
-		$insertionContext->setDb( $db );
-		$insertionContext->setTableName( $tableName );
-		$insertionContext->setShowInfo( $showInfo );
-		$insertionContext->setWholePath( $wholePath );
-
-		$success = $insertionStrategy->execute( $insertionContext );
 		if ( !$success ) {
 			$this->error( "Failed to run import to db" );
 		}
-
 		if ( $showInfo ) {
 			$this->output( "... Done loading\n" );
 		}
 	}
 
 	/**
-	 * @param $db
-	 * @param $tableName
-	 * @param $showInfo
+	 * @param boolean $useInsert
+	 * @return Importer
 	 */
-	private function clearTable( $db, $tableName, $showInfo ) {
+	function createImportStrategy( $useInsert ) {
+		global $wgDbType;
+		if ( $wgDbType == 'mysql' and !$useInsert ) {
+			return new MySQLImporter();
+		} elseif ( $wgDbType == 'postgres' and !$useInsert ) {
+			return new PostgresImporter();
+		} else {
+			return new BasicImporter();
+		}
+	}
+
+	/**
+	 * @param \DatabaseBase $db
+	 * @param string $tableName
+	 * @param string $wholePath
+	 * @return ImportContext
+	 */
+	function createImportContext( \DatabaseBase $db, $tableName, $wholePath ) {
+		$importContext = new ImportContext();
+		$importContext->setDb( $db );
+		$importContext->setTableName( $tableName );
+		$importContext->setWholePath( $wholePath );
+		return $importContext;
+	}
+
+
+	/**
+	 * @param \DatabaseBase $db
+	 * @param string $tableName
+	 * @param boolean $showInfo
+	 */
+	private function clearTable( \DatabaseBase $db, $tableName, $showInfo ) {
 		if ( $db->tableExists( $tableName ) ) {
 			if ( $showInfo ) {
 				$this->output( "removing old entries\n" );
 			}
 			$db->delete( $tableName, '*' );
-			if ( $showInfo ) {
-				$this->output( "... Done removing\n" );
-			}
 		} else {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}

@@ -6,7 +6,7 @@
 return array(
 	'PropertySuggesterHooks' => 'PropertySuggesterHooks.php',
 	
-	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdateTable.php',
+	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdatePropertyRelationsTable.php',
 
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
 	'PropertySuggester\GetSuggestionsHelper' => 'src/PropertySuggester/GetSuggestionsHelper.php',
@@ -16,9 +16,9 @@ return array(
 	'PropertySuggester\Suggesters\SuggesterEngine' => 'src/PropertySuggester/Suggesters/SuggesterEngine.php',
 	'PropertySuggester\Suggesters\SimpleSuggester' => 'src/PropertySuggester/Suggesters/SimpleSuggester.php',
 
-	'PropertySuggester\UpdateTable\Inserter\Inserter' => 'src/PropertySuggester/UpdateTable/Inserter/Inserter.php',
-	'PropertySuggester\UpdateTable\Inserter\InsertInserter' => 'src/PropertySuggester/UpdateTable/Inserter/InsertInserter.php',
-	'PropertySuggester\UpdateTable\Inserter\PostgresInserter' => 'src/PropertySuggester/UpdateTable/Inserter/PostgresInserter.php',
-	'PropertySuggester\UpdateTable\Inserter\MySQLInserter' => 'src/PropertySuggester/UpdateTable/Inserter/MySQLInserter.php',
-	'PropertySuggester\UpdateTable\InserterContext' => 'src/PropertySuggester/UpdateTable/InserterContext.php'
+	'PropertySuggester\UpdateTable\Importer\Importer' => 'src/PropertySuggester/UpdateTable/Importer/Importer.php',
+	'PropertySuggester\UpdateTable\Importer\BasicImporter' => 'src/PropertySuggester/UpdateTable/Importer/BasicImporter.php',
+	'PropertySuggester\UpdateTable\Importer\PostgresImporter' => 'src/PropertySuggester/UpdateTable/Importer/PostgresImporter.php',
+	'PropertySuggester\UpdateTable\Importer\MySQLImporter' => 'src/PropertySuggester/UpdateTable/Importer/MySQLImporter.php',
+	'PropertySuggester\UpdateTable\ImportContext' => 'src/PropertySuggester/UpdateTable/ImportContext.php'
 );
