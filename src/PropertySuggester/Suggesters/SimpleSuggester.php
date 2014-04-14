@@ -42,6 +42,7 @@ class SimpleSuggester implements SuggesterEngine {
 	/**
 	 * @param int[] $propertyIds
 	 * @param int $limit
+	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
 	protected function getSuggestions( array $propertyIds, $limit ) {
@@ -116,5 +117,4 @@ class SimpleSuggester implements SuggesterEngine {
 		}
 		return $resultArray;
 	}
-
 }
