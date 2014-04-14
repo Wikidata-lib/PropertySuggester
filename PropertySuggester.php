@@ -37,6 +37,9 @@ $wgExtensionMessagesFiles['PropertySuggesterAlias'] = __DIR__  . '/PropertySugge
 global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
+global $wgSpecialPages;
+$wgSpecialPages['PropertySuggester'] = 'PropertySuggester\SpecialSuggester';
+
 global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
 
@@ -50,6 +53,14 @@ $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 		'dependencies'  => array( 'jquery.wikibase.entityselector' ),
 		'localBasePath' => __DIR__,
 		'remoteExtPath' => 'PropertySuggester',
+);
+
+$wgResourceModules['ext.PropertySuggester'] = array(
+	'scripts'		=> array( 'modules/ext.PropertySuggester.js' ),
+//	'styles'		=> array( 'modules/ext.PropertySuggester.css' ),
+//	'dependencies'	=> array( 'ext.PropertySuggester.EntitySelector' ),
+	'localBasePath'	=> __DIR__,
+	'remoteExtPath'	=> 'PropertySuggester',
 );
 
 
