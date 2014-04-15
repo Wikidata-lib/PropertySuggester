@@ -43,12 +43,13 @@ class GetSuggestionsHelper {
 	 *
 	 * @param string $item
 	 * @param int $limit
+	 * @param float $minProbability
 	 * @return array
 	 */
-	public function generateSuggestionsByItem( $item, $limit ) {
+	public function generateSuggestionsByItem( $item, $limit, $minProbability ) {
 		$id = new  ItemId( $item );
 		$item = $this->lookup->getEntity( $id );
-		$suggestions = $this->suggester->suggestByItem( $item, $limit );
+		$suggestions = $this->suggester->suggestByItem( $item, $limit, $minProbability );
 		return $suggestions;
 	}
 
@@ -57,15 +58,16 @@ class GetSuggestionsHelper {
 	 *
 	 * @param string $propertyList
 	 * @param int $limit
+	 * @param float $minProbability
 	 * @return Suggestion[]
 	 */
-	public function generateSuggestionsByPropertyList( $propertyList, $limit ) {
+	public function generateSuggestionsByPropertyList( $propertyList, $limit, $minProbability ) {
 		$splitList = explode( ',', $propertyList );
 		$properties = array();
 		foreach ( $splitList as $id ) {
 			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
 		}
-		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit );
+		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit, $minProbability );
 		return $suggestions;
 	}
 
