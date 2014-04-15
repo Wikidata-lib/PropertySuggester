@@ -1,27 +1,35 @@
 <?php
 
-namespace PropertySuggester\Suggesters;
+namespace PropertySuggester\ValueSuggester;
 
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\ItemId;
 
-class Suggestion {
-
-	/**
-	 * @var EntityId
-	 */
-	private $entityId;
+class ValueSuggestion {
 
 	/**
-	 * @var float
+	 * @var PropertyId
 	 */
+	private $propertyId;
+
+	/**
+	 * @var ItemId
+	 */
+	private $value;
+
+	/**
+	 * @var string
+	 */
+
 	private $probability;
 
 	/**
 	 * @param PropertyId $propertyId
 	 * @param float $probability
 	 */
-	function __construct( PropertyId $propertyId, $probability ) {
+	function __construct( PropertyId $propertyId, ItemId $value, $probability ) {
 		$this->propertyId = $propertyId;
+		$this->value = $value;
 		$this->probability = $probability;
 	}
 
@@ -39,4 +47,10 @@ class Suggestion {
 		return $this->probability;
 	}
 
+	/**
+	 * @return \Wikibase\DataModel\Entity\EntityId
+	 */
+	public function getValue() {
+		return $this->value;
+	}
 }

@@ -5,9 +5,9 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
+use PropertySuggester\ResultBuilder\SuggestionsResultBuilder;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
-use PropertySuggester\ResultBuilder;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
@@ -88,7 +88,7 @@ class GetSuggestions extends ApiBase {
 		$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize );
 
 		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $search);
+		$resultBuilder = new SuggestionsResultBuilder( $this->getResult(), $search);
 		$entries = $resultBuilder->createJSON( $suggestions, $language, $search );
 
 		// merge with search result if possible and necessary

@@ -1,6 +1,6 @@
 <?php
 
-namespace PropertySuggester;
+namespace PropertySuggester\ResultBuilder;
 
 use ApiResult;
 use PropertySuggester\Suggesters\Suggestion;
@@ -15,7 +15,7 @@ use Wikibase\DataModel\Entity\EntityId;
  *
  * @licence GNU GPL v2+
  */
-class ResultBuilder {
+class SuggestionsResultBuilder extends ResultBuilder{
 
 	/**
 	 * @var $EntityTitleLookup
@@ -101,6 +101,7 @@ class ResultBuilder {
 	}
 
 	/**
+	 *
 	 * @param Term[] $terms
 	 * @return Term[][]
 	 */
