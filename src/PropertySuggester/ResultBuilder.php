@@ -109,7 +109,7 @@ class ResultBuilder {
 
 		foreach ( $terms as $term ) {
 			$id = $term->getEntityId()->getSerialization();
-			if ( !$clusteredTerms[$id] ) {
+			if ( ! isset( $clusteredTerms[$id] ) ) {
 				$clusteredTerms[$id] = array();
 			}
 			$clusteredTerms[$id][] = $term;

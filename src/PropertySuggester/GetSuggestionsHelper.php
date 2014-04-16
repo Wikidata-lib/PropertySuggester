@@ -52,15 +52,14 @@ class GetSuggestionsHelper {
 	}
 
 	/**
-	 * @param string $propertyList - A comma separated list of property ids
+	 * @param string[] $propertyList - A list of property ids
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @return Suggestion[]
 	 */
 	public function generateSuggestionsByPropertyList( $propertyList, $limit, $minProbability ) {
-		$splitList = explode( ',', $propertyList );
 		$properties = array();
-		foreach ( $splitList as $id ) {
+		foreach ( $propertyList as $id ) {
 			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
 		}
 		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit, $minProbability );
