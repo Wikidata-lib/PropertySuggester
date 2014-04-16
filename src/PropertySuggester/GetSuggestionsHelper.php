@@ -57,7 +57,7 @@ class GetSuggestionsHelper {
 	 * @param float $minProbability
 	 * @return Suggestion[]
 	 */
-	public function generateSuggestionsByPropertyList( $propertyList, $limit, $minProbability ) {
+	public function generateSuggestionsByPropertyList( array $propertyList, $limit, $minProbability ) {
 		$properties = array();
 		foreach ( $propertyList as $id ) {
 			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
