@@ -43,7 +43,7 @@ class GetSuggestions extends ApiBase {
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
 
 		global $wgPropertySuggesterDeprecatedIds;
-		$this->suggester->setDeprecatedPropertyIds($wgPropertySuggesterDeprecatedIds);
+		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 	}
 
 	/**
@@ -91,7 +91,7 @@ class GetSuggestions extends ApiBase {
 		$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize );
 
 		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $search);
+		$resultBuilder = new ResultBuilder( $this->getResult(), $search );
 		$entries = $resultBuilder->createJSON( $suggestions, $language, $search );
 
 		// merge with search result if possible and necessary
@@ -102,7 +102,9 @@ class GetSuggestions extends ApiBase {
 
 		// Define Result
 		$slicedEntries = array_slice( $entries, $params['continue'], $params['limit'] );
+		$this->getResult()->setIndexedTagName( $slicedEntries, 'search' );
 		$this->getResult()->addValue( null, 'search', $slicedEntries );
+
 		$this->getResult()->addValue( null, 'success', 1 );
 		if ( count( $entries ) >= $resultSize ) {
 			$this->getResult()->addValue( null, 'search-continue', $resultSize );
@@ -146,6 +148,7 @@ class GetSuggestions extends ApiBase {
 			),
 			'properties' => array(
 				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_ISMULTI => true
 			),
 			'limit' => array(
 				ApiBase::PARAM_TYPE => 'limit',
