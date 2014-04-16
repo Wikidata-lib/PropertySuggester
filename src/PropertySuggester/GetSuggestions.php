@@ -36,14 +36,28 @@ class GetSuggestions extends ApiBase {
 	 */
 	private $termIndex;
 
+    /**
+     * @var int
+     */
+    private $defaultSuggestionSearchLimit;
+
+    /**
+     * @var float
+     */
+    private $defaultMinProbability;
+
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
 		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
+        $this->defaultSuggestionSearchLimit = 500;
+
+        global $wgPropertySuggesterMinProbability;
+        $this->defaultMinProbability = $wgPropertySuggesterMinProbability;
 
 		global $wgPropertySuggesterDeprecatedIds;
-		$this->suggester->setDeprecatedPropertyIds($wgPropertySuggesterDeprecatedIds);
+		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 	}
 
 	/**
@@ -61,7 +75,7 @@ class GetSuggestions extends ApiBase {
 
 		// The entityselector doesn't allow a search for '' so '*' gets mapped to ''
 		if ( $params['search'] !== '*' ) {
-			$search = $params['search'];
+			$search = trim( $params['search'] );
 		} else {
 			$search = '';
 		}
@@ -73,12 +87,11 @@ class GetSuggestions extends ApiBase {
 			// the results matching '$search' can be at the bottom of the list
 			// however very low ranked properties are not interesting and can
 			// still be found during the merge with search result later.
-			$suggesterLimit = 500;
+			$suggesterLimit = $this->defaultSuggestionSearchLimit;
 			$minProbability = 0.0;
 		} else {
 			$suggesterLimit = $resultSize;
-			global $wgPropertySuggesterMinProbability;
-			$minProbability = $wgPropertySuggesterMinProbability;
+			$minProbability = $this->defaultMinProbability;
 		}
 
 		$helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
@@ -193,17 +206,8 @@ class GetSuggestions extends ApiBase {
 	 */
 	public function getDescription() {
 		return array(
-			'API module to get property suggestions.'
+			'API module to get property suggestions (e.g. when editing data entities)'
 		);
-	}
-
-	/**
-	 * @see ApiBase::getPossibleErrors()
-	 */
-	public function getPossibleErrors() {
-		return array_merge( parent::getPossibleErrors(), array(
-			array( 'code' => 'param-missing', 'info' => $this->msg( 'wikibase-api-param-missing' )->text() )
-		) );
 	}
 
 	/**

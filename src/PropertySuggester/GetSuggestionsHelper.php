@@ -39,9 +39,7 @@ class GetSuggestionsHelper {
 	}
 
 	/**
-	 * Provide either an item id
-	 *
-	 * @param string $item
+	 * @param string $item - An item id
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @return array
@@ -54,9 +52,7 @@ class GetSuggestionsHelper {
 	}
 
 	/**
-	 * Provide comma separated list of property ids
-	 *
-	 * @param string $propertyList
+	 * @param string $propertyList - A comma separated list of property ids
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @return Suggestion[]
