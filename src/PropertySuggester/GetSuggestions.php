@@ -24,7 +24,7 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @var EntityLookup
 	 */
-	private $lookup;
+	private $entityLookup;
 
 	/**
 	 * @var SuggesterEngine
@@ -48,7 +48,7 @@ class GetSuggestions extends ApiBase {
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
-		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
 		$this->defaultSuggestionSearchLimit = 500;
@@ -94,7 +94,7 @@ class GetSuggestions extends ApiBase {
 			$minProbability = $this->defaultMinProbability;
 		}
 
-		$helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
+		$helper = new GetSuggestionsHelper( $this->entityLookup, $this->termIndex, $this->suggester );
 
 		if ( $params["entity"] !== null ) {
 			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit, $minProbability );
@@ -218,11 +218,11 @@ class GetSuggestions extends ApiBase {
 	 */
 	protected function getExamples() {
 		return array(
-			'api.php?action=wbsgetsuggestions&format=json&entity=Q4'
+			'api.php?action=wbsgetsuggestions&entity=Q4'
 			=> 'Get suggestions for entity 4',
-			'api.php?action=wbsgetsuggestions&format=json&entity=Q4&continue=10&limit=5'
+			'api.php?action=wbsgetsuggestions&entity=Q4&continue=10&limit=5'
 			=> 'Get suggestions for entity 4 from rank 10 to 15',
-			'api.php?action=wbsgetsuggestions&format=json&properties=P31,P21'
+			'api.php?action=wbsgetsuggestions&properties=P31|P21'
 			=> 'Get suggestions for the property combination P21 and P31'
 		);
 	}

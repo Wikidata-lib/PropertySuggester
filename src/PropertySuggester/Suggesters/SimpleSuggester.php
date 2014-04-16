@@ -112,6 +112,8 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
+	 * Converts the rows of the SQL result to Suggestion objects
+	 *
 	 * @param ResultWrapper $res
 	 * @return Suggestion[]
 	 */
