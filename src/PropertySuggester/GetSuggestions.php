@@ -36,25 +36,25 @@ class GetSuggestions extends ApiBase {
 	 */
 	private $termIndex;
 
-    /**
-     * @var int
-     */
-    private $defaultSuggestionSearchLimit;
+	/**
+	* @var int
+	*/
+	private $defaultSuggestionSearchLimit;
 
-    /**
-     * @var float
-     */
-    private $defaultMinProbability;
+	/**
+	 * @var float
+	 */
+	private $defaultMinProbability;
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
 		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
-        $this->defaultSuggestionSearchLimit = 500;
+		$this->defaultSuggestionSearchLimit = 500;
 
-        global $wgPropertySuggesterMinProbability;
-        $this->defaultMinProbability = $wgPropertySuggesterMinProbability;
+		global $wgPropertySuggesterMinProbability;
+		$this->defaultMinProbability = $wgPropertySuggesterMinProbability;
 
 		global $wgPropertySuggesterDeprecatedIds;
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
