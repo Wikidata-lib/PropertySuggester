@@ -52,7 +52,7 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 
 	__useSuggester: function() {
 		var entity = this.__getEntity();
-		return this.options.type === 'property' && entity && entity.getType() == 'item' && this.__isInNewStatementView();
+		return this.options.type === 'property' && entity && entity.getType() === 'item' && this.__isInNewStatementView();
 	},
 
 	__getEntity: function() {
@@ -74,7 +74,7 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 	__isInNewStatementView: function() {
 		var $statementView =  this.element.closest( ':wikibase-statementview' );
 		var value = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
-		return value == null;
+		return value === null;
 	},
 
 	__buildOptions: function() {
