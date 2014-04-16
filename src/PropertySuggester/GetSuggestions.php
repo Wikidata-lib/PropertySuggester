@@ -74,16 +74,19 @@ class GetSuggestions extends ApiBase {
 			// however very low ranked properties are not interesting and can
 			// still be found during the merge with search result later.
 			$suggesterLimit = 500;
+			$minProbability = 0.0;
 		} else {
 			$suggesterLimit = $resultSize;
+			global $wgPropertySuggesterMinProbability;
+			$minProbability = $wgPropertySuggesterMinProbability;
 		}
 
 		$helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
 
 		if ( $params["entity"] !== null ) {
-			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit );
+			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit, $minProbability );
 		} else {
-			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit );
+			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit, $minProbability );
 		}
 		$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize );
 
