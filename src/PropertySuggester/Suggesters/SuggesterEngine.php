@@ -5,6 +5,12 @@ namespace PropertySuggester\Suggesters;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 
+/**
+ * interface for (Property-)Suggester
+ *
+ * @licence GNU GPL v2+
+ */
+
 interface SuggesterEngine {
 
 	/**

@@ -7,7 +7,6 @@ use ApiMain;
 use DerivativeRequest;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
-use PropertySuggester\ResultBuilder;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
@@ -78,14 +77,14 @@ class GetSuggestions extends ApiBase {
 			$suggesterLimit = $resultSize;
 		}
 
-		$helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
+		$suggestionGenerator = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
 
 		if ( $params["entity"] !== null ) {
-			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit );
+			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params["entity"], $suggesterLimit );
 		} else {
-			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit );
+			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit );
 		}
-		$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize );
+		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $search, $language, $resultSize );
 
 		// Build result Array
 		$resultBuilder = new ResultBuilder( $this->getResult(), $search);

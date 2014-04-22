@@ -22,7 +22,7 @@ use Wikibase\TermIndex;
 class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 	/**
-	 * @var GetSuggestionsHelper
+	 * @var SuggestionGenerator
 	 */
 	protected $helper;
 
@@ -48,7 +48,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
-		$this->helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
+		$this->helper = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
 	}
 
 	public function testFilterSuggestions() {

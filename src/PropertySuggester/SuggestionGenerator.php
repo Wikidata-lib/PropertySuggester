@@ -11,11 +11,11 @@ use Wikibase\EntityLookup;
 use Wikibase\TermIndex;
 
 /**
- * API module helper to get property suggestions
+ * API module helper to generate property suggestions
  *
  * @licence GNU GPL v2+
  */
-class GetSuggestionsHelper {
+class SuggestionGenerator {
 
 	/**
 	 * @var EntityLookup
