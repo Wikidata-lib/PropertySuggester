@@ -9,7 +9,7 @@ return array(
 	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdatePropertyRelationsTable.php',
 
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
-	'PropertySuggester\GetSuggestionsHelper' => 'src/PropertySuggester/GetSuggestionsHelper.php',
+	'PropertySuggester\SuggestionGenerator' => 'src/PropertySuggester/SuggestionGenerator.php',
 	'PropertySuggester\ResultBuilder' => 'src/PropertySuggester/ResultBuilder.php',
 	
 	'PropertySuggester\Suggesters\Suggestion' => 'src/PropertySuggester/Suggesters/Suggestion.php',

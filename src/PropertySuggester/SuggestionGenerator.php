@@ -7,16 +7,15 @@ use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\EntityId;
 use Wikibase\EntityLookup;
 use Wikibase\TermIndex;
 
 /**
- * API module helper to get property suggestions
+ * API module helper to generate property suggestions
  *
  * @licence GNU GPL v2+
  */
-class GetSuggestionsHelper {
+class SuggestionGenerator {
 
 	/**
 	 * @var EntityLookup
