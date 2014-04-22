@@ -24,7 +24,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	/**
 	 * @var SuggestionGenerator
 	 */
-	protected $helper;
+	protected $suggestionGenerator;
 
 	/**
 	 * @var SuggesterEngine
@@ -48,7 +48,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
-		$this->helper = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
+		$this->suggestionGenerator = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
 	}
 
 	public function testFilterSuggestions() {
@@ -71,7 +71,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->method( 'getMatchingIDs' )
 			->will( $this->returnValue( array( $p7, $p10, $p15, $p12 ) ) );
 
-		$result = $this->helper->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
+		$result = $this->suggestionGenerator->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
 
 		$this->assertEquals( array( $suggestions[0], $suggestions[2] ), $result );
 
@@ -88,7 +88,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->helper->generateSuggestionsByPropertyList( array( 'P12', 'p13', '14' ) , 100, 0.0 );
+		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', '14' ) , 100, 0.0 );
 		$this->assertEquals( $result1, array( 'foo' ) );
 
 	}
@@ -111,7 +111,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $item ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result3 = $this->helper->generateSuggestionsByItem( 'Q42', 100, 0.0 );
+		$result3 = $this->suggestionGenerator->generateSuggestionsByItem( 'Q42', 100, 0.0 );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
 
