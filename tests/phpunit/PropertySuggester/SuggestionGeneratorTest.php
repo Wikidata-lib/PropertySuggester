@@ -19,7 +19,7 @@ use Wikibase\TermIndex;
  * @group API
  * @group medium
  */
-class GetSuggestionHelperTest extends MediaWikiTestCase {
+class SuggestionGeneratorTest extends MediaWikiTestCase {
 
 	/**
 	 * @var SuggestionGenerator
