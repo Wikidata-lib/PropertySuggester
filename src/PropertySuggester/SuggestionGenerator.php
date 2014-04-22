@@ -20,7 +20,7 @@ class SuggestionGenerator {
 	/**
 	 * @var EntityLookup
 	 */
-	private $lookup;
+	private $entityLookup;
 
 	/**
 	 * @var TermIndex
@@ -32,40 +32,37 @@ class SuggestionGenerator {
 	 */
 	private $suggester;
 
-	public function __construct( EntityLookup $lookup, TermIndex $termIndex, SuggesterEngine $suggester ) {
-		$this->lookup = $lookup;
+	public function __construct( EntityLookup $entityLookup, TermIndex $termIndex, SuggesterEngine $suggester ) {
+		$this->entityLookup = $entityLookup;
 		$this->suggester = $suggester;
 		$this->termIndex = $termIndex;
 	}
 
 	/**
-	 * Provide either an item id
-	 *
-	 * @param string $item
+	 * @param string $item - An item id
 	 * @param int $limit
+	 * @param float $minProbability
 	 * @return array
 	 */
-	public function generateSuggestionsByItem( $item, $limit ) {
+	public function generateSuggestionsByItem( $item, $limit, $minProbability ) {
 		$id = new  ItemId( $item );
-		$item = $this->lookup->getEntity( $id );
-		$suggestions = $this->suggester->suggestByItem( $item, $limit );
+		$item = $this->entityLookup->getEntity( $id );
+		$suggestions = $this->suggester->suggestByItem( $item, $limit, $minProbability );
 		return $suggestions;
 	}
 
 	/**
-	 * Provide comma separated list of property ids
-	 *
-	 * @param string $propertyList
+	 * @param string[] $propertyList - A list of property ids
 	 * @param int $limit
+	 * @param float $minProbability
 	 * @return Suggestion[]
 	 */
-	public function generateSuggestionsByPropertyList( $propertyList, $limit ) {
-		$splitList = explode( ',', $propertyList );
+	public function generateSuggestionsByPropertyList( array $propertyList, $limit, $minProbability ) {
 		$properties = array();
-		foreach ( $splitList as $id ) {
+		foreach ( $propertyList as $id ) {
 			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
 		}
-		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit );
+		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit, $minProbability );
 		return $suggestions;
 	}
 
@@ -77,7 +74,7 @@ class SuggestionGenerator {
 	 * @return int
 	 */
 	protected function getNumericPropertyId( $propertyId ) {
-		if ( $propertyId[0] === 'P' ) {
+		if ( strlen( $propertyId ) && strtolower( $propertyId[0] ) === 'p' ) {
 			return (int)substr( $propertyId, 1 );
 		}
 		return (int)$propertyId;
@@ -91,21 +88,47 @@ class SuggestionGenerator {
 	 * @param int $resultSize
 	 * @return Suggestion[]
 	 */
-	public function filterSuggestions( $suggestions, $search, $language, $resultSize ) {
+	public function filterSuggestions( array $suggestions, $search, $language, $resultSize ) {
 		if ( !$search ) {
 			return $suggestions;
 		}
+		$ids = $this->getMatchingIDs( $search, $language );
+
+		$id_map = array();
+		foreach ( $ids as $id ) {
+			$id_map[$id->getNumericId()] = true;
+		}
+
+		$matching_suggestions = array();
+		$count = 0;
+		foreach ( $suggestions as $suggestion ) {
+			if ( array_key_exists( $suggestion->getPropertyId()->getNumericId(), $id_map ) ) {
+				$matching_suggestions[] = $suggestion;
+				if ( ++$count == $resultSize ) {
+					break;
+				}
+			}
+		}
+		return $matching_suggestions;
+	}
+
+	/**
+	 * @param string $search
+	 * @param string $language
+	 * @return PropertyId[]
+	 */
+	private function getMatchingIDs( $search, $language ) {
 		$ids = $this->termIndex->getMatchingIDs(
 			array(
 				new \Wikibase\Term( array(
-					'termType' 		=> \Wikibase\Term::TYPE_LABEL,
-					'termLanguage' 	=> $language,
-					'termText' 		=> $search
+					'termType' => \Wikibase\Term::TYPE_LABEL,
+					'termLanguage' => $language,
+					'termText' => $search
 				) ),
 				new \Wikibase\Term( array(
-					'termType' 		=> \Wikibase\Term::TYPE_ALIAS,
-					'termLanguage' 	=> $language,
-					'termText' 		=> $search
+					'termType' => \Wikibase\Term::TYPE_ALIAS,
+					'termLanguage' => $language,
+					'termText' => $search
 				) )
 			),
 			Property::ENTITY_TYPE,
@@ -114,23 +137,7 @@ class SuggestionGenerator {
 				'prefixSearch' => true,
 			)
 		);
-
-		$id_map = array();
-		foreach ( $ids as $id ) {
-			/** @var PropertyId $id */
-			$id_map[$id->getNumericId()] = true;
-		}
-
-		$matching_suggestions = array();
-		foreach ( $suggestions as $suggestion ) {
-			if ( array_key_exists( $suggestion->getPropertyId()->getNumericId(), $id_map ) ) {
-				$matching_suggestions[] = $suggestion;
-			}
-			if ( count( $matching_suggestions ) == $resultSize ) {
-				break;
-			}
-		}
-		return $matching_suggestions;
+		return $ids;
 	}
 
 }

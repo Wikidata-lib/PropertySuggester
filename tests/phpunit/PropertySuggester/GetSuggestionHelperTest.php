@@ -79,18 +79,17 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 	public function testGenerateSuggestionsWithPropertyList() {
 		$properties = array();
-		$properties[] = PropertyId::newFromNumber( 12 );
+		$properties[] = new PropertyId( 'P12' );
+		$properties[] = new PropertyId( 'P13' );
+		$properties[] = new PropertyId( 'P14' );
 
 		$this->suggester->expects( $this->any() )
 			->method( 'suggestByPropertyIds' )
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->helper->generateSuggestionsByPropertyList( 'P12', 100 );
+		$result1 = $this->helper->generateSuggestionsByPropertyList( array( 'P12', 'p13', '14' ) , 100, 0.0 );
 		$this->assertEquals( $result1, array( 'foo' ) );
-
-		$result2 = $this->helper->generateSuggestionsByPropertyList( '12', 100 );
-		$this->assertEquals( $result2, array( 'foo' ) );
 
 	}
 
@@ -112,7 +111,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $item ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result3 = $this->helper->generateSuggestionsByItem( 'Q42', 100 );
+		$result3 = $this->helper->generateSuggestionsByItem( 'Q42', 100, 0.0 );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
 
