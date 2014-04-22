@@ -3,6 +3,7 @@
 
 namespace PropertySuggester\ValueSuggester;
 
+use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\EntityLookup;
 use Wikibase\TermIndex;
 
@@ -18,7 +19,7 @@ class ValueSuggestionArrayTransformer {
 	/**
 	 * @param EntityLookup $lookup
 	 * @param TermIndex $termIndex
-	 * @param ValueSuggestion[] $suggestions
+	 * @param Suggestion[] $suggestions
 	 * @return string
 	 */
 	static function &toJson( EntityLookup &$lookup, TermIndex &$termIndex, array &$suggestions)

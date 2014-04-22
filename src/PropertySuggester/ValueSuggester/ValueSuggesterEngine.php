@@ -2,19 +2,21 @@
 
 namespace PropertySuggester\ValueSuggester;
 
-use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\EntityId;
-
-interface ValueSuggesterEngine {
+abstract class ValueSuggesterEngine {
 
 	/**
-	 * @param EntityId $itemId
-	 * @param PropertyId $itemId
-	 * @param $minProbability float
-	 * @return ValueSuggestion[]
+	 * @param $statements
+	 * @param $propertyId
+	 * @param $minProbability
+	 * @return mixed|\PropertySuggester\Suggesters\Suggestion[]
 	 */
-	public function getValueSuggestions( $itemId, $propertyId,  $minProbability );
+	abstract protected function &getValueSuggestionsByStatements( &$statements, $propertyId,  $minProbability );
 
+
+	public function getValueSuggestionsByItem( $itemId, $propertyId,  $minProbability )
+	{
+		$statements = array( "(31,5)", "(106, 12204)");
+		return $this->getValueSuggestionsByStatements($statements, $propertyId, $minProbability );
+	}
 }
 

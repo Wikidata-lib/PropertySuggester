@@ -3,8 +3,7 @@
 namespace PropertySuggester\ValueSuggester;
 
 use LoadBalancer;
-use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Entity\PropertyId;
+use PropertySuggester\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
 use ResultWrapper;
 
@@ -13,7 +12,7 @@ use ResultWrapper;
  * a Suggester implementation that creates suggestion via MySQL
  * Needs the wbs_propertypairs table filled with pair probabilities.
  */
-class ValueSuggester implements ValueSuggesterEngine {
+class ValueSuggester extends ValueSuggesterEngine {
 
 
 	/**
@@ -24,33 +23,33 @@ class ValueSuggester implements ValueSuggesterEngine {
 	}
 
 	/**
-	 * @param ItemId $itemId
-	 * @param PropertyId $itemId
-	 * @param $minProbability float
-	 * @return ValueSuggestion[]
+	 * @param $statements
+	 * @param $propertyId
+	 * @param $minProbability
+	 * @return mixed|\PropertySuggester\Suggesters\Suggestion[]
 	 */
-	public function getValueSuggestions( $itemId, $propertyId,  $minProbability )
+	protected function &getValueSuggestionsByStatements( &$statements, $propertyId,  $minProbability )
 	{
 		$dbr = $this->lb->getConnection( DB_SLAVE );
-		$statements = array( "(31,5)");
 		$res = $dbr->select(
 			array( //FROM
-				"rules" => "vs_statement_pair_occurrences",
-				"property_value_occurrences" => "vs_statement_occurrences",
-				"property_property_occurrences" => "vs_statement_occurrences"),
+				"vs_statement_pair_occurrences as rules",
+				"vs_statement_occurrences as property_value_occurrences",
+				"wbs_propertypairs as property_property_occurrences"),
 			array( //SELECT
-				"propertyId" => "rule.s2Id",
-				"value" => "rule.s2ValueId",
-				"( 1 - EXP(SUM(LOG(1- ( (rules.occurrences*1.0/property_value_occurrences.occurrences) / (property_property_occurrences.probability ) ))) ) ) " => "pr"),
+				"propertyId" => "rules.s2Id",
+				"value" => "rules.s2ValueId",
+				"pr" => "( 1 - EXP(SUM(LOG(1- ( (rules.occurrences*1.0/property_value_occurrences.occurrences) / (property_property_occurrences.probability ) ))) ) ) "),
 			array( //WHERE
+				"rules.s2Id = $propertyId",
 				"property_property_occurrences.pid1 = s1Id",
 				"property_property_occurrences.pid2 = s2Id",
 				"property_value_occurrences.propertyId = s1Id",
 				"property_value_occurrences.valueEntityId = s1ValueId",
-				"(s1Id, s1ValueId) IN " . $dbr->makeList( $statements ) . " "),
+				"(s1Id, s1ValueId) IN (" . join(",", $statements) . ")"),
 			__METHOD__,
 			array(
-				"GROUP BY" =>  $dbr->makeList( array("rules.s2Id", "rules.s2ValueId")),
+				"GROUP BY" =>  "rules.s2Id, rules.s2ValueId",
 				"HAVING" => "pr > $minProbability",
 				"ORDER BY" => "pr DESC"));
 		$this->lb->reuseConnection($dbr);
@@ -60,14 +59,13 @@ class ValueSuggester implements ValueSuggesterEngine {
 
 	/**
 	 * @param ResultWrapper $res
-	 * @return ValueSuggestion[]
+	 * @return Suggestion[]
 	 */
 	protected function &buildResult( ResultWrapper &$res ) {
 		$resultArray = array();
 		foreach ( $res as $row ) {
-			$propertyId = PropertyId::newFromNumber( (int) $row->propertyId);
-			$valueId = ItemId::newFromNumber( ( int ) $row->value );
-			$suggestion = new ValueSuggestion($propertyId, $valueId, $row->pr);
+			$valueId = ItemId::newFromNumber( (int) $row->value);
+			$suggestion = new Suggestion($valueId, $row->pr);
 			$resultArray[] = $suggestion;
 		}
 		return $resultArray;

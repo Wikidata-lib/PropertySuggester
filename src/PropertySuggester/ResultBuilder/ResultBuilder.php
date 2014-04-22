@@ -20,32 +20,32 @@ class ResultBuilder {
 	/**
 	 * @var $EntityTitleLookup
 	 */
-	private $entityTitleLookup;
+	protected $entityTitleLookup;
 
 	/**
 	 * @var TermIndex
 	 */
-	private $termIndex;
+	protected $termIndex;
 
 	/**
 	 * @var ApiResult
 	 */
-	private $result;
+	protected $result;
 
 	/**
 	 * @var string
 	 */
-	private $searchPattern;
+	protected $searchPattern;
 
 	/**
 	 * @param ApiResult $result
 	 * @param string $search
 	 */
 	public function __construct( ApiResult $result, $search ) {
+		$this->searchPattern = '/^' . preg_quote( $search, '/' ) . '/i';
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
 		$this->result = $result;
-		$this->searchPattern = '/^' . preg_quote( $search, '/' ) . '/i';
 	}
 
 	/**
@@ -53,19 +53,19 @@ class ResultBuilder {
 	 * @param string $language
 	 * @return array
 	 */
-	public function createJSON( array $suggestions, $language ) {
-		$entries = array();
-		$ids = array();
+	public function createJSON( array $suggestions, $language, $entityType='property' ) {
+
+		$propertyIds = array();
 		foreach ( $suggestions as $suggestion ) {
-			$id = $suggestion->getPropertyId();
-			$ids[] = $id;
+			$id = $suggestion->getEntityId();
+			$propertyIds[] = $id;
 		}
-		//See SearchEntities
-		$terms = $this->termIndex->getTermsOfEntities( $ids, 'property', $language );
+		$terms = $this->termIndex->getTermsOfEntities( $propertyIds, $entityType, $language );
 		$clusteredTerms = $this->clusterTerms( $terms );
 
+		$entries = array();
 		foreach ( $suggestions as $suggestion ) {
-			$id = $suggestion->getPropertyId();
+			$id = $suggestion->getEntityId();
 			$entries[] = $this->buildEntry( $id, $clusteredTerms, $suggestion );
 		}
 		return $entries;
@@ -159,3 +159,4 @@ class ResultBuilder {
 	}
 
 }
+

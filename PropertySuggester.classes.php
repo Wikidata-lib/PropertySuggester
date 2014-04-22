@@ -10,19 +10,17 @@ return array(
 
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
 	'PropertySuggester\GetSuggestionsHelper' => 'src/PropertySuggester/GetSuggestionsHelper.php',
-	'PropertySuggester\GetSuggestionsHelper' => 'src/PropertySuggester/GetValueSuggestions.php',
+	'PropertySuggester\GetValueSuggestions' => 'src/PropertySuggester/GetValueSuggestions.php',
 
 	'PropertySuggester\ResultBuilder\ResultBuilder' => 'src/PropertySuggester/ResultBuilder/ResultBuilder.php',
-	'PropertySuggester\ResultBuilder\SuggestionsResultBuilder' => 'src/PropertySuggester/ResultBuilder/SuggestionsResultBuilder.php',
-	'PropertySuggester\ResultBuilder\ValueSuggestionsResultBuilder' => 'src/PropertySuggester/ResultBuilder/ValueSuggestionsResultBuilder.php',
 
-	'PropertySuggester\Suggesters\Suggestion' => 'src/PropertySuggester/Suggesters/Suggestion.php',
+	'PropertySuggester\Suggestion' => 'src/PropertySuggester/Suggestion.php',
+
 	'PropertySuggester\Suggesters\SuggesterEngine' => 'src/PropertySuggester/Suggesters/SuggesterEngine.php',
 	'PropertySuggester\Suggesters\SimpleSuggester' => 'src/PropertySuggester/Suggesters/SimpleSuggester.php',
 
-	'PropertySuggester\ValueSuggester\Suggestion' => 'src/PropertySuggester/ValueSuggester/Suggestion.php',
-	'PropertySuggester\ValueSuggester\SuggesterEngine' => 'src/PropertySuggester/ValueSuggester/SuggesterEngine.php',
-	'PropertySuggester\ValueSuggester\SimpleSuggester' => 'src/PropertySuggester/ValueSuggester/SimpleSuggester.php',
+	'PropertySuggester\ValueSuggester\ValueSuggesterEngine' => 'src/PropertySuggester/ValueSuggester/ValueSuggesterEngine.php',
+	'PropertySuggester\ValueSuggester\ValueSuggester' => 'src/PropertySuggester/ValueSuggester/ValueSuggester.php',
 
 	'PropertySuggester\UpdateTable\Importer\Importer' => 'src/PropertySuggester/UpdateTable/Importer/Importer.php',
 	'PropertySuggester\UpdateTable\Importer\BasicImporter' => 'src/PropertySuggester/UpdateTable/Importer/BasicImporter.php',

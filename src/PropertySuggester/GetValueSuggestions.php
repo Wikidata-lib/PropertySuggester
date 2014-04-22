@@ -1,15 +1,12 @@
 <?php
 
-namespace ValueSuggester;
+namespace PropertySuggester;
 
 use ApiBase;
 use ApiMain;
-use DerivativeRequest;
-use PropertySuggester\ResultBuilder\ValueSuggestionsResultBuilder;
-use PropertySuggester\ValueResultBuilder;
+use PropertySuggester\ResultBuilder\ResultBuilder;
 use PropertySuggester\ValueSuggester\ValueSuggester;
 use PropertySuggester\ValueSuggester\ValueSuggesterEngine;
-use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
@@ -20,7 +17,7 @@ use Wikibase\Utils;
  *
  * @licence GNU GPL v2+
  */
-class GetAllValueSuggestions extends ApiBase {
+class GetValueSuggestions extends ApiBase {
 
 	/**
 	 * @var EntityLookup
@@ -51,26 +48,15 @@ class GetAllValueSuggestions extends ApiBase {
 		wfProfileIn( __METHOD__ );
 		$params = $this->extractRequestParams();
 
-		$suggestions = $this->valueSuggester->getValueSuggestions($params["entity"], $params["property"], $params["threshold"]);
+		$suggestions = $this->valueSuggester->getValueSuggestionsByItem($params["item"], $params["property"], (float) $params["threshold"]);
 
 		// Build result Array
-		$resultBuilder = new ValueSuggestionsResultBuilder( $suggestions );
-		$entries = $resultBuilder->createJSON( $suggestions, $language, $search );
-
-		// merge with search result if possible and necessary
-		if ( count( $entries ) < $resultSize && $search !== '' ) {
-			$searchResult = $this->querySearchApi( $resultSize, $search, $language );
-			$entries = $resultBuilder->mergeWithTraditionalSearchResults( $entries, $searchResult, $resultSize );
-		}
+		$resultBuilder = new ResultBuilder( $this->getResult(), '' );
+		$entries = $resultBuilder->createJSON( $suggestions, $params["language"], 'item' );
 
 		// Define Result
-		$slicedEntries = array_slice( $entries, $params['continue'], $params['limit'] );
-		$this->getResult()->addValue( null, 'search', $slicedEntries );
+		$this->getResult()->addValue( null, 'search', $entries );
 		$this->getResult()->addValue( null, 'success', 1 );
-		if ( count( $entries ) >= $resultSize ) {
-			$this->getResult()->addValue( null, 'search-continue', $resultSize );
-		}
-		$this->getResult()->addValue( 'searchinfo', 'search', $search );
 	}
 
 
@@ -80,21 +66,17 @@ class GetAllValueSuggestions extends ApiBase {
 	 */
 	public function getAllowedParams() {
 		return array(
-			'entity' => array(
-				ApiBase::PARAM_TYPE => 'int',
+			'item' => array(
+				ApiBase::PARAM_TYPE => 'integer',
 				ApiBase::PARAM_REQUIRED => true
 			),
 			'property' => array(
-				ApiBase::PARAM_TYPE => 'int',
+				ApiBase::PARAM_TYPE => 'integer',
 				ApiBase::PARAM_REQUIRED => true
 			),
 			'threshold' => array(
-				ApiBase::PARAM_TYPE => 'int',
-				ApiBase::PARAM_DFLT => 7,
-				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
-				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
-				ApiBase::PARAM_MIN => 0,
-				ApiBase::PARAM_RANGE_ENFORCE => true,
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_REQUIRED => true
 			),
 			'language' => array(
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
@@ -108,7 +90,8 @@ class GetAllValueSuggestions extends ApiBase {
 	 */
 	public function getParamDescription() {
 		return array_merge( parent::getParamDescription(), array(
-			'entity' => 'Suggest Values for given entity. (Id)',
+			'item' => 'Id of treated entity.',
+			'property' => 'Id of property for which values should be shown',
 			'threshold' => 'Minimal probability',
 			'language' => 'Language of value suggestion labels'
 		) );
@@ -137,12 +120,8 @@ class GetAllValueSuggestions extends ApiBase {
 	 */
 	protected function getExamples() {
 		return array(
-			'api.php?action=wbsgetsuggestions&format=json&entity=Q4'
-			=> 'Get suggestions for entity 4',
-			'api.php?action=wbsgetsuggestions&format=json&entity=Q4&continue=10&limit=5'
-			=> 'Get suggestions for entity 4 from rank 10 to 15',
-			'api.php?action=wbsgetsuggestions&format=json&properties=P31,P21'
-			=> 'Get suggestions for the property combination P21 and P31'
+			'api.php?action=wbsgetvaluesuggestions&format=json&item=5&property=21&threshold=0.025'
+			=> 'Get suggestions for property 21 for item 5',
 		);
 	}
 
