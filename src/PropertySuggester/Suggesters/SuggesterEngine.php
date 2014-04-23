@@ -10,7 +10,6 @@ use Wikibase\DataModel\Entity\PropertyId;
  *
  * @licence GNU GPL v2+
  */
-
 interface SuggesterEngine {
 
 	/**
