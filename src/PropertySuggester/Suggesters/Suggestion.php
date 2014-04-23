@@ -32,7 +32,6 @@ class Suggestion {
 	}
 
 	/**
-	 * average probability that an already existing property is used with the suggested property
 	 * @return PropertyId
 	 */
 	public function getPropertyId() {
@@ -40,6 +39,7 @@ class Suggestion {
 	}
 
 	/**
+	 * average probability that an already existing property is used with the suggested property
 	 * @return float
 	 */
 	public function getProbability() {
