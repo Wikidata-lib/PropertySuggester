@@ -4,6 +4,7 @@ namespace PropertySuggester;
 
 use ApiResult;
 use MediaWikiTestCase;
+use PropertySuggester\ResultBuilder\ResultBuilder;
 
 /**
  * @covers PropertySuggester\ResultBuilder

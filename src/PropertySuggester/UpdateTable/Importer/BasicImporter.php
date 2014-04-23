@@ -4,6 +4,11 @@ namespace PropertySuggester\UpdateTable\Importer;
 
 use PropertySuggester\UpdateTable\ImportContext;
 
+/**
+ * A strategy, which import entries from CSV file into DB table, used as fallback, when no special import commands are supported by the dbms
+ * Class BasicImporter
+ * @package PropertySuggester\UpdateTable\Importer
+ */
 class BasicImporter implements Importer {
 
 	/**
@@ -12,27 +17,36 @@ class BasicImporter implements Importer {
 	 * @return bool
 	 */
 	function importFromCsvFileToDb( ImportContext $importContext ) {
-		$fileHandle = fopen( $importContext->getWholePath(), "r" );
+		$fileHandle = fopen( $importContext->getCsvFilePath(), "r" );
+
+		$lb = $importContext->getLb();
+		$db = $lb->getConnection( DB_MASTER );
 
 		if ( $fileHandle == false ) {
 			return false;
 		}
 
-		$accumulator = Array();
-		$data = fgetcsv( $fileHandle, 0, ';' );
+		doImport($fileHandle, $db, $importContext);
 
-		while ( $data !== false ) {
-			$accumulator[] = array( 'pid1' => $data[0], 'pid2' => $data[1], 'count' => $data[2], 'probability' => $data[3] );
-
-			$data = fgetcsv( $fileHandle, 0, ';' );
-
-			if ( $data === false or count( $accumulator ) > 1000 ) {
-				$importContext->getDb()->insert( $importContext->getTableName(), $accumulator );
-				$accumulator = Array();
-			}
-		}
+		$lb->reuseConnection( $db );
 
 		fclose( $fileHandle );
 		return true;
+	}
+
+	private function doImport($fileHandle, $db, $importContext) {
+		$accumulator = Array();
+		$i = 0;
+
+		while ( ( $data = fgetcsv( $fileHandle, 0, ',' ) ) !== false ) {
+			$accumulator[] = array( 'pid1' => $data[0], 'pid2' => $data[1], 'count' => $data[2], 'probability' => $data[3] );
+			++$i;
+
+			if ( $data === false || $i > 1000 ) {
+				$db->insert( $importContext->getTargetTableName(), $accumulator );
+				$i = 0;
+				$accumulator = Array();
+			}
+		}
 	}
 }

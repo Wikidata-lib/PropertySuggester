@@ -3,6 +3,7 @@
 namespace PropertySuggester\Maintenance;
 
 use Maintenance;
+use LoadBalancer;
 use PropertySuggester\UpdateTable\Importer\BasicImporter;
 use PropertySuggester\UpdateTable\Importer\MySQLImporter;
 use PropertySuggester\UpdateTable\Importer\PostgresImporter;
@@ -47,14 +48,15 @@ class UpdateTable extends Maintenance {
 		$tableName = 'wbs_propertypairs';
 
 		wfWaitForSlaves( 5 );
-		$db = wfGetDB( DB_MASTER );
-		$this->clearTable( $db, $tableName, $showInfo );
+		$lb = wfGetLB( DB_MASTER );
+
+		$this->clearTable( $lb, $tableName, $showInfo );
 
 		if ( $showInfo ) {
 			$this->output( "loading new entries from file\n" );
 		}
 
-		$importContext = $this->createImportContext( $db, $tableName, $wholePath );
+		$importContext = $this->createImportContext( $lb, $tableName, $wholePath );
 		$insertionStrategy = $this->createImportStrategy( $useInsert );
 		$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
 
@@ -81,27 +83,29 @@ class UpdateTable extends Maintenance {
 		}
 	}
 
+
 	/**
-	 * @param \DatabaseBase $db
+	 * @param LoadBalancer $lb
 	 * @param string $tableName
 	 * @param string $wholePath
 	 * @return ImportContext
 	 */
-	function createImportContext( \DatabaseBase $db, $tableName, $wholePath ) {
+	function createImportContext( LoadBalancer $lb, $tableName, $wholePath ) {
 		$importContext = new ImportContext();
-		$importContext->setDb( $db );
-		$importContext->setTableName( $tableName );
-		$importContext->setWholePath( $wholePath );
+		$importContext->setLb( $db );
+		$importContext->setTargetTableName( $tableName );
+		$importContext->setCsvFilePath( $wholePath );
 		return $importContext;
 	}
 
 
 	/**
-	 * @param \DatabaseBase $db
+	 * @param LoadBalancer $lb
 	 * @param string $tableName
 	 * @param boolean $showInfo
 	 */
-	private function clearTable( \DatabaseBase $db, $tableName, $showInfo ) {
+	private function clearTable( \LoadBalancer $lb, $tableName, $showInfo ) {
+		$db = $lb->getConnection( DB_MASTER );
 		if ( $db->tableExists( $tableName ) ) {
 			if ( $showInfo ) {
 				$this->output( "removing old entries\n" );
@@ -110,6 +114,7 @@ class UpdateTable extends Maintenance {
 		} else {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
+		$lb->reuseConnection($db);
 	}
 
 }

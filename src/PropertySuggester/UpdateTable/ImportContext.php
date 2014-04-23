@@ -2,66 +2,66 @@
 
 namespace PropertySuggester\UpdateTable;
 
-use DatabaseBase;
+use LoadBalancer;
 
 class ImportContext {
 	/**
 	 * Path to CSV file
 	 * @var string
 	 */
-	private $wholePath = "";
+	private $csvFilePath = "";
 
 	/**
 	 * table name
 	 * @var string
 	 */
-	private $tableName = "";
+	private $targetTableName = "";
 
 	/**
-	 * @var DatabaseBase
+	 * @var LoadBalancer
 	 */
-	private $db = "";
+	private $lb = "";
 
 
 	/**
-	 * @param DatabaseBase $db
+	 * @param LoadBalancer $lb
 	 */
-	public function setDb( $db ) {
-		$this->db = $db;
+	public function setLb( $lb ) {
+		$this->lb = $lb;
 	}
 
 	/**
-	 * @return DatabaseBase
+	 * @return LoadBalancer
 	 */
-	public function getDb() {
-		return $this->db;
+	public function getLb() {
+		return $this->lb;
 	}
 
 	/**
 	 * @param string $tablename
 	 */
-	public function setTableName( $tablename ) {
-		$this->tableName = $tablename;
+	public function setTargetTableName( $tablename ) {
+		$this->targetTableName = $tablename;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getTableName() {
-		return $this->tableName;
+	public function getTargetTableName() {
+		return $this->targetTableName;
 	}
 
 	/**
 	 * @param string $wholePath
 	 */
-	public function setWholePath( $wholePath ) {
-		$this->wholePath = $wholePath;
+	public function setCsvFilePath( $wholePath ) {
+		$this->csvFilePath = $wholePath;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getWholePath() {
-		return $this->wholePath;
+	public function getCsvFilePath() {
+		return $this->csvFilePath;
 	}
 }

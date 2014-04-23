@@ -6,12 +6,10 @@
 return array(
 	'PropertySuggesterHooks' => 'PropertySuggesterHooks.php',
 	
-	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdatePropertyRelationsTable.php',
+	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdatePropertyPairsTable.php',
 
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
-	'PropertySuggester\SuggestionGenerator' => 'src/PropertySuggester/SuggestionGenerator.php',
-	'PropertySuggester\ResultBuilder' => 'src/PropertySuggester/ResultBuilder.php',
-	
+
 	'PropertySuggester\Suggesters\Suggestion' => 'src/PropertySuggester/Suggesters/Suggestion.php',
 	'PropertySuggester\Suggesters\SuggesterEngine' => 'src/PropertySuggester/Suggesters/SuggesterEngine.php',
 	'PropertySuggester\Suggesters\SimpleSuggester' => 'src/PropertySuggester/Suggesters/SimpleSuggester.php',

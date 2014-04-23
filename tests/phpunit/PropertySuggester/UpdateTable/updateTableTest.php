@@ -46,7 +46,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 		$this->rows = array();
 
 		foreach ( $rows as $row ) {
-			fputcsv( $fhandle, $row, ";" );
+			fputcsv( $fhandle, $row, "," );
 			$this->rows[] = array_values( $row );
 		}
 		fclose( $fhandle );
