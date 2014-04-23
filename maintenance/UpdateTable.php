@@ -5,6 +5,7 @@ namespace PropertySuggester\Maintenance;
 use Maintenance;
 use LoadBalancer;
 use PropertySuggester\UpdateTable\Importer\BasicImporter;
+use PropertySuggester\UpdateTable\Importer\Importer;
 use PropertySuggester\UpdateTable\Importer\MySQLImporter;
 use PropertySuggester\UpdateTable\Importer\PostgresImporter;
 use PropertySuggester\UpdateTable\ImportContext;
@@ -36,11 +37,11 @@ class UpdateTable extends Maintenance {
 		if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
 			$this->error( "The --file option requires a file as an argument.\n", true );
 		}
-		$wholePath = realpath( $this->getOption( 'file' ) );
-		$wholePath = str_replace( '\\', '/', $wholePath );
+		$fullPath = realpath( $this->getOption( 'file' ) );
+		$fullPath = str_replace( '\\', '/', $fullPath );
 
-		if ( !file_exists( $wholePath ) ) {
-			$this->error( "Cant find $wholePath \n", true );
+		if ( !file_exists( $fullPath ) ) {
+			$this->error( "Cant find $fullPath \n", true );
 		}
 
 		$useInsert = $this->getOption( 'use-insert' );
@@ -56,7 +57,7 @@ class UpdateTable extends Maintenance {
 			$this->output( "loading new entries from file\n" );
 		}
 
-		$importContext = $this->createImportContext( $lb, $tableName, $wholePath );
+		$importContext = $this->createImportContext( $lb, $tableName, $fullPath );
 		$insertionStrategy = $this->createImportStrategy( $useInsert );
 		$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
 
@@ -74,15 +75,14 @@ class UpdateTable extends Maintenance {
 	 */
 	function createImportStrategy( $useInsert ) {
 		global $wgDbType;
-		if ( $wgDbType == 'mysql' and !$useInsert ) {
+		if ( $wgDbType === 'mysql' and !$useInsert ) {
 			return new MySQLImporter();
-		} elseif ( $wgDbType == 'postgres' and !$useInsert ) {
+		} elseif ( $wgDbType === 'postgres' and !$useInsert ) {
 			return new PostgresImporter();
 		} else {
 			return new BasicImporter();
 		}
 	}
-
 
 	/**
 	 * @param LoadBalancer $lb
@@ -98,13 +98,12 @@ class UpdateTable extends Maintenance {
 		return $importContext;
 	}
 
-
 	/**
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
 	 * @param boolean $showInfo
 	 */
-	private function clearTable( \LoadBalancer $lb, $tableName, $showInfo ) {
+	private function clearTable( LoadBalancer $lb, $tableName, $showInfo ) {
 		$db = $lb->getConnection( DB_MASTER );
 		if ( $db->tableExists( $tableName ) ) {
 			if ( $showInfo ) {

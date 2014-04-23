@@ -6,7 +6,7 @@ use PropertySuggester\UpdateTable\ImportContext;
 
 /**
  * A interface for strategies, which import entries from CSV file into DB table
- * Interface Importer
+ *
  * @author BP2013N2
  * @licence GNU GPL v2+
  */

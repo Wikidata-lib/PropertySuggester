@@ -6,7 +6,7 @@ use LoadBalancer;
 
 /**
  * Context for importing data from a csv file to a db table using a Importer strategy
- * Class ImportContext
+ *
  * @author BP2013N2
  * @licence GNU GPL v2+
  */
@@ -32,14 +32,7 @@ class ImportContext {
 	/**
 	 * @var LoadBalancer
 	 */
-	private $lb = "";
-
-	/**
-	 * @param string $csvDelimiter
-	 */
-	public function setCsvDelimiter( $csvDelimiter ) {
-		$this->csvDelimiter = $csvDelimiter;
-	}
+	private $lb = null;
 
 	/**
 	 * @return string
@@ -49,10 +42,10 @@ class ImportContext {
 	}
 
 	/**
-	 * @param LoadBalancer $lb
+	 * @param string $csvDelimiter
 	 */
-	public function setLb( $lb ) {
-		$this->lb = $lb;
+	public function setCsvDelimiter( $csvDelimiter ) {
+		$this->csvDelimiter = $csvDelimiter;
 	}
 
 	/**
@@ -63,10 +56,10 @@ class ImportContext {
 	}
 
 	/**
-	 * @param string $tablename
+	 * @param LoadBalancer $lb
 	 */
-	public function setTargetTableName( $tablename ) {
-		$this->targetTableName = $tablename;
+	public function setLb( $lb ) {
+		$this->lb = $lb;
 	}
 
 	/**
@@ -77,10 +70,10 @@ class ImportContext {
 	}
 
 	/**
-	 * @param string $wholePath
+	 * @param string $tableName
 	 */
-	public function setCsvFilePath( $wholePath ) {
-		$this->csvFilePath = $wholePath;
+	public function setTargetTableName( $tableName ) {
+		$this->targetTableName = $tableName;
 	}
 
 	/**
@@ -88,6 +81,13 @@ class ImportContext {
 	 */
 	public function getCsvFilePath() {
 		return $this->csvFilePath;
+	}
+
+	/**
+	 * @param string $fullPath
+	 */
+	public function setCsvFilePath( $fullPath ) {
+		$this->csvFilePath = $fullPath;
 	}
 
 }

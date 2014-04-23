@@ -2,11 +2,13 @@
 
 namespace PropertySuggester\UpdateTable\Importer;
 
+use DatabaseBase;
 use PropertySuggester\UpdateTable\ImportContext;
 
 /**
- * A strategy, which import entries from CSV file into DB table, used as fallback, when no special import commands are supported by the dbms
- * Class BasicImporter
+ * A strategy, which import entries from CSV file into DB table, used as fallback, when no special import commands
+ * are supported by the dbms.
+ *
  * @author BP2013N2
  * @licence GNU GPL v2+
  */
@@ -33,7 +35,12 @@ class BasicImporter implements Importer {
 		return true;
 	}
 
-	private function doImport( $fileHandle, $db, $importContext ) {
+	/**
+	 * @param $fileHandle
+	 * @param DatabaseBase $db
+	 * @param ImportContext $importContext
+	 */
+	private function doImport( $fileHandle, DatabaseBase $db, ImportContext $importContext ) {
 		$accumulator = Array();
 		$i = 0;
 
