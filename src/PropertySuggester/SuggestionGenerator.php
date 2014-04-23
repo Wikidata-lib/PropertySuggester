@@ -95,15 +95,15 @@ class SuggestionGenerator {
 		}
 		$ids = $this->getMatchingIDs( $search, $language );
 
-		$id_map = array();
+		$id_set = array();
 		foreach ( $ids as $id ) {
-			$id_map[$id->getNumericId()] = true;
+			$id_set[$id->getNumericId()] = true;
 		}
 
 		$matching_suggestions = array();
 		$count = 0;
 		foreach ( $suggestions as $suggestion ) {
-			if ( array_key_exists( $suggestion->getPropertyId()->getNumericId(), $id_map ) ) {
+			if ( array_key_exists( $suggestion->getPropertyId()->getNumericId(), $id_set ) ) {
 				$matching_suggestions[] = $suggestion;
 				if ( ++$count == $resultSize ) {
 					break;

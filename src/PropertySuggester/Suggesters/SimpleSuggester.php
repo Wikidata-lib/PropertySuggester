@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
+use Wikibase\DataModel\Snak\Snak;
 
 /**
  * a Suggester implementation that creates suggestion via MySQL
@@ -44,7 +45,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int[] $propertyIds
 	 * @param int $limit
 	 * @param float $minProbability
-	 * @throws \InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
 	protected function getSuggestions( array $propertyIds, $limit, $minProbability ) {
@@ -88,10 +89,8 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability ) {
-		$numericIds = array();
-		foreach ( $propertyIds as $id ) {
-			$numericIds[] = $id->getNumericId();
-		}
+		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds);
+
 		return $this->getSuggestions( $numericIds, $limit, $minProbability );
 	}
 
@@ -105,10 +104,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability ) {
 		$snaks = $item->getAllSnaks();
-		$numericIds = array();
-		foreach ( $snaks as $snak ) {
-			$numericIds[] = $snak->getPropertyId()->getNumericId();
-		}
+		$numericIds = array_map( array( $this, 'getNumericIdFromSnak' ), $snaks);
 		return $this->getSuggestions( $numericIds, $limit, $minProbability );
 	}
 
@@ -126,6 +122,14 @@ class SimpleSuggester implements SuggesterEngine {
 			$resultArray[] = $suggestion;
 		}
 		return $resultArray;
+	}
+
+	private function getNumericIdFromSnak( Snak $snak ) {
+		return $snak->getPropertyId()->getNumericId();
+	}
+
+	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {
+		return $propertyId->getNumericId();
 	}
 
 }
