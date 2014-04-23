@@ -6,7 +6,7 @@ use DatabaseBase;
 use PropertySuggester\UpdateTable\ImportContext;
 
 /**
- * A strategy, which import entries from CSV file into DB table, used as fallback, when no special import commands
+ * A strategy, which imports entries from CSV file into DB table, used as fallback, when no special import commands
  * are supported by the dbms.
  *
  * @author BP2013N2

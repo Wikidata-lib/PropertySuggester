@@ -33,7 +33,7 @@ interface SuggesterEngine {
 	public function suggestByItem( Item $item, $limit, $minProbability );
 
 	/**
-	 * @param int[] $numericIds
+	 * @param int[] $numericIds - blacklist used to filter suggestions
 	 * @return void
 	 */
 	public function setDeprecatedPropertyIds( array $numericIds );

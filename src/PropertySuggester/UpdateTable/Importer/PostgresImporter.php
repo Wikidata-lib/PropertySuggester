@@ -5,7 +5,7 @@ namespace PropertySuggester\UpdateTable\Importer;
 use PropertySuggester\UpdateTable\ImportContext;
 
 /**
- * A strategy, which import entries from CSV file into DB table, using "COPY" - command.
+ * A strategy, which imports entries from CSV file into DB table, using "COPY" - command.
  *
  * @author BP2013N2
  * @licence GNU GPL v2+
