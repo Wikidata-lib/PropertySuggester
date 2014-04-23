@@ -13,6 +13,7 @@ use Wikibase\TermIndex;
 /**
  * API module helper to generate property suggestions
  *
+ * @author BP2013N2
  * @licence GNU GPL v2+
  */
 class SuggestionGenerator {

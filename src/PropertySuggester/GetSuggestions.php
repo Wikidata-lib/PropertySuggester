@@ -36,8 +36,8 @@ class GetSuggestions extends ApiBase {
 	private $termIndex;
 
 	/**
-	* @var int
-	*/
+	 * @var int
+	 */
 	private $defaultSuggestionSearchLimit;
 
 	/**

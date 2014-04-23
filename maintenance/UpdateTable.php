@@ -16,8 +16,8 @@ require_once $basePath . '/maintenance/Maintenance.php';
 /**
  * Maintenance script to load property pair occurrence probability table from given csv file
  *
- * @licence GNU GPL v2+
  * @author BP2013N2
+ * @licence GNU GPL v2+
  */
 class UpdateTable extends Maintenance {
 
@@ -92,7 +92,7 @@ class UpdateTable extends Maintenance {
 	 */
 	function createImportContext( LoadBalancer $lb, $tableName, $wholePath ) {
 		$importContext = new ImportContext();
-		$importContext->setLb( $db );
+		$importContext->setLb( $lb );
 		$importContext->setTargetTableName( $tableName );
 		$importContext->setCsvFilePath( $wholePath );
 		return $importContext;
@@ -114,7 +114,7 @@ class UpdateTable extends Maintenance {
 		} else {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
-		$lb->reuseConnection($db);
+		$lb->reuseConnection( $db );
 	}
 
 }

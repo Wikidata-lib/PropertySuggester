@@ -13,6 +13,7 @@ use Wikibase\DataModel\Entity\EntityId;
 /**
  * ResultBuilder builds Json-compatible array structure from suggestions
  *
+ * @author BP2013N2
  * @licence GNU GPL v2+
  */
 class ResultBuilder {
@@ -77,7 +78,7 @@ class ResultBuilder {
 	 * @param Suggestion $suggestion
 	 * @return array $entry
 	 */
-	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ){
+	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ) {
 		$entry = array();
 		$entry['id'] = $id->getPrefixedId();
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
@@ -109,7 +110,7 @@ class ResultBuilder {
 
 		foreach ( $terms as $term ) {
 			$id = $term->getEntityId()->getSerialization();
-			if ( ! isset( $clusteredTerms[$id] ) ) {
+			if ( !isset( $clusteredTerms[$id] ) ) {
 				$clusteredTerms[$id] = array();
 			}
 			$clusteredTerms[$id][] = $term;

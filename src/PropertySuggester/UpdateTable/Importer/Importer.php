@@ -7,7 +7,8 @@ use PropertySuggester\UpdateTable\ImportContext;
 /**
  * A interface for strategies, which import entries from CSV file into DB table
  * Interface Importer
- * @package PropertySuggester\UpdateTable\Importer
+ * @author BP2013N2
+ * @licence GNU GPL v2+
  */
 interface Importer {
 	/**
@@ -16,4 +17,5 @@ interface Importer {
 	 * @return bool
 	 */
 	function importFromCsvFileToDb( ImportContext $importContext );
+
 }

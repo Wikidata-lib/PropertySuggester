@@ -6,13 +6,15 @@
 return array(
 	'PropertySuggesterHooks' => 'PropertySuggesterHooks.php',
 	
-	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdatePropertyPairsTable.php',
+	'PropertySuggester\Maintenance\UpdateTable' => '/maintenance/UpdateTable.php',
 
 	'PropertySuggester\GetSuggestions' => 'src/PropertySuggester/GetSuggestions.php',
 
 	'PropertySuggester\Suggesters\Suggestion' => 'src/PropertySuggester/Suggesters/Suggestion.php',
 	'PropertySuggester\Suggesters\SuggesterEngine' => 'src/PropertySuggester/Suggesters/SuggesterEngine.php',
 	'PropertySuggester\Suggesters\SimpleSuggester' => 'src/PropertySuggester/Suggesters/SimpleSuggester.php',
+	'PropertySuggester\SuggestionGenerator' => 'src/PropertySuggester/SuggestionGenerator.php',
+	'PropertySuggester\ResultBuilder' => 'src/PropertySuggester/ResultBuilder.php',
 
 	'PropertySuggester\UpdateTable\Importer\Importer' => 'src/PropertySuggester/UpdateTable/Importer/Importer.php',
 	'PropertySuggester\UpdateTable\Importer\BasicImporter' => 'src/PropertySuggester/UpdateTable/Importer/BasicImporter.php',

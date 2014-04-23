@@ -4,15 +4,27 @@ namespace PropertySuggester\UpdateTable;
 
 use LoadBalancer;
 
+/**
+ * Context for importing data from a csv file to a db table using a Importer strategy
+ * Class ImportContext
+ * @author BP2013N2
+ * @licence GNU GPL v2+
+ */
 class ImportContext {
 	/**
-	 * Path to CSV file
+	 * file system path to the CSV to load data from
 	 * @var string
 	 */
 	private $csvFilePath = "";
 
 	/**
-	 * table name
+	 * delimiter used in csv file
+	 * @var string
+	 */
+	private $csvDelimiter = ",";
+
+	/**
+	 * table name of the table to import to
 	 * @var string
 	 */
 	private $targetTableName = "";
@@ -22,6 +34,19 @@ class ImportContext {
 	 */
 	private $lb = "";
 
+	/**
+	 * @param string $csvDelimiter
+	 */
+	public function setCsvDelimiter( $csvDelimiter ) {
+		$this->csvDelimiter = $csvDelimiter;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCsvDelimiter() {
+		return $this->csvDelimiter;
+	}
 
 	/**
 	 * @param LoadBalancer $lb
@@ -64,4 +89,5 @@ class ImportContext {
 	public function getCsvFilePath() {
 		return $this->csvFilePath;
 	}
+
 }
