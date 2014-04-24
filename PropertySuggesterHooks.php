@@ -1,5 +1,7 @@
 <?php
 
+namespace PropertySuggester;
+
 final class PropertySuggesterHooks {
 	/**
 	 * Handler for the BeforePageDisplay hook, injects special behaviour

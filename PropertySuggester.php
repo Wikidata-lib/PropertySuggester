@@ -20,15 +20,7 @@ $wgExtensionCredits['other'][] = array(
 	'descriptionmsg' => 'propertysuggester-desc'
 );
 
-spl_autoload_register( function ( $className ) {
-	static $classes = false;
-	if ( $classes === false ) {
-		$classes = include( __DIR__ . '/' . 'PropertySuggester.classes.php' );
-	}
-	if ( array_key_exists( $className, $classes ) ) {
-		include_once __DIR__ . '/' . $classes[$className];
-	}
-} );
+require_once 'vendor/autoload.php';
 
 global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
@@ -41,9 +33,9 @@ global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
 
 global $wgHooks;
-$wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
-$wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
-$wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
+$wgHooks['BeforePageDisplay'][] = 'PropertySuggester\PropertySuggesterHooks::onBeforePageDisplay';
+$wgHooks['UnitTestsList'][] = 'PropertySuggester\PropertySuggesterHooks::onUnitTestsList';
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggester\PropertySuggesterHooks::onCreateSchema';
 
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 	'scripts'       => array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
