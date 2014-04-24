@@ -31,7 +31,10 @@ cd extensions
 
 cp -r $originalDirectory PropertySuggester
 
-cd Wikibase
+cd PropertySuggester
+composer dump-autoload
+
+cd ../Wikibase
 composer install --prefer-source
 
 cd ../..
