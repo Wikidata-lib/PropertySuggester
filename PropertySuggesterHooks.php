@@ -2,6 +2,13 @@
 
 namespace PropertySuggester;
 
+use DatabaseUpdater;
+use OutputPage;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Skin;
+use SplFileInfo;
+
 final class PropertySuggesterHooks {
 	/**
 	 * Handler for the BeforePageDisplay hook, injects special behaviour

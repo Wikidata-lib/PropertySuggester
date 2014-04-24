@@ -4,6 +4,8 @@
  * License: GNU GPL v2+
  */
 
+require_once 'vendor/autoload.php';
+
 if ( defined( 'PropertySuggester_VERSION' ) ) {
 	// Do not initialize more than once.
 	return;
@@ -19,8 +21,6 @@ $wgExtensionCredits['other'][] = array(
 	'url' => 'https://github.com/Wikidata-lib/PropertySuggester',
 	'descriptionmsg' => 'propertysuggester-desc'
 );
-
-require_once 'vendor/autoload.php';
 
 global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
