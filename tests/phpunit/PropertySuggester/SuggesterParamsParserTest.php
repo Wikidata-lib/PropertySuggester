@@ -3,7 +3,7 @@
 namespace PropertySuggester;
 
 use MediaWikiTestCase;
-
+use InvalidArgumentException;
 
 /**
  * @covers PropertySuggester\SuggesterParams
@@ -19,18 +19,12 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	 */
 	protected $paramsParser;
 
-	/**
-	 * @var GetSuggestions
-	 */
-	protected $api;
-
 	protected $defaultSuggesterResultSize = 100;
 	protected $defaultMinProbability = 0.01;
 
 	public function setUp() {
 		parent::setUp();
-		$this->api = $this->getMockBuilder( 'PropertySuggester\GetSuggestions' )->disableOriginalConstructor()->getMock();
-		$this->paramsParser = new SuggesterParamsParser( $this->api, $this->defaultSuggesterResultSize, $this->defaultMinProbability );
+		$this->paramsParser = new SuggesterParamsParser( $this->defaultSuggesterResultSize, $this->defaultMinProbability );
 	}
 
 	public function testSuggesterParameters() {
@@ -59,11 +53,18 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		$this->assertEquals( 'asd', $params->search );
 	}
 
-	public function testSuggesterWithInvalidParameters(){
-		$this->api->expects( $this->exactly(2) )
-			->method( 'dieUsage' );
-		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => array('P31'), 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
+	/**
+ 	* @expectedException InvalidArgumentException
+ 	*/
+	public function testSuggestionWithoutEntityOrProperties() {
 		$this->paramsParser->parseAndValidate( array( 'entity' => null, 'properties' => null, 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testSuggestionWithEntityAndProperties() {
+		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => array('P31'), 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
 	}
 
 }
