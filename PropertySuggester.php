@@ -33,9 +33,9 @@ global $wgAPIModules;
 $wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
 
 global $wgHooks;
-$wgHooks['BeforePageDisplay'][] = 'PropertySuggester\PropertySuggesterHooks::onBeforePageDisplay';
-$wgHooks['UnitTestsList'][] = 'PropertySuggester\PropertySuggesterHooks::onUnitTestsList';
-$wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggester\PropertySuggesterHooks::onCreateSchema';
+$wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
+$wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
 
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 	'scripts'       => array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
