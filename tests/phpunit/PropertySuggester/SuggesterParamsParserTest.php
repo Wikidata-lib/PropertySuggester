@@ -19,13 +19,18 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	 */
 	protected $paramsParser;
 
+	/**
+	 * @var GetSuggestions
+	 */
+	protected $api;
+
 	protected $defaultSuggesterResultSize = 100;
 	protected $defaultMinProbability = 0.01;
 
 	public function setUp() {
 		parent::setUp();
-		$api =  $this->getMockBuilder( 'PropertySuggester\GetSuggestions' )->disableOriginalConstructor()->getMock();
-		$this->paramsParser = new SuggesterParamsParser( $api, $this->defaultSuggesterResultSize, $this->defaultMinProbability );
+		$this->api = $this->getMockBuilder( 'PropertySuggester\GetSuggestions' )->disableOriginalConstructor()->getMock();
+		$this->paramsParser = new SuggesterParamsParser( $this->api, $this->defaultSuggesterResultSize, $this->defaultMinProbability );
 	}
 
 	public function testSuggesterParameters() {
@@ -52,6 +57,13 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		$this->assertEquals( $this->defaultSuggesterResultSize, $params->suggesterLimit );
 		$this->assertEquals( 0, $params->minProbability );
 		$this->assertEquals( 'asd', $params->search );
+	}
+
+	public function testSuggesterWithInvalidParameters(){
+		$this->api->expects( $this->exactly(2) )
+			->method( 'dieUsage' );
+		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => array('P31'), 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
+		$this->paramsParser->parseAndValidate( array( 'entity' => null, 'properties' => null, 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
 	}
 
 }
