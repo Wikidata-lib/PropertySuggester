@@ -53,4 +53,4 @@ class SuggesterParams {
 	 */
 	public $resultSize;
 
-} 
+}
