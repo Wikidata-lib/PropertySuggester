@@ -33,6 +33,7 @@ class SuggesterParamsParser {
 	/**
 	 * parses and validates the parameters of GetSuggestion
 	 * @param array $params
+	 * @throws InvalidArgumentException
 	 * @return SuggesterParams
 	 */
 	public function parseAndValidate( array $params ) {

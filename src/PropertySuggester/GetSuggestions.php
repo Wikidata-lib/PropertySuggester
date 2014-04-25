@@ -51,7 +51,7 @@ class GetSuggestions extends ApiBase {
 
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 
-		$this->paramsParser = new SuggesterParamsParser( $this, 500, $wgPropertySuggesterMinProbability );
+		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
 	}
 
 	/**
