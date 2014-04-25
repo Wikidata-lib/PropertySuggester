@@ -71,4 +71,5 @@ class SuggesterParamsParser {
 
 		return $result;
 	}
+
 }
