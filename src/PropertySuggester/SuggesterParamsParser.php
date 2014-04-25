@@ -2,6 +2,7 @@
 
 namespace PropertySuggester;
 
+use InvalidArgumentException;
 
 /**
  * Parses the suggester parameters
@@ -9,11 +10,6 @@ namespace PropertySuggester;
  * @licence GNU GPL v2+
  */
 class SuggesterParamsParser {
-
-	/**
-	 * @var GetSuggestions
-	 */
-	private $apimethod;
 
 	/**
 	 * @var int
@@ -26,13 +22,10 @@ class SuggesterParamsParser {
 	private $defaultMinProbability;
 
 	/**
-	 * @param GetSuggestions $apiMethod
 	 * @param int $defaultSuggestionSearchLimit
 	 * @param float $defaultMinProbability
 	 */
-	public function __construct( GetSuggestions $apiMethod, $defaultSuggestionSearchLimit, $defaultMinProbability ) {
-		$this->apimethod = $apiMethod;
-
+	public function __construct( $defaultSuggestionSearchLimit, $defaultMinProbability ) {
 		$this->defaultSuggestionSearchLimit = $defaultSuggestionSearchLimit;
 		$this->defaultMinProbability = $defaultMinProbability;
 	}
@@ -49,7 +42,7 @@ class SuggesterParamsParser {
 		$result->properties = $params['properties'];
 
 		if ( !( $result->entity XOR $result->properties ) ) {
-			$this->apimethod->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
+			throw new InvalidArgumentException( 'provide either entity-id parameter \'entity\' or a list of properties \'properties\'' );
 		}
 
 		// The entityselector doesn't allow a search for '' so '*' gets mapped to ''
