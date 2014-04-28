@@ -11,6 +11,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\EntityLookup;
 use Wikibase\TermIndex;
+use InvalidArgumentException;
 
 /**
  * @covers PropertySuggester\GetSuggestionHelper
@@ -112,6 +113,20 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 
 		$result3 = $this->suggestionGenerator->generateSuggestionsByItem( 'Q42', 100, 0.0 );
 		$this->assertEquals( $result3, array( 'foo' ) );
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testGenerateSuggestionsWithNonExistentItem() {
+		$itemId = new ItemId( 'Q41' );
+
+		$this->lookup->expects( $this->once() )
+			->method( 'getEntity' )
+			->with( $this->equalTo( $itemId ) )
+			->will( $this->returnValue( null ) );
+
+		$this->suggestionGenerator->generateSuggestionsByItem( 'Q41', 100, 0.0 );
 	}
 
 }
