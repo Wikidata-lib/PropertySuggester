@@ -17,8 +17,7 @@ The recommended way to use this library is via [Composer](http://getcomposer.org
 
 To add this package as a local, per-project dependency to your project, simply add a
 dependency on `propertysuggester/propertysuggester` to your project's `composer.json` file.
-Here is a minimal example of a `composer.json` file that just defines a dependency on
-version 1.0 of this package:
+Here is a minimal example of a `composer.json` file:
 
     {
         "require": {
@@ -32,6 +31,6 @@ This extension adds a new table "wbs_propertypairs" that contains the informatio
 suggestions. You can use [PropertySuggester-Python](https://github.com/Wikidata-lib/PropertySuggester-Python) to
 generate this data from a wikidata dump.
 
-* run composer dump-autoload in the extension folder (if installed without composer)
-* run maintenance/update.php to create the neccessary table
+* run ```composer dump-autoload``` in the extension folder (if installed without composer)
+* run ```maintenance/update.php``` to create the neccessary table
 * follow the Readme of PropertySuggester-Python to generate and load suggestion data
