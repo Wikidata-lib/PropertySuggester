@@ -19,7 +19,6 @@
 			"PropertySuggester\\": "src/PropertySuggester/"
 		},
 		"files" : [
-			"PropertySuggester.php"
 		],
 		"classmap": [
 			"PropertySuggesterHooks.php",
