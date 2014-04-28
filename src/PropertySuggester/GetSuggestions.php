@@ -36,92 +36,59 @@ class GetSuggestions extends ApiBase {
 	private $termIndex;
 
 	/**
-	 * @var int
+	 * @var SuggesterParamsParser
 	 */
-	private $defaultSuggestionSearchLimit;
-
-	/**
-	 * @var float
-	 */
-	private $defaultMinProbability;
+	private $paramsParser;
 
 	public function __construct( ApiMain $main, $name, $prefix = '' ) {
 		parent::__construct( $main, $name, $prefix );
+		global $wgPropertySuggesterDeprecatedIds;
+		global $wgPropertySuggesterMinProbability;
+
 		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
-		$this->defaultSuggestionSearchLimit = 500;
 
-		global $wgPropertySuggesterMinProbability;
-		$this->defaultMinProbability = $wgPropertySuggesterMinProbability;
-
-		global $wgPropertySuggesterDeprecatedIds;
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
+
+		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
 	}
 
 	/**
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
-		wfProfileIn( __METHOD__ );
-		$params = $this->extractRequestParams();
-
-		// parse params
-		if ( !( $params['entity'] XOR $params['properties'] ) ) {
-			wfProfileOut( __METHOD__ );
-			$this->dieUsage( 'provide either entity id parameter \'entity\' or a list of properties \'properties\'', 'param-missing' );
-		}
-
-		// The entityselector doesn't allow a search for '' so '*' gets mapped to ''
-		if ( $params['search'] !== '*' ) {
-			$search = trim( $params['search'] );
-		} else {
-			$search = '';
-		}
-
-		$language = $params['language'];
-		$resultSize = $params['continue'] + $params['limit'];
-
-		if ( $search ) {
-			// the results matching '$search' can be at the bottom of the list
-			// however very low ranked properties are not interesting and can
-			// still be found during the merge with search result later.
-			$suggesterLimit = $this->defaultSuggestionSearchLimit;
-			$minProbability = 0.0;
-		} else {
-			$suggesterLimit = $resultSize;
-			$minProbability = $this->defaultMinProbability;
-		}
+		$params = $this->paramsParser->parseAndValidate( $this->extractRequestParams() );
 
 		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
 
-		if ( $params["entity"] !== null ) {
-			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params["entity"], $suggesterLimit, $minProbability );
+		if ( $params->entity !== null ) {
+			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params->entity, $params->suggesterLimit, $params->minProbability );
 		} else {
-			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit, $minProbability );
+			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params->properties, $params->suggesterLimit, $params->minProbability );
 		}
-		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $search, $language, $resultSize );
+		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
 
 		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $search );
-		$entries = $resultBuilder->createJSON( $suggestions, $language, $search );
+		$resultBuilder = new ResultBuilder( $this->getResult(), $params->search );
+		$entries = $resultBuilder->createJSON( $suggestions, $params->language, $params->search );
 
 		// merge with search result if possible and necessary
-		if ( count( $entries ) < $resultSize && $search !== '' ) {
-			$searchResult = $this->querySearchApi( $resultSize, $search, $language );
-			$entries = $resultBuilder->mergeWithTraditionalSearchResults( $entries, $searchResult, $resultSize );
+		if ( count( $entries ) < $params->resultSize && $params->search !== '' ) {
+			$searchResult = $this->querySearchApi( $params->resultSize, $params->search, $params->language );
+			$entries = $resultBuilder->mergeWithTraditionalSearchResults( $entries, $searchResult, $params->resultSize );
 		}
 
 		// Define Result
-		$slicedEntries = array_slice( $entries, $params['continue'], $params['limit'] );
+		$slicedEntries = array_slice( $entries, $params->continue, $params->limit );
 		$this->getResult()->setIndexedTagName( $slicedEntries, 'search' );
 		$this->getResult()->addValue( null, 'search', $slicedEntries );
 
 		$this->getResult()->addValue( null, 'success', 1 );
-		if ( count( $entries ) >= $resultSize ) {
-			$this->getResult()->addValue( null, 'search-continue', $resultSize );
+		if ( count( $entries ) >= $params->resultSize ) {
+			$this->getResult()->addValue( null, 'search-continue', $params->resultSize );
 		}
-		$this->getResult()->addValue( 'searchinfo', 'search', $search );
+		$this->getResult()->addValue( 'searchinfo', 'search', $params->search );
 	}
 
 

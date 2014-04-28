@@ -4,6 +4,8 @@
  * License: GNU GPL v2+
  */
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 if ( defined( 'PropertySuggester_VERSION' ) ) {
 	// Do not initialize more than once.
 	return;
@@ -19,16 +21,6 @@ $wgExtensionCredits['other'][] = array(
 	'url' => 'https://github.com/Wikidata-lib/PropertySuggester',
 	'descriptionmsg' => 'propertysuggester-desc'
 );
-
-spl_autoload_register( function ( $className ) {
-	static $classes = false;
-	if ( $classes === false ) {
-		$classes = include( __DIR__ . '/' . 'PropertySuggester.classes.php' );
-	}
-	if ( array_key_exists( $className, $classes ) ) {
-		include_once __DIR__ . '/' . $classes[$className];
-	}
-} );
 
 global $wgExtensionMessagesFiles;
 $wgExtensionMessagesFiles['PropertySuggester'] = __DIR__ . '/PropertySuggester.i18n.php';
