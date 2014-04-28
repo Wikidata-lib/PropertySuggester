@@ -31,3 +31,7 @@ version 1.0 of this package:
 This extension adds a new table "wbs_propertypairs" that contains the information that is needed to generate
 suggestions. You can use [PropertySuggester-Python](https://github.com/Wikidata-lib/PropertySuggester-Python) to
 generate this data from a wikidata dump.
+
+* run composer dump-autoload in the extension folder (if installed without composer)
+* run maintenance/update.php to create the neccessary table
+* follow the Readme of PropertySuggester-Python to generate and load suggestion data
