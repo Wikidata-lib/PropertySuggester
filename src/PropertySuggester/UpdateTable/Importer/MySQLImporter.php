@@ -4,6 +4,12 @@ namespace PropertySuggester\UpdateTable\Importer;
 
 use PropertySuggester\UpdateTable\ImportContext;
 
+/**
+ * A strategy, which imports entries from CSV file into DB table, using "LOAD DATA INFILE" - command.
+ *
+ * @author BP2013N2
+ * @licence GNU GPL v2+
+ */
 class MySQLImporter implements Importer {
 
 	/**
@@ -11,17 +17,23 @@ class MySQLImporter implements Importer {
 	 * @return bool
 	 */
 	function importFromCsvFileToDb( ImportContext $importContext ) {
-		$db = $importContext->getDb();
-		$dbTableName = $db->tableName( $importContext->getTableName() );
-		$wholePath = $importContext->getWholePath();
+
+		$lb = $importContext->getLb();
+		$db = $lb->getConnection( DB_MASTER );
+
+		$dbTableName = $db->tableName( $importContext->getTargetTableName() );
+		$fullPath = $importContext->getCsvFilePath();
+		$delimiter = $importContext->getCsvDelimiter();
 		$db->query( "
-				LOAD DATA INFILE '$wholePath'
+				LOAD DATA INFILE '$fullPath'
 				INTO TABLE $dbTableName
 				FIELDS
-					TERMINATED BY ';'
+					TERMINATED BY '$delimiter'
 				LINES
 					TERMINATED BY '\\n'
 			" );
+		$lb->reuseConnection( $db );
 		return true;
 	}
+
 }

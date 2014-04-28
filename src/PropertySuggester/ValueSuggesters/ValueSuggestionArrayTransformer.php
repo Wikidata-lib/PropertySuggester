@@ -1,7 +1,7 @@
 <?php
 
 
-namespace PropertySuggester\ValueSuggester;
+namespace PropertySuggester\ValueSuggesters;
 
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\EntityLookup;

@@ -4,6 +4,12 @@ namespace PropertySuggester\UpdateTable\Importer;
 
 use PropertySuggester\UpdateTable\ImportContext;
 
+/**
+ * A interface for strategies, which imports entries from CSV file into DB table
+ *
+ * @author BP2013N2
+ * @licence GNU GPL v2+
+ */
 interface Importer {
 	/**
 	 * run specific algorithm to import data to wbs_propertypairs db table from csv. Returns success
@@ -11,4 +17,5 @@ interface Importer {
 	 * @return bool
 	 */
 	function importFromCsvFileToDb( ImportContext $importContext );
+
 }

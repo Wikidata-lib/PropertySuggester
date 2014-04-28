@@ -4,6 +4,7 @@ namespace PropertySuggester\Suggesters;
 
 use LoadBalancerSingle;
 use MediaWikiTestCase;
+use PropertySuggester\Suggestion;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
@@ -54,10 +55,10 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	public function testSuggestByPropertyIds() {
 		$ids = array( new PropertyId( 'p1' ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0 );
 
-		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
-		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getEntityId() );
+		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getEntityId() );
 	}
 
 	public function testSuggestByItem() {
@@ -66,10 +67,10 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
 
-		$res = $this->suggester->suggestByItem( $item, 100 );
+		$res = $this->suggester->suggestByItem( $item, 100, 0.0 );
 
-		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
-		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getEntityId() );
+		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getEntityId() );
 	}
 
 	public function testDeprecatedProperties() {
@@ -77,9 +78,9 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$this->suggester->setDeprecatedPropertyIds( array( 2 ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids, 100 );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0 );
 
-		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
+		$resultIds = array_map( function ( Suggestion $r ) { return $r->getEntityId()->getNumericId(); }, $res );
 		$this->assertNotContains( 2 , $resultIds );
 		$this->assertContains( 3 , $resultIds );
 	}

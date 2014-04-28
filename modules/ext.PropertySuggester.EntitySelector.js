@@ -51,17 +51,30 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 	}, 
 
 	__useSuggester: function() {
-		return this.options.type === 'property' && this.__getEntityId();
+		var entity = this.__getEntity();
+		return this.options.type === 'property' && entity && entity.getType() === 'item' && this.__isInNewStatementView();
 	},
 
-	__getEntityId: function() {
+	__getEntity: function() {
 		var $entityView = this.element.closest( ':wikibase-entityview');
-		entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
+		var entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
 		if( entity ) {
-			return entity.getId();
+			return entity;
 		} else {
 			return null;
 		}
+	},
+
+	/**
+	 * only entityselectors in statements describing the item should get suggestions.
+	 * this is hopefully exactly the case if the statement has no value.
+	 * other entityselectors like source and quantifier should not get suggestions since
+	 * they already have a statementview with a value.
+	 */
+	__isInNewStatementView: function() {
+		var $statementView =  this.element.closest( ':wikibase-statementview' );
+		var value = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
+		return value === null;
 	},
 
 	__buildOptions: function() {
@@ -70,13 +83,13 @@ $.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 			timeout: this.options.timeout,
 			params: {
 				action: 'wbsgetsuggestions',
-				entity: this.__getEntityId(),
+				entity: this.__getEntity().getId(),
 				format: 'json',
 				language: this.options.language,
 				type: this.options.type,
 				'continue': this.offset
 			}
-		}
+		};
 		return params;
 	}
 

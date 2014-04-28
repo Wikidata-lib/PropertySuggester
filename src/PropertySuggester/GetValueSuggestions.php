@@ -4,9 +4,8 @@ namespace PropertySuggester;
 
 use ApiBase;
 use ApiMain;
-use PropertySuggester\ResultBuilder\ResultBuilder;
-use PropertySuggester\ValueSuggester\ValueSuggester;
-use PropertySuggester\ValueSuggester\ValueSuggesterEngine;
+use PropertySuggester\ValueSuggesters\ValueSuggester;
+use PropertySuggester\ValueSuggesters\ValueSuggesterEngine;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
 use Wikibase\TermIndex;

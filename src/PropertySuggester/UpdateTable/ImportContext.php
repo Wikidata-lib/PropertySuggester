@@ -2,66 +2,92 @@
 
 namespace PropertySuggester\UpdateTable;
 
-use DatabaseBase;
+use LoadBalancer;
 
+/**
+ * Context for importing data from a csv file to a db table using a Importer strategy
+ *
+ * @author BP2013N2
+ * @licence GNU GPL v2+
+ */
 class ImportContext {
 	/**
-	 * Path to CSV file
+	 * file system path to the CSV to load data from
 	 * @var string
 	 */
-	private $wholePath = "";
+	private $csvFilePath = "";
 
 	/**
-	 * table name
+	 * delimiter used in csv file
 	 * @var string
 	 */
-	private $tableName = "";
+	private $csvDelimiter = ",";
 
 	/**
-	 * @var DatabaseBase
+	 * table name of the table to import to
+	 * @var string
 	 */
-	private $db = "";
-
+	private $targetTableName = "";
 
 	/**
-	 * @param DatabaseBase $db
+	 * @var LoadBalancer
 	 */
-	public function setDb( $db ) {
-		$this->db = $db;
+	private $lb = null;
+
+	/**
+	 * @return string
+	 */
+	public function getCsvDelimiter() {
+		return $this->csvDelimiter;
 	}
 
 	/**
-	 * @return DatabaseBase
+	 * @param string $csvDelimiter
 	 */
-	public function getDb() {
-		return $this->db;
+	public function setCsvDelimiter( $csvDelimiter ) {
+		$this->csvDelimiter = $csvDelimiter;
 	}
 
 	/**
-	 * @param string $tablename
+	 * @return LoadBalancer
 	 */
-	public function setTableName( $tablename ) {
-		$this->tableName = $tablename;
+	public function getLb() {
+		return $this->lb;
+	}
+
+	/**
+	 * @param LoadBalancer $lb
+	 */
+	public function setLb( $lb ) {
+		$this->lb = $lb;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getTableName() {
-		return $this->tableName;
+	public function getTargetTableName() {
+		return $this->targetTableName;
 	}
 
 	/**
-	 * @param string $wholePath
+	 * @param string $tableName
 	 */
-	public function setWholePath( $wholePath ) {
-		$this->wholePath = $wholePath;
+	public function setTargetTableName( $tableName ) {
+		$this->targetTableName = $tableName;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getWholePath() {
-		return $this->wholePath;
+	public function getCsvFilePath() {
+		return $this->csvFilePath;
 	}
+
+	/**
+	 * @param string $fullPath
+	 */
+	public function setCsvFilePath( $fullPath ) {
+		$this->csvFilePath = $fullPath;
+	}
+
 }

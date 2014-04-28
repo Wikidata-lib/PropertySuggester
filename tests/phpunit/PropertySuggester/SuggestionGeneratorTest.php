@@ -4,7 +4,6 @@ namespace PropertySuggester;
 
 use MediaWikiTestCase;
 use PropertySuggester\Suggesters\SuggesterEngine;
-use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
@@ -19,12 +18,12 @@ use Wikibase\TermIndex;
  * @group API
  * @group medium
  */
-class GetSuggestionHelperTest extends MediaWikiTestCase {
+class SuggestionGeneratorTest extends MediaWikiTestCase {
 
 	/**
-	 * @var GetSuggestionsHelper
+	 * @var SuggestionGenerator
 	 */
-	protected $helper;
+	protected $suggestionGenerator;
 
 	/**
 	 * @var SuggesterEngine
@@ -48,7 +47,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
-		$this->helper = new GetSuggestionsHelper( $this->lookup, $this->termIndex, $this->suggester );
+		$this->suggestionGenerator = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
 	}
 
 	public function testFilterSuggestions() {
@@ -71,7 +70,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->method( 'getMatchingIDs' )
 			->will( $this->returnValue( array( $p7, $p10, $p15, $p12 ) ) );
 
-		$result = $this->helper->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
+		$result = $this->suggestionGenerator->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
 
 		$this->assertEquals( array( $suggestions[0], $suggestions[2] ), $result );
 
@@ -79,18 +78,17 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 
 	public function testGenerateSuggestionsWithPropertyList() {
 		$properties = array();
-		$properties[] = PropertyId::newFromNumber( 12 );
+		$properties[] = new PropertyId( 'P12' );
+		$properties[] = new PropertyId( 'P13' );
+		$properties[] = new PropertyId( 'P14' );
 
 		$this->suggester->expects( $this->any() )
 			->method( 'suggestByPropertyIds' )
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->helper->generateSuggestionsByPropertyList( 'P12', 100 );
+		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', '14' ) , 100, 0.0 );
 		$this->assertEquals( $result1, array( 'foo' ) );
-
-		$result2 = $this->helper->generateSuggestionsByPropertyList( '12', 100 );
-		$this->assertEquals( $result2, array( 'foo' ) );
 
 	}
 
@@ -112,7 +110,7 @@ class GetSuggestionHelperTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $item ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result3 = $this->helper->generateSuggestionsByItem( 'Q42', 100 );
+		$result3 = $this->suggestionGenerator->generateSuggestionsByItem( 'Q42', 100, 0.0 );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
 

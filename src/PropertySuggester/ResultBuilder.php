@@ -1,9 +1,8 @@
 <?php
 
-namespace PropertySuggester\ResultBuilder;
+namespace PropertySuggester;
 
 use ApiResult;
-use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
@@ -13,6 +12,7 @@ use Wikibase\DataModel\Entity\EntityId;
 /**
  * ResultBuilder builds Json-compatible array structure from suggestions
  *
+ * @author BP2013N2
  * @licence GNU GPL v2+
  */
 class ResultBuilder {
@@ -49,8 +49,9 @@ class ResultBuilder {
 	}
 
 	/**
-	 * @param Suggestion[] $suggestions
-	 * @param string $language
+	 * @param array $suggestions
+	 * @param $language
+	 * @param string $entityType
 	 * @return array
 	 */
 	public function createJSON( array $suggestions, $language, $entityType='property' ) {
@@ -77,7 +78,7 @@ class ResultBuilder {
 	 * @param Suggestion $suggestion
 	 * @return array $entry
 	 */
-	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ){
+	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ) {
 		$entry = array();
 		$entry['id'] = $id->getPrefixedId();
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
@@ -109,8 +110,8 @@ class ResultBuilder {
 		$clusteredTerms = array();
 
 		foreach ( $terms as $term ) {
-			$id = $term->getEntityId()->getSerialization();
-			if ( !$clusteredTerms[$id] ) {
+			$id = $term->getEntityId();
+			if ( !isset( $clusteredTerms[$id] ) ) {
 				$clusteredTerms[$id] = array();
 			}
 			$clusteredTerms[$id][] = $term;

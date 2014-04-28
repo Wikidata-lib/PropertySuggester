@@ -1,6 +1,6 @@
 <?php
 
-namespace PropertySuggester\ValueSuggester;
+namespace PropertySuggester\ValueSuggesters;
 
 use LoadBalancer;
 use PropertySuggester\Suggestion;

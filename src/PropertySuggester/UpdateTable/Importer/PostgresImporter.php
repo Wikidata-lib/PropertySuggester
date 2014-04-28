@@ -4,6 +4,12 @@ namespace PropertySuggester\UpdateTable\Importer;
 
 use PropertySuggester\UpdateTable\ImportContext;
 
+/**
+ * A strategy, which imports entries from CSV file into DB table, using "COPY" - command.
+ *
+ * @author BP2013N2
+ * @licence GNU GPL v2+
+ */
 class PostgresImporter implements Importer {
 
 	/**
@@ -12,14 +18,21 @@ class PostgresImporter implements Importer {
 	 * @return bool
 	 */
 	function importFromCsvFileToDb( ImportContext $importContext ) {
-		$db = $importContext->getDb();
-		$dbTableName = $db->tableName( $importContext->getTableName() );
-		$wholePath = $importContext->getWholePath();
+
+		$lb = $importContext->getLb();
+		$db = $lb->getConnection( DB_MASTER );
+
+		$dbTableName = $db->tableName( $importContext->getTargetTableName() );
+		$fullPath = $importContext->getCsvFilePath();
+		$delimiter = $importContext->getCsvDelimiter();
+
 		$db->query( "
 			COPY $dbTableName
-			FROM '$wholePath'
-			WITH DELIMITER ';'
+			FROM '$fullPath'
+			WITH DELIMITER '$delimiter'
 		" );
+		$lb->reuseConnection( $db );
 		return true;
 	}
+
 }

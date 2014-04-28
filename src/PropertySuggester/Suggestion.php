@@ -3,7 +3,6 @@
 namespace PropertySuggester;
 
 use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\Entity\PropertyId;
 
 class Suggestion {
 
@@ -18,8 +17,9 @@ class Suggestion {
 	private $probability;
 
 	/**
-	 * @param EntityId $propertyId
-	 * @param float $probability
+	 * @param EntityId $entityId
+	 * @param $probability
+	 * @param string $type
 	 */
 	function __construct( EntityId $entityId, $probability, $type = "property" ) {
 		$this->entityId = $entityId;
