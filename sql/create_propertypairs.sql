@@ -1,13 +1,12 @@
 
 CREATE TABLE IF NOT EXISTS /*_*/wbs_propertypairs (
-  row_id            INT unsigned    NOT NULL AUTO_INCREMENT,
+  row_id            INT unsigned    NOT NULL PRIMARY KEY AUTO_INCREMENT,
   pid1              INT unsigned    NOT NULL,
   qid1              INT unsigned    NULL,
   pid2              INT unsigned    NOT NULL,
   count             INT unsigned    NOT NULL,
   probability       FLOAT           NOT NULL,
-  context           VARBINARY(32)   NOT NULL,
-  PRIMARY KEY(row_id)
+  context           VARBINARY(32)   NOT NULL
 ) /*$wgDBTableOptions*/;
 
 
