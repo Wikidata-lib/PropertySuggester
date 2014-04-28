@@ -74,10 +74,10 @@ class UpdateTable extends Maintenance {
 	 * @return Importer
 	 */
 	function createImportStrategy( $useInsert ) {
-		global $wgDbType;
-		if ( $wgDbType === 'mysql' and !$useInsert ) {
+		global $wgDBtype;
+		if ( $wgDBtype === 'mysql' and !$useInsert ) {
 			return new MySQLImporter();
-		} elseif ( $wgDbType === 'postgres' and !$useInsert ) {
+		} elseif ( $wgDBtype === 'postgres' and !$useInsert ) {
 			return new PostgresImporter();
 		} else {
 			return new BasicImporter();

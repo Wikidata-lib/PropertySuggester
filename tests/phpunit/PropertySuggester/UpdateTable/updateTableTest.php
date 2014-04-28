@@ -34,17 +34,15 @@ class UpdateTableTest extends MediaWikiTestCase {
 
 		$this->testfilename = sys_get_temp_dir() . "/_temp_test_csv_file.csv";
 
-		$fhandle = fopen( $this->testfilename, "w" );
 
 		$rows = array();
-		$rows[] = $this->newRow( 1, 2, 100, 0.1 );
-		$rows[] = $this->newRow( 1, 3, 50, 0.05 );
-		$rows[] = $this->newRow( 2, 3, 100, 0.1 );
-		$rows[] = $this->newRow( 2, 4, 200, 0.2 );
-		$rows[] = $this->newRow( 3, 1, 123, 0.5 );
+		$rows[] = array( 1, null, 2, 100, 0.1, 'item' );
+		$rows[] = array( 1, null, 3, 50, 0.05, 'item' );
+		$rows[] = array( 2, null, 3, 100, 0.1, 'item' );
+		$rows[] = array( 2, null, 4, 200, 0.2, 'item' );
+		$rows[] = array( 3, null, 1, 123, 0.5, 'item' );
 
-		$this->rows = array();
-
+		$fhandle = fopen( $this->testfilename, "w" );
 		foreach ( $rows as $row ) {
 			fputcsv( $fhandle, $row, "," );
 			$this->rows[] = array_values( $row );
@@ -71,7 +69,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 		$maintenanceScript->execute();
 		$this->assertSelect(
 			'wbs_propertypairs',
-			array( 'pid1', 'pid2', 'count', 'probability' ),
+			array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ),
 			array(),
 			$this->rows
 		);

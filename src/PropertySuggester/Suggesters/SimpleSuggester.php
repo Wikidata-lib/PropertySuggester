@@ -60,13 +60,16 @@ class SimpleSuggester implements SuggesterEngine {
 		}
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
 		$count = count( $propertyIds );
+		$context = 'item'; // only 'item' is supported at the moment
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
 			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
-				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
+				   'qid1' => null,
+				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
+				   'context' => $context ),
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',

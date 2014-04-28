@@ -23,17 +23,17 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	 */
 	protected $suggester;
 
-	private function row( $pid1, $pid2, $count, $probability ) {
-		return array( 'pid1' => $pid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability );
+	private function row( $pid1, $qid1, $pid2, $count, $probability, $context ) {
+		return array( 'pid1' => $pid1, 'qid1' => $qid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability, 'context' => $context );
 	}
 
 	public function addDBData() {
 		$rows = array();
-		$rows[] = $this->row( 1, 2, 100, 0.1 );
-		$rows[] = $this->row( 1, 3, 50, 0.05 );
-		$rows[] = $this->row( 2, 3, 100, 0.1 );
-		$rows[] = $this->row( 2, 4, 200, 0.2 );
-		$rows[] = $this->row( 3, 1, 100, 0.5 );
+		$rows[] = $this->row( 1, null, 2, 100, 0.1, 'item' );
+		$rows[] = $this->row( 1, null, 3, 50, 0.05, 'item' );
+		$rows[] = $this->row( 2, null, 3, 100, 0.1, 'item' );
+		$rows[] = $this->row( 2, null, 4, 200, 0.2, 'item' );
+		$rows[] = $this->row( 3, null, 1, 100, 0.5, 'item' );
 
 		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
