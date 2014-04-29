@@ -16,5 +16,5 @@ script:
   - bash ./build/travis/script.sh
 
 after_success:
-  - coveralls debug
-  - coveralls
+  - bash ./build/travis/after_script.sh
+

@@ -50,13 +50,13 @@ class UpdateTableTest extends MediaWikiTestCase {
 
 	public function testRewriteNativeStrategy() {
 		$maintenanceScript = new UpdateTable();
-		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1 ), null );
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => true ), null );
 		$this->runScriptAndAssert( $maintenanceScript );
 	}
 
 	public function testRewriteWithSQLInserts() {
 		$maintenanceScript = new UpdateTable();
-		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 0 ), null );
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => true, "use-insert" => true ), null );
 		$this->runScriptAndAssert( $maintenanceScript );
 	}
 
