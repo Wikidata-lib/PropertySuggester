@@ -22,6 +22,7 @@ class MySQLImporter implements Importer {
 		$db = $lb->getConnection( DB_MASTER );
 
 		$dbTableName = $db->tableName( $importContext->getTargetTableName() );
+
 		$fullPath = $importContext->getCsvFilePath();
 		$delimiter = $importContext->getCsvDelimiter();
 		$db->query( "
@@ -31,6 +32,8 @@ class MySQLImporter implements Importer {
 					TERMINATED BY '$delimiter'
 				LINES
 					TERMINATED BY '\\n'
+				(pid1, qid1, pid2, count, probability, context)
+				SET qid1 = nullif(@vtwo,'')
 			" );
 		$lb->reuseConnection( $db );
 		return true;
