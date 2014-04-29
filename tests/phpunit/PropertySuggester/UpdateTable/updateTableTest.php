@@ -6,7 +6,10 @@ use MediaWikiTestCase;
 use PropertySuggester\Maintenance\UpdateTable;
 
 /**
- * @covers PropertySuggester\maintenance\updateTableTest
+ * @covers PropertySuggester\maintenance\UpdateTable
+ * @covers PropertySuggester\UpdateTable\Importer\BasicImporter
+ * @covers PropertySuggester\UpdateTable\Importer\MySQLImporter
+ * @covers PropertySuggester\UpdateTable\ImportContext
  * @group PropertySuggester
  * @group Database
  * @group medium
@@ -23,10 +26,6 @@ class UpdateTableTest extends MediaWikiTestCase {
 	 */
 	protected $rows;
 
-	private function newRow( $pid1, $pid2, $count, $probability ) {
-		return array( 'pid1' => $pid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability );
-	}
-
 	public function setUp() {
 		parent::setUp();
 
@@ -35,17 +34,16 @@ class UpdateTableTest extends MediaWikiTestCase {
 		$this->testfilename = sys_get_temp_dir() . "/_temp_test_csv_file.csv";
 
 
-		$rows = array();
-		$rows[] = array( 1, null, 2, 100, 0.1, 'item' );
-		$rows[] = array( 1, null, 3, 50, 0.05, 'item' );
-		$rows[] = array( 2, null, 3, 100, 0.1, 'item' );
-		$rows[] = array( 2, null, 4, 200, 0.2, 'item' );
-		$rows[] = array( 3, null, 1, 123, 0.5, 'item' );
+		$this->rows = array();
+		$this->rows[] = array( 1, null, 2, 100, 0.1, 'item' );
+		$this->rows[] = array( 1, null, 3, 50, 0.05, 'item' );
+		$this->rows[] = array( 2, null, 3, 100, 0.1, 'item' );
+		$this->rows[] = array( 2, null, 4, 200, 0.2, 'item' );
+		$this->rows[] = array( 3, null, 1, 123, 0.5, 'item' );
 
 		$fhandle = fopen( $this->testfilename, "w" );
-		foreach ( $rows as $row ) {
+		foreach ( $this->rows as $row ) {
 			fputcsv( $fhandle, $row, "," );
-			$this->rows[] = array_values( $row );
 		}
 		fclose( $fhandle );
 	}
@@ -58,7 +56,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 
 	public function testRewriteWithSQLInserts() {
 		$maintenanceScript = new UpdateTable();
-		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 1 ), null );
+		$maintenanceScript->loadParamsAndArgs( null, array( "file" => $this->testfilename, "silent" => 1, "use-insert" => 0 ), null );
 		$this->runScriptAndAssert( $maintenanceScript );
 	}
 

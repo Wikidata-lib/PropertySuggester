@@ -15,7 +15,8 @@ use Wikibase\TermIndex;
 use InvalidArgumentException;
 
 /**
- * @covers PropertySuggester\GetSuggestionHelper
+ * @covers PropertySuggester\SuggestionGenerator
+ * @covers PropertySuggester\Suggesters\Suggestion
  * @group PropertySuggester
  * @group API
  * @group medium

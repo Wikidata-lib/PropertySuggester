@@ -1,0 +1,26 @@
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="tests/bootstrap.php"
+         cacheTokens="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         strict="true"
+         verbose="true">
+    <testsuites>
+        <testsuite name="PropertySuggester">
+            <directory>tests/phpunit</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+            <directory suffix=".php">maintenance</directory>
+        </whitelist>
+    </filter>
+</phpunit>

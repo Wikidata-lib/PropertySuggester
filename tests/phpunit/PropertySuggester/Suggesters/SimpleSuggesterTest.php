@@ -10,7 +10,8 @@ use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 
 /**
- * @covers PropertySuggester\Suggesters\SimplePHPSuggester
+ * @covers PropertySuggester\Suggesters\SimpleSuggester
+ * @covers PropertySuggester\Suggesters\Suggestion
  * @group PropertySuggester
  * @group API
  * @group Database
