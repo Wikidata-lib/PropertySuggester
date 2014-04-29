@@ -4,14 +4,16 @@
  * License: GNU GPL v2+
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
-
 if ( defined( 'PropertySuggester_VERSION' ) ) {
 	// Do not initialize more than once.
 	return;
 }
 
 define( 'PropertySuggester_VERSION', '0.1' );
+
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
 
 global $wgExtensionCredits;
 $wgExtensionCredits['other'][] = array(
