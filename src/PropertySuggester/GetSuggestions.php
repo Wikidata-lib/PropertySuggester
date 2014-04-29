@@ -9,6 +9,8 @@ use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
+use Wikibase\EntityTitleLookup;
+use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
 use Wikibase\Utils;
@@ -24,6 +26,11 @@ class GetSuggestions extends ApiBase {
 	 * @var EntityLookup
 	 */
 	private $entityLookup;
+
+	/**
+	 * @var EntityTitleLookup
+	 */
+	private $entityTitleLookup;
 
 	/**
 	 * @var SuggesterEngine
@@ -45,8 +52,10 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterDeprecatedIds;
 		global $wgPropertySuggesterMinProbability;
 
-		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
+		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
+
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
 
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
@@ -70,7 +79,7 @@ class GetSuggestions extends ApiBase {
 		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
 
 		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $params->search );
+		$resultBuilder = new ResultBuilder( $this->getResult(), $this->termIndex, $this->entityTitleLookup, $params->search );
 		$entries = $resultBuilder->createJSON( $suggestions, $params->language, $params->search );
 
 		// merge with search result if possible and necessary

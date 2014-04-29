@@ -16,7 +16,6 @@ use InvalidArgumentException;
 
 /**
  * @covers PropertySuggester\SuggestionGenerator
- * @covers PropertySuggester\Suggesters\Suggestion
  * @group PropertySuggester
  * @group API
  * @group medium

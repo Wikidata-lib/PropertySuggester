@@ -49,14 +49,14 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	protected function getSuggestions( array $propertyIds, $limit, $minProbability ) {
-		if ( !$propertyIds ) {
-			return array();
-		}
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException('$limit must be int!');
 		}
 		if ( !is_float( $minProbability ) ) {
 			throw new InvalidArgumentException('$minProbability must be float!');
+		}
+		if ( !$propertyIds ) {
+			return array();
 		}
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
 		$count = count( $propertyIds );
