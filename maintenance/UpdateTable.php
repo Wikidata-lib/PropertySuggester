@@ -96,6 +96,7 @@ class UpdateTable extends Maintenance {
 		$importContext->setLb( $lb );
 		$importContext->setTargetTableName( $tableName );
 		$importContext->setCsvFilePath( $wholePath );
+		$importContext->setCsvDelimiter( ',' );
 		return $importContext;
 	}
 

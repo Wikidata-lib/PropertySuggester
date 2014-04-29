@@ -71,12 +71,21 @@ class UpdateTableTest extends MediaWikiTestCase {
 
 	private function runScriptAndAssert( UpdateTable $maintenanceScript, array $rows ) {
 		$maintenanceScript->execute();
-		$this->assertSelect(
-			'wbs_propertypairs',
-			array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ),
-			array(),
-			$rows
-		);
+		if ( count( $rows ) < 100 ) {
+			$this->assertSelect(
+				'wbs_propertypairs',
+				array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ),
+				array(),
+				$rows
+			);
+		} else { // assertSelect is too slow to compare 1100 rows... just check the size
+			$this->assertSelect(
+				'wbs_propertypairs',
+				array( 'count' => 'count(*)' ),
+				array(),
+				array( array( count( $rows ) ) )
+			);
+		}
 	}
 
 	private function setupData( array $rows ) {
