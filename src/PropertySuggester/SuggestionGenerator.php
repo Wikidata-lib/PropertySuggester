@@ -9,6 +9,7 @@ use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
 use Wikibase\TermIndex;
+use InvalidArgumentException;
 
 /**
  * API module helper to generate property suggestions.
@@ -43,11 +44,15 @@ class SuggestionGenerator {
 	 * @param string $item - An item id
 	 * @param int $limit
 	 * @param float $minProbability
+	 * @throws InvalidArgumentException
 	 * @return array
 	 */
 	public function generateSuggestionsByItem( $item, $limit, $minProbability ) {
 		$id = new  ItemId( $item );
 		$item = $this->entityLookup->getEntity( $id );
+		if( $item == null ){
+			throw new InvalidArgumentException( 'Item ' . $id . ' could not be found' );
+		}
 		$suggestions = $this->suggester->suggestByItem( $item, $limit, $minProbability );
 		return $suggestions;
 	}

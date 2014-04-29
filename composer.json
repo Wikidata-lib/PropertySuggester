@@ -15,8 +15,14 @@
 	"require-dev": {
 	},
 	"autoload": {
+		"psr-4": {
+			"PropertySuggester\\": "src/PropertySuggester/"
+		},
 		"files" : [
-			"PropertySuggester.php"
+		],
+		"classmap": [
+			"PropertySuggesterHooks.php",
+			"maintenance/UpdateTable.php"
 		]
 	}
 }
