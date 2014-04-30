@@ -23,6 +23,7 @@ use Wikibase\Test\Api\WikibaseApiTestCase;
  * @covers PropertySuggester\GetSuggestions
  * @covers PropertySuggester\ResultBuilder
  * @group PropertySuggester
+ * @group Database
  * @group API
  * @group medium
  */
@@ -40,54 +41,57 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 	public function setup() {
 		parent::setup();
 
-		if( !isset( self::$hasSetup ) ){
+		$this->tablesUsed[] = 'wbs_propertypairs';
+
+		$apiMain = $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
+		$this->getSuggestions = new GetSuggestions( $apiMain, 'wbgetsuggestion' );
+	}
+
+	public function addDBData() {
+		if (!self::$hasSetup) {
 			$store = WikibaseRepo::getDefaultInstance()->getEntityStore();
 
-			$prop = Property::newEmpty();
-			$prop->setDataTypeId( 'string' );
+			$prop = Property::newFromType( 'string' );
 			$store->saveEntity( $prop, 'EditEntityTestP56', $GLOBALS['wgUser'], EDIT_NEW );
 			self::$idMap['%P56%'] = $prop->getId()->getSerialization();
-			self::$idMap['%StringProp%'] = $prop->getId()->getSerialization();
 
-			$prop = Property::newEmpty();
-			$prop->setDataTypeId( 'string' );
+			$prop = Property::newFromType( 'string' );
 			$store->saveEntity( $prop, 'EditEntityTestP72', $GLOBALS['wgUser'], EDIT_NEW );
 			self::$idMap['%P72%'] = $prop->getId()->getSerialization();
 
-			//$this->initTestEntities( array( 'Berlin' ), self::$idMap );
-			//self::$idMap['%Berlin%'] = EntityTestHelper::getId( 'Berlin' );
-
-			//$p56 = self::$idMap['%P56%'];
-			//$berlinData = EntityTestHelper::getEntityOutput( 'Berlin' );
-			//self::$idMap['%BerlinP56%'] = $berlinData['claims'][$p56][0]['id'];
-
-			$p56 = self::$idMap['%P56%'];
-			$p72 = self::$idMap['%P72%'];
-
-			$ip56 = (int)substr( $p56, 1 );
-			$ip72 = (int)substr( $p72, 1 );
-
-			$dbw = wfGetDB( DB_MASTER );
-			$row = array( 'pid1' => $ip56, 'qid1' => null, 'pid2' => $ip72, 'count' => 1,
-						  'probability' => 0.3, 'context' => 'item' );
-			$dbw->insert( 'wbs_propertypairs', array( $row ) );
-
+			self::$hasSetup = true;
 		}
-		self::$hasSetup = true;
 
-		$apiMain =  $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
-		$this->getSuggestions = new GetSuggestions( $apiMain, 'wbgetsuggestion' );
+		$p56 = self::$idMap['%P56%'];
+		$p72 = self::$idMap['%P72%'];
+		$ip56 = (int)substr( $p56, 1 );
+		$ip72 = (int)substr( $p72, 1 );
 
+		$row = array( 'pid1' => $ip56, 'qid1' => null, 'pid2' => $ip72, 'count' => 1,
+			'probability' => 0.3, 'context' => 'item' );
+
+		$this->db->insert( 'wbs_propertypairs', array( $row ) );
+	}
+
+	public function testDatabaseHasRows() {
+		$p56 = self::$idMap['%P56%'];
+		$p72 = self::$idMap['%P72%'];
+		$ip56 = (int)substr( $p56, 1 );
+		$ip72 = (int)substr( $p72, 1 );
+
+		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2' ),  array( 'pid1' => $ip56, 'pid2' => $ip72) );
+		$this->assertEquals( 1, $res->numRows() );
 	}
 
 	public function testExecution() {
-		//$berlinId = self::$idMap['%Berlin%']->getSerialization();
 		$p56 = self::$idMap['%P56%'];
 		$p72 = self::$idMap['%P72%'];
 
 		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => '*' );
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
+
+		var_dump($result);
 
 		$this->assertEquals( 1, $result['success'] );
 		$this->assertEquals( '', $result['searchinfo']['search'] );
@@ -99,12 +103,13 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 	public function testExecutionWithSearch() {
 		$p56 = self::$idMap['%P56%'];
 
-		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'test');
+		// TODO add terms to do a useful search!
+		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'IdontExist');
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
 
 		$this->assertEquals( 1, $result['success'] );
-		$this->assertEquals( 'test', $result['searchinfo']['search'] );
+		$this->assertEquals( 'IdontExist', $result['searchinfo']['search'] );
 		$this->assertCount( 0, $result['search'] );
 	}
 
