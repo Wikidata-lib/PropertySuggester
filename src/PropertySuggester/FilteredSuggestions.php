@@ -2,21 +2,21 @@
 
 namespace PropertySuggester;
 
-use PropertySuggester\Suggesters\SuggesterEngine;
-use Wikibase\DataModel\Entity\ItemId;
+use PropertySuggester\Suggester\EntitySuggester;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
+use Wikibase\StoreFactory;
+use Wikibase\Term;
 use Wikibase\TermIndex;
-use InvalidArgumentException;
 
 /**
- * API module helper to generate property suggestions.
+ * Retrieves Suggestions from an Entity Suggester and filters suggestions, which don't match a certain search string
  *
  * @author BP2013N2
  * @licence GNU GPL v2+
  */
-class SuggestionGenerator {
+class FilteredSuggestions {
 
 	/**
 	 * @var EntityLookup
@@ -28,93 +28,42 @@ class SuggestionGenerator {
 	 */
 	private $termIndex;
 
-	/**
-	 * @var SuggesterEngine
-	 */
-	private $suggester;
+	/** @var Suggestion[] */
+	private $filteredSuggestions;
 
-	public function __construct( EntityLookup $entityLookup, TermIndex $termIndex, SuggesterEngine $suggester ) {
-		$this->entityLookup = $entityLookup;
-		$this->suggester = $suggester;
-		$this->termIndex = $termIndex;
+	public function __construct( EntitySuggester $suggester, Params $params ) {
+		$this->$entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
+		$this->filterSuggestions( $suggester->getSuggestions(), $params->search, $params->language, $params->internalResultListSize );
 	}
 
 	/**
-	 * @param string $item - An item id
-	 * @param int $limit
-	 * @param float $minProbability
-	 * @throws InvalidArgumentException
-	 * @return array
+	 * @param Suggestion[] $allSuggestions
+	 * @param $search
+	 * @param $language
+	 * @param $resultSize
 	 */
-	public function generateSuggestionsByItem( $item, $limit, $minProbability ) {
-		$id = new  ItemId( $item );
-		$item = $this->entityLookup->getEntity( $id );
-		if( $item == null ){
-			throw new InvalidArgumentException( 'Item ' . $id . ' could not be found' );
-		}
-		$suggestions = $this->suggester->suggestByItem( $item, $limit, $minProbability );
-		return $suggestions;
-	}
-
-	/**
-	 * @param string[] $propertyList - A list of property ids
-	 * @param int $limit
-	 * @param float $minProbability
-	 * @return Suggestion[]
-	 */
-	public function generateSuggestionsByPropertyList( array $propertyList, $limit, $minProbability ) {
-		$properties = array();
-		foreach ( $propertyList as $id ) {
-			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
-		}
-		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit, $minProbability );
-		return $suggestions;
-	}
-
-	/**
-	 * Accepts strings of the format "P123" or "123" and returns
-	 * the id as int. Returns 0 if the string is not of the specified format.
-	 *
-	 * @param string $propertyId
-	 * @return int
-	 */
-	protected function getNumericPropertyId( $propertyId ) {
-		if ( strlen( $propertyId ) && strtolower( $propertyId[0] ) === 'p' ) {
-			return (int)substr( $propertyId, 1 );
-		}
-		return (int)$propertyId;
-	}
-
-
-	/**
-	 * @param Suggestion[] $suggestions
-	 * @param string $search
-	 * @param string $language
-	 * @param int $resultSize
-	 * @return Suggestion[]
-	 */
-	public function filterSuggestions( array $suggestions, $search, $language, $resultSize ) {
+	public function filterSuggestions( array $allSuggestions, $search, $language, $resultSize ) {
 		if ( !$search ) {
-			return $suggestions;
+			$this->filteredSuggestions = $allSuggestions;
 		}
 		$ids = $this->getMatchingIDs( $search, $language );
 
 		$id_set = array();
 		foreach ( $ids as $id ) {
-			$id_set[$id->getNumericId()] = true;
+			$id_set[$id->getSerialization()] = true;
 		}
 
-		$matching_suggestions = array();
+		$this->filteredSuggestions = array();
 		$count = 0;
-		foreach ( $suggestions as $suggestion ) {
-			if ( array_key_exists( $suggestion->getEntityId()->getNumericId(), $id_set ) ) {
-				$matching_suggestions[] = $suggestion;
+		foreach ( $allSuggestions as $suggestion ) {
+			if ( array_key_exists( $suggestion->getEntityId()->getSerialization(), $id_set ) ) {
+				$this->filteredSuggestions[] = $suggestion;
 				if ( ++$count == $resultSize ) {
 					break;
 				}
 			}
 		}
-		return $matching_suggestions;
 	}
 
 	/**
@@ -125,13 +74,13 @@ class SuggestionGenerator {
 	private function getMatchingIDs( $search, $language ) {
 		$ids = $this->termIndex->getMatchingIDs(
 			array(
-				new \Wikibase\Term( array(
-					'termType' => \Wikibase\Term::TYPE_LABEL,
+				new Term( array(
+					'termType' => Term::TYPE_LABEL,
 					'termLanguage' => $language,
 					'termText' => $search
 				) ),
-				new \Wikibase\Term( array(
-					'termType' => \Wikibase\Term::TYPE_ALIAS,
+				new Term( array(
+					'termType' => Term::TYPE_ALIAS,
 					'termLanguage' => $language,
 					'termText' => $search
 				) )

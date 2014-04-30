@@ -3,62 +3,40 @@
 namespace PropertySuggester;
 
 use ApiBase;
-use ApiMain;
-use DerivativeRequest;
-use PropertySuggester\Suggesters\SimpleSuggester;
-use PropertySuggester\Suggesters\SuggesterEngine;
-use Wikibase\DataModel\Entity\Property;
-use Wikibase\EntityLookup;
+use PropertySuggester\Suggester\PropertySuggester;
+use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\StoreFactory;
-use Wikibase\TermIndex;
 use Wikibase\Utils;
+use InvalidArgumentException;
 
 /**
  * API module to get property suggestions.
  *
  * @licence GNU GPL v2+
  */
-class GetSuggestions extends ApiBase {
-
-	/**
-	 * @var EntityLookup
-	 */
-	private $entityLookup;
-
-	/**
-	 * @var SuggesterEngine
-	 */
-	private $suggester;
-
-	/**
-	 * @var TermIndex
-	 */
-	private $termIndex;
-
-	/**
-	 * @var SuggesterParamsParser
-	 */
-	private $paramsParser;
-
-	public function __construct( ApiMain $main, $name, $prefix = '' ) {
-		parent::__construct( $main, $name, $prefix );
-		global $wgPropertySuggesterDeprecatedIds;
-		global $wgPropertySuggesterMinProbability;
-
-		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
-		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
-
-		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
-
-		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
-	}
+class GetPropertySuggestions extends ApiBase {
 
 	/**
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
-		$params = $this->paramsParser->parseAndValidate( $this->extractRequestParams() );
+		global $wgPropertySuggesterDeprecatedIds;
+		global $wgPropertySuggesterMinProbability;
+
+		$paramsParser = new ParamsParser( 500, $wgPropertySuggesterMinProbability );
+		$params = $paramsParser->parseAndValidate( $this->extractRequestParams() );
+
+		$suggester = new PropertySuggester( wfGetLB( DB_SLAVE ), $params->entity, $params->minProbability );
+		$suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
+		$suggester->setItem($this->getItemFromNumericId($params->entity));
+
+		$searchResult = new SearchResultsWithSuggestions( $suggester, $params, "property" );
+
+		$this->buildResult( $searchResult, $params->internalResultListSize, $params->search );
+
+
+		//old method code ->
+		/*
 
 		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
 
@@ -87,35 +65,49 @@ class GetSuggestions extends ApiBase {
 		$this->getResult()->addValue( null, 'success', 1 );
 		if ( count( $entries ) >= $params->resultSize ) {
 			$this->getResult()->addValue( null, 'search-continue', $params->resultSize );
-		}
-		$this->getResult()->addValue( 'searchinfo', 'search', $params->search );
-	}
+		};
+		$this->getResult()->addValue( 'searchinfo', 'search', $params->search )
 
+		*/
+	}
 
 	/**
-	 * @param int $resultSize
-	 * @param string $search
-	 * @param string $language
-	 * @return array
+	 * @param $numericItemId
+	 * @return null|\Wikibase\Item
+	 * @throws InvalidArgumentException
 	 */
-	private function querySearchApi( $resultSize, $search, $language ) {
-		$searchEntitiesParameters = new DerivativeRequest(
-			$this->getRequest(),
-			array(
-				'limit' => $resultSize + 1,
-				'continue' => 0,
-				'search' => $search,
-				'action' => 'wbsearchentities',
-				'language' => $language,
-				'type' => Property::ENTITY_TYPE
-			)
-		);
-		$api = new ApiMain( $searchEntitiesParameters );
-		$api->execute();
-		$apiResult = $api->getResultData();
-		$searchResult = $apiResult['search'];
-		return $searchResult;
+	private function getItemFromNumericId($numericItemId)
+	{
+		$entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$id = new ItemId( $numericItemId );
+		$item = $entityLookup->getEntity( $id );
+		if( $item == null ){
+			throw new InvalidArgumentException( 'Item ' . $id . ' could not be found' );
+		}
+		return $item;
 	}
+
+	private function buildResult( SearchResultsWithSuggestions &$searchResult, $resultSize, $search ) {
+		$searchResultDictionary = $searchResult->getResultDictionary();
+
+		$this->setIndexedTags( $searchResultDictionary );
+		$apiResult = $this->getResult();
+		$apiResult->addValue( null, 'search', $searchResultDictionary );
+		if ( $searchResult->resultSize() >= $resultSize ) {
+			$apiResult->getResult()->addValue( null, 'search-continue', $resultSize );
+		}
+		$apiResult->addValue( null, 'success', 1 );
+		$apiResult->addValue( 'searchinfo', 'search', $search );
+	}
+
+
+	private function setIndexedTags( &$searchResultDictionary ) {
+		$this->getResult()->setIndexedTagName( $searchResultDictionary, 'search' );
+		foreach ( $searchResultDictionary as $entry ) {
+			$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
+		}
+	}
+
 
 	/**
 	 * @see ApiBase::getAllowedParams()
@@ -160,14 +152,14 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::getParamDescription()
 	 */
 	public function getParamDescription() {
-		return array_merge( parent::getParamDescription(), array(
+		return array(
 			'entity' => 'Suggest attributes for given entity',
 			'properties' => 'Identifier for the site on which the corresponding page resides',
 			'size' => 'Specify number of suggestions to be returned',
 			'language' => 'language for result',
 			'limit' => 'Maximal number of results',
 			'continue' => 'Offset where to continue a search'
-		) );
+		);
 	}
 
 	/**

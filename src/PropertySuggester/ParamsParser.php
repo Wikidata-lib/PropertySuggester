@@ -9,7 +9,7 @@ use InvalidArgumentException;
  *
  * @licence GNU GPL v2+
  */
-class SuggesterParamsParser {
+class ParamsParser {
 
 	/**
 	 * @var int
@@ -34,10 +34,10 @@ class SuggesterParamsParser {
 	 * parses and validates the parameters of GetSuggestion
 	 * @param array $params
 	 * @throws InvalidArgumentException
-	 * @return SuggesterParams
+	 * @return Params
 	 */
 	public function parseAndValidate( array $params ) {
-		$result = new SuggesterParams();
+		$result = new Params();
 
 		$result->entity = $params['entity'];
 		$result->properties = $params['properties'];
@@ -55,7 +55,7 @@ class SuggesterParamsParser {
 
 		$result->limit = $params['limit'];
 		$result->continue = $params['continue'];
-		$result->resultSize = $result->limit + $result->continue;
+		$result->$internalResultListSize = $result->limit + $result->continue;
 		$result->language = $params['language'];
 
 		if ( $result->search ) {
@@ -65,7 +65,7 @@ class SuggesterParamsParser {
 			$result->suggesterLimit = $this->defaultSuggestionSearchLimit;
 			$result->minProbability = 0.0;
 		} else {
-			$result->suggesterLimit = $result->limit + $result->continue;
+			$result->suggesterLimit = $result->$internalResultListSize;
 			$result->minProbability = $this->defaultMinProbability;
 		}
 

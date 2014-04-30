@@ -5,7 +5,7 @@ namespace PropertySuggester;
 /**
  * Stores the suggester params
  */
-class SuggesterParams {
+class Params {
 
 	/**
 	 * @var string|null
@@ -13,7 +13,7 @@ class SuggesterParams {
 	public $entity;
 
 	/**
-	 * @var string[]|null
+	 * @var array
 	 */
 	public $properties;
 
@@ -51,6 +51,6 @@ class SuggesterParams {
 	/**
 	 * @var int
 	 */
-	public $resultSize;
+	public $internalResultListSize;
 
 }

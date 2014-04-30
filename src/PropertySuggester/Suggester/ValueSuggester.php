@@ -1,6 +1,6 @@
 <?php
 
-namespace PropertySuggester\ValueSuggesters;
+namespace PropertySuggester\ValueSuggester;
 
 use LoadBalancer;
 use PropertySuggester\Suggestion;
@@ -12,7 +12,7 @@ use ResultWrapper;
  * a Suggester implementation that creates suggestion via MySQL
  * Needs the wbs_propertypairs table filled with pair probabilities.
  */
-class ValueSuggester extends ValueSuggesterEngine {
+class ItemSuggester extends EntitySuggester {
 
 
 	/**

@@ -2,7 +2,6 @@
 
 namespace PropertySuggester;
 
-use ApiResult;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
@@ -10,42 +9,60 @@ use Wikibase\TermIndex;
 use Wikibase\DataModel\Entity\EntityId;
 
 /**
- * ResultBuilder builds Json-compatible array structure from suggestions
+ * SearchResultsWithSuggestions builds Json-compatible array structure after merging suggestions with search results
  *
  * @author BP2013N2
  * @licence GNU GPL v2+
  */
-class ResultBuilder {
+class SearchResultsWithSuggestions {
 
-	/**
-	 * @var $EntityTitleLookup
-	 */
+	/** @var $EntityTitleLookup */
 	protected $entityTitleLookup;
 
-	/**
-	 * @var TermIndex
-	 */
+	/** @var TermIndex */
 	protected $termIndex;
 
-	/**
-	 * @var ApiResult
-	 */
-	protected $result;
-
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $searchPattern;
 
+	/** @var array */
+	protected $searchResult;
+
 	/**
-	 * @param ApiResult $result
-	 * @param string $search
+	 * @param $suggester
+	 * @param Params $params
+	 * @param $entityType
 	 */
-	public function __construct( ApiResult $result, $search ) {
-		$this->searchPattern = '/^' . preg_quote( $search, '/' ) . '/i';
+	public function __construct( $suggester, $params, $entityType ) {
+		$this->searchPattern = '/^' . preg_quote( $params->$search, '/' ) . '/i';
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
-		$this->result = $result;
+
+		$filteredSuggestions = new FilteredSuggestions( $suggester, $params );
+		$suggestions = $filteredSuggestions->getSuggestions();
+
+		$this->buildEntries( $suggestions, $params->language, $entityType );
+
+		// merge with search result if possible and necessary
+		if ( $this->resultSize() < $params->internalResultListSize && $params->search !== '' ) {
+			$this->supplementEntries( $params->internalResultListSize, $params->search, $params->language, $entityType );
+		}
+
+		$this->searchResult = array_slice( $this->searchResult, $params->continue, $params->limit );
+	}
+
+	/**
+	 * @return int
+	 */
+	public function resultSize() {
+		return count( $this->searchResult );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function &getResultDictionary() {
+		return $this->$searchResult;
 	}
 
 	/**
@@ -54,8 +71,7 @@ class ResultBuilder {
 	 * @param string $entityType
 	 * @return array
 	 */
-	public function createJSON( array $suggestions, $language, $entityType='property' ) {
-
+	public function buildEntries( array &$suggestions, $language, $entityType ) {
 		$propertyIds = array();
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getEntityId();
@@ -64,12 +80,11 @@ class ResultBuilder {
 		$terms = $this->termIndex->getTermsOfEntities( $propertyIds, $entityType, $language );
 		$clusteredTerms = $this->clusterTerms( $terms );
 
-		$entries = array();
+		$this->$searchResult = array();
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getEntityId();
-			$entries[] = $this->buildEntry( $id, $clusteredTerms, $suggestion );
+			$this->$searchResult[] = $this->buildEntry( $id, $clusteredTerms, $suggestion );
 		}
-		return $entries;
 	}
 
 	/**
@@ -102,7 +117,6 @@ class ResultBuilder {
 	}
 
 	/**
-	 *
 	 * @param Term[] $terms
 	 * @return Term[][]
 	 */
@@ -127,37 +141,65 @@ class ResultBuilder {
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();
-				$this->result->setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 			$entry['aliases'][] = $term->getText();
 		}
 	}
 
 	/**
-	 * @param array $entries
-	 * @param array $searchResults
-	 * @param int $resultSize
-	 * @return array representing Json
+	 * @param $resultSize
+	 * @param $search
+	 * @param $language
+	 * @param $entityType
 	 */
-	public function mergeWithTraditionalSearchResults( array &$entries, array $searchResults, $resultSize ) {
+	private function supplementEntries( $resultSize, $search, $language, $entityType ) {
+		if ( $entityType === 'property' ) {
+			$type = Property::ENTITY_TYPE;
+		} else {
+			$type = Item::ENITY_TYPE;
+		}
+
+		$searchEntitiesParameters = new DerivativeRequest(
+			$this->getRequest(),
+			array(
+				'limit' => $resultSize + 1,
+				'continue' => 0,
+				'search' => $search,
+				'action' => 'wbsearchentities',
+				'language' => $language,
+				'type' => $type
+			)
+		);
+
+		$api = new ApiMain( $searchEntitiesParameters );
+		$api->execute();
+		$apiResult = $api->getResultData();
+		$apiSearchResult = $apiResult['search'];
+
+		$this->mergeWithTraditionalSearchResults( $apiSearchResult, $resultSize );
+	}
+
+	/**
+	 * @param array $searchApiResult
+	 * @param $targetResultSize
+	 */
+	public function mergeWithTraditionalSearchResults( array &$searchApiResult, $targetResultSize ) {
 		// Avoid duplicates
 		$existingKeys = array();
-		foreach ( $entries as $entry ) {
+		foreach ( $this->searchResult as $entry ) {
 			$existingKeys[$entry['id']] = true;
 		}
 
-		$distinctCount = count( $entries );
-		foreach ( $searchResults as $result ) {
+		$distinctCount = $this->getSize();
+		foreach ( $searchApiResult as $result ) {
 			if ( !array_key_exists( $result['id'], $existingKeys ) ) {
-				$entries[] = $result;
+				$this->searchResult[] = $result;
 				$distinctCount++;
-				if ( $distinctCount >= $resultSize ) {
+				if ( $distinctCount >= $targetResultSize ) {
 					break;
 				}
 			}
 		}
-		return $entries;
 	}
-
 }
 

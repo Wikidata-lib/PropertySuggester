@@ -1,6 +1,6 @@
 <?php
 
-namespace PropertySuggester\Suggesters;
+namespace PropertySuggester\Suggester;
 
 use LoadBalancer;
 use InvalidArgumentException;
@@ -16,23 +16,49 @@ use Wikibase\DataModel\Snak\Snak;
  *
  * @licence GNU GPL v2+
  */
-class SimpleSuggester implements SuggesterEngine {
+class PropertySuggester implements EntitySuggester {
 
-	/**
-	 * @var int[]
-	 */
+	/** @var int[] */
 	private $deprecatedPropertyIds = array();
 
-	/**
-	 * @var LoadBalancer
-	 */
+	/** @var int[] */
+	private $numericPropertyIds;
+
+	/** @var int */
+	private $limit;
+
+	/** @var float */
+	private $minProbability;
+
+	/** @var LoadBalancer */
 	private $lb;
 
 	/**
 	 * @param LoadBalancer $lb
+	 * @param $limit
+	 * @param $minProbability
 	 */
-	public function __construct( LoadBalancer $lb ) {
+	public function __construct( LoadBalancer $lb, $limit, $minProbability ) {
 		$this->lb = $lb;
+		$this->limit = $limit;
+		$this->minProbability = $minProbability;
+	}
+
+	/**
+	 * @param array $propertyIds
+	 */
+	public function setPropertyIds( array $propertyIds )
+	{
+		$this->$numericPropertyIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds);
+	}
+
+	/**
+	 * @param Item $item
+	 */
+	public function setItem( Item $item )
+	{
+		$snaks = $item->getAllSnaks();
+		$this->$numericPropertyIds = array_map( array( $this, 'getNumericIdFromSnak' ), $snaks);
 	}
 
 	/**
@@ -43,37 +69,34 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param int[] $propertyIds
-	 * @param int $limit
-	 * @param float $minProbability
-	 * @throws InvalidArgumentException
-	 * @return Suggestion[]
+	 * @return array|\PropertySuggester\Suggestion[]
+	 * @throws \InvalidArgumentException
 	 */
-	protected function getSuggestions( array $propertyIds, $limit, $minProbability ) {
-		if ( !$propertyIds ) {
+	public function getSuggestions() {
+		if ( !$this->$numericPropertyIds ) {
 			return array();
 		}
-		if ( !is_int( $limit ) ) {
+		if ( !is_int( $this->limit ) ) {
 			throw new InvalidArgumentException('$limit must be int!');
 		}
-		if ( !is_float( $minProbability ) ) {
+		if ( !is_float( $this->minProbability ) ) {
 			throw new InvalidArgumentException('$minProbability must be float!');
 		}
-		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
-		$count = count( $propertyIds );
+		$excludedIds = array_merge( $this->$numericPropertyIds, $this->deprecatedPropertyIds );
+		$count = count( $this->$numericPropertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
+			array( 'pid1 IN (' . $dbr->makeList( $this->$numericPropertyIds ) . ')',
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
 				'ORDER BY' => 'prob DESC',
-				'LIMIT'    => $limit,
-				'HAVING'   => "prob > $minProbability"
+				'LIMIT'    => $this->limit,
+				'HAVING'   => "prob > $this->minProbability"
 			)
 		);
 		$this->lb->reuseConnection( $dbr );
@@ -81,33 +104,6 @@ class SimpleSuggester implements SuggesterEngine {
 		return $this->buildResult($res);
 	}
 
-	/**
-	 * @see SuggesterEngine::suggestByPropertyIds
-	 *
-	 * @param PropertyId[] $propertyIds
-	 * @param int $limit
- 	 * @param float $minProbability
-	 * @return Suggestion[]
-	 */
-	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability ) {
-		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds);
-
-		return $this->getSuggestions( $numericIds, $limit, $minProbability );
-	}
-
-	/**
-	 * @see SuggesterEngine::suggestByEntity
-	 *
-	 * @param Item $item
-	 * @param int $limit
-  	 * @param float $minProbability
-	 * @return Suggestion[]
-	 */
-	public function suggestByItem( Item $item, $limit, $minProbability ) {
-		$snaks = $item->getAllSnaks();
-		$numericIds = array_map( array( $this, 'getNumericIdFromSnak' ), $snaks);
-		return $this->getSuggestions( $numericIds, $limit, $minProbability );
-	}
 
 	/**
 	 * Converts the rows of the SQL result to Suggestion objects

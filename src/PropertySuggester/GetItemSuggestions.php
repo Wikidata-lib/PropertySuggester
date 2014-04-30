@@ -16,7 +16,7 @@ use Wikibase\Utils;
  *
  * @licence GNU GPL v2+
  */
-class GetValueSuggestions extends ApiBase {
+class GetItemSuggestions extends ApiBase {
 
 	/**
 	 * @var EntityLookup
@@ -44,18 +44,6 @@ class GetValueSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
-		wfProfileIn( __METHOD__ );
-		$params = $this->extractRequestParams();
-
-		$suggestions = $this->valueSuggester->getValueSuggestionsByItem($params["item"], $params["property"], (float) $params["threshold"]);
-
-		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), '' );
-		$entries = $resultBuilder->createJSON( $suggestions, $params["language"], 'item' );
-
-		// Define Result
-		$this->getResult()->addValue( null, 'search', $entries );
-		$this->getResult()->addValue( null, 'success', 1 );
 	}
 
 
@@ -88,12 +76,12 @@ class GetValueSuggestions extends ApiBase {
 	 * @see ApiBase::getParamDescription()
 	 */
 	public function getParamDescription() {
-		return array_merge( parent::getParamDescription(), array(
+		return array(
 			'item' => 'Id of treated entity.',
 			'property' => 'Id of property for which values should be shown',
 			'threshold' => 'Minimal probability',
 			'language' => 'Language of value suggestion labels'
-		) );
+		);
 	}
 
 	/**
