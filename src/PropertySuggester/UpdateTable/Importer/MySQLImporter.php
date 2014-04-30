@@ -22,18 +22,18 @@ class MySQLImporter implements Importer {
 		$db = $lb->getConnection( DB_MASTER );
 
 		$dbTableName = $db->tableName( $importContext->getTargetTableName() );
+		$fullPath = $db->addQuotes( $importContext->getCsvFilePath() );
+		$delimiter = $db->addQuotes( $importContext->getCsvDelimiter() );
 
-		$fullPath = $importContext->getCsvFilePath();
-		$delimiter = $importContext->getCsvDelimiter();
-		$db->query( "
-				LOAD DATA INFILE '$fullPath'
+		$db->query("
+				LOAD DATA INFILE $fullPath
 				INTO TABLE $dbTableName
 				FIELDS
-					TERMINATED BY '$delimiter'
+					TERMINATED BY $delimiter
 				LINES
 					TERMINATED BY '\\n'
 				(pid1, qid1, pid2, count, probability, context)
-				SET qid1 = nullif(@vtwo,'')
+				SET qid1 = nullif(@vtwo, '')
 			" );
 		$lb->reuseConnection( $db );
 		return true;

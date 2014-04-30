@@ -37,11 +37,12 @@ class UpdateTable extends Maintenance {
 		if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
 			$this->error( "The --file option requires a file as an argument.\n", true );
 		}
-		$fullPath = realpath( $this->getOption( 'file' ) );
+		$path = $this->getOption( 'file' );
+		$fullPath = realpath( $path );
 		$fullPath = str_replace( '\\', '/', $fullPath );
 
 		if ( !file_exists( $fullPath ) ) {
-			$this->error( "Cant find $fullPath \n", true );
+			$this->error( "Cant find $path \n", true );
 		}
 
 		$useInsert = $this->getOption( 'use-insert' );
@@ -74,10 +75,10 @@ class UpdateTable extends Maintenance {
 	 * @return Importer
 	 */
 	function createImportStrategy( $useInsert ) {
-		global $wgDBType;
-		if ( $wgDBType === 'mysql' and !$useInsert ) {
+		global $wgDBtype;
+		if ( $wgDBtype === 'mysql' and !$useInsert ) {
 			return new MySQLImporter();
-		} elseif ( $wgDBType === 'postgres' and !$useInsert ) {
+		} elseif ( $wgDBtype === 'postgres' and !$useInsert ) {
 			return new PostgresImporter();
 		} else {
 			return new BasicImporter();
@@ -95,6 +96,7 @@ class UpdateTable extends Maintenance {
 		$importContext->setLb( $lb );
 		$importContext->setTargetTableName( $tableName );
 		$importContext->setCsvFilePath( $wholePath );
+		$importContext->setCsvDelimiter( ',' );
 		return $importContext;
 	}
 

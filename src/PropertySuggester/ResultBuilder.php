@@ -4,8 +4,7 @@ namespace PropertySuggester;
 
 use ApiResult;
 use PropertySuggester\Suggesters\Suggestion;
-use Wikibase\Repo\WikibaseRepo;
-use Wikibase\StoreFactory;
+use Wikibase\EntityTitleLookup;
 use Wikibase\Term;
 use Wikibase\TermIndex;
 use Wikibase\DataModel\Entity\EntityId;
@@ -40,11 +39,13 @@ class ResultBuilder {
 
 	/**
 	 * @param ApiResult $result
+	 * @param TermIndex $termIndex
+	 * @param EntityTitleLookup $entityTitleLookup
 	 * @param string $search
 	 */
-	public function __construct( ApiResult $result, $search ) {
-		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
-		$this->termIndex = StoreFactory::getStore()->getTermIndex();
+	public function __construct( ApiResult $result, TermIndex $termIndex, EntityTitleLookup $entityTitleLookup, $search ) {
+		$this->entityTitleLookup = $entityTitleLookup;
+		$this->termIndex = $termIndex;
 		$this->result = $result;
 		$this->searchPattern = '/^' . preg_quote( $search, '/' ) . '/i';
 	}
@@ -84,7 +85,12 @@ class ResultBuilder {
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
 		$entry['rating'] = $suggestion->getProbability();
 
-		foreach ( $clusteredTerms[$id->getSerialization()] as $term ) {
+		if ( isset( $clusteredTerms[$id->getSerialization()] ) ) {
+			$matchingTerms = $clusteredTerms[$id->getSerialization()];
+		} else {
+			$matchingTerms = array();
+		}
+		foreach ( $matchingTerms as $term ) {
 			/** @var $term Term */
 			switch ( $term->getType() ) {
 				case Term::TYPE_LABEL:
@@ -97,6 +103,9 @@ class ResultBuilder {
 					$this->checkAndSetAlias( $entry, $term );
 					break;
 			}
+		}
+		if ( !isset($entry['label'] ) ) {
+			$entry['label'] = $id->getSerialization();
 		}
 		return $entry;
 	}

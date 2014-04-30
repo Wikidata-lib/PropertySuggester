@@ -1,0 +1,37 @@
+<phpunit
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="tests/bootstrap.php"
+         cacheTokens="false"
+         colors="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         strict="true"
+         verbose="true">
+
+    <testsuites>
+        <testsuite name="PropertySuggester">
+            <directory>tests/phpunit</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+            <directory suffix=".php">maintenance</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
+
+</phpunit>

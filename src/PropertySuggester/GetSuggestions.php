@@ -9,6 +9,8 @@ use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
+use Wikibase\EntityTitleLookup;
+use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
 use Wikibase\Utils;
@@ -24,6 +26,11 @@ class GetSuggestions extends ApiBase {
 	 * @var EntityLookup
 	 */
 	private $entityLookup;
+
+	/**
+	 * @var EntityTitleLookup
+	 */
+	private $entityTitleLookup;
 
 	/**
 	 * @var SuggesterEngine
@@ -45,8 +52,10 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterDeprecatedIds;
 		global $wgPropertySuggesterMinProbability;
 
-		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
+		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
+
 		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
 
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
@@ -58,7 +67,8 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
-		$params = $this->paramsParser->parseAndValidate( $this->extractRequestParams() );
+		$extracted = $this->extractRequestParams();
+		$params = $this->paramsParser->parseAndValidate( $extracted );
 
 		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
 
@@ -70,7 +80,7 @@ class GetSuggestions extends ApiBase {
 		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
 
 		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $params->search );
+		$resultBuilder = new ResultBuilder( $this->getResult(), $this->termIndex, $this->entityTitleLookup, $params->search );
 		$entries = $resultBuilder->createJSON( $suggestions, $params->language, $params->search );
 
 		// merge with search result if possible and necessary
@@ -137,14 +147,7 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_MIN => 0,
 				ApiBase::PARAM_RANGE_ENFORCE => true,
 			),
-			'continue' => array(
-				ApiBase::PARAM_TYPE => 'limit',
-				ApiBase::PARAM_DFLT => 0,
-				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
-				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
-				ApiBase::PARAM_MIN => 0,
-				ApiBase::PARAM_RANGE_ENFORCE => true,
-			),
+			'continue' => null,
 			'language' => array(
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
@@ -160,14 +163,14 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::getParamDescription()
 	 */
 	public function getParamDescription() {
-		return array_merge( parent::getParamDescription(), array(
+		return array(
 			'entity' => 'Suggest attributes for given entity',
 			'properties' => 'Identifier for the site on which the corresponding page resides',
 			'size' => 'Specify number of suggestions to be returned',
 			'language' => 'language for result',
 			'limit' => 'Maximal number of results',
 			'continue' => 'Offset where to continue a search'
-		) );
+		);
 	}
 
 	/**
@@ -182,7 +185,7 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @see ApiBase::getExamples()
 	 */
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=wbsgetsuggestions&entity=Q4'
 			=> 'Get suggestions for entity 4',

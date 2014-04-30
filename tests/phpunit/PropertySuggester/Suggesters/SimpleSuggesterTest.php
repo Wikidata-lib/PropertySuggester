@@ -3,6 +3,7 @@
 namespace PropertySuggester\Suggesters;
 
 use LoadBalancerSingle;
+use InvalidArgumentException;
 use MediaWikiTestCase;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
@@ -10,7 +11,9 @@ use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 
 /**
- * @covers PropertySuggester\Suggesters\SimplePHPSuggester
+ * @covers PropertySuggester\Suggesters\SimpleSuggester
+ * @covers PropertySuggester\Suggesters\SuggesterEngine
+ * @covers PropertySuggester\Suggesters\Suggestion
  * @group PropertySuggester
  * @group API
  * @group Database
@@ -31,7 +34,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$rows = array();
 		$rows[] = $this->row( 1, null, 2, 100, 0.1, 'item' );
 		$rows[] = $this->row( 1, null, 3, 50, 0.05, 'item' );
-		$rows[] = $this->row( 2, null, 3, 100, 0.1, 'item' );
+		$rows[] = $this->row( 2, null, 3, 100, 0.3, 'item' );
 		$rows[] = $this->row( 2, null, 4, 200, 0.2, 'item' );
 		$rows[] = $this->row( 3, null, 1, 100, 0.5, 'item' );
 
@@ -57,7 +60,9 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0 );
 
 		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
+		$this->assertEquals( 0.1, $res[0]->getProbability(), '', 0.0001 );
 		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
+		$this->assertEquals( 0.05, $res[1]->getProbability(), '', 0.0001 );
 	}
 
 	public function testSuggestByItem() {
@@ -82,6 +87,24 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
 		$this->assertNotContains( 2 , $resultIds );
 		$this->assertContains( 3 , $resultIds );
+	}
+
+	public function testEmptyResult() {
+		$this->assertEmpty( $this->suggester->suggestByPropertyIds( array(), 10, 0.01 ) );
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testInvalidLimit() {
+		$this->suggester->suggestByPropertyIds( array(), '10', 0.01 );
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testInvalidMinProbability() {
+		$this->suggester->suggestByPropertyIds( array(), 10, '0.01' );
 	}
 
 }

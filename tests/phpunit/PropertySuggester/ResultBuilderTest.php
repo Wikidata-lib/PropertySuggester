@@ -21,10 +21,24 @@ class ResultBuilderTest extends MediaWikiTestCase {
 	public function setUp() {
 		parent::setUp();
 		$apiMain =  $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
+
+		$entityTitleLookup = $this->getMock( 'Wikibase\EntityTitleLookup' );
+		$termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$result = new ApiResult( $apiMain );
 
-		$this->resultBuilder = new ResultBuilder( $result, '' );
+		$this->resultBuilder = new ResultBuilder( $result, $termIndex, $entityTitleLookup, '' );
 	}
+
+/*	public function testBuildJson() {
+		$suggestions = array(
+			new Suggestion( new PropertyId( 'P1' ), 0.3 ),
+			new Suggestion( new PropertyId( 'P2' ), 0.5 )
+		);
+
+		$result = $this->resultBuilder->createJSON( $suggestions, 'en' );
+
+		$this->assertArrayEquals( array(), $result );
+	}*/
 
 	public function testMergeWithTraditionalSearchResults() {
 		$suggesterResult = array(

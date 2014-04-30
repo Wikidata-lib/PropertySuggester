@@ -14,3 +14,7 @@ before_script:
 
 script:
   - bash ./build/travis/script.sh
+
+after_success:
+  - bash ./build/travis/after_script.sh
+

@@ -27,7 +27,7 @@ interface SuggesterEngine {
 	 *
 	 * @param Item $item
 	 * @param int $limit
- 	 * @param float $minProbability
+	 * @param float $minProbability
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability );
