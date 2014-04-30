@@ -86,7 +86,8 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 		$p72 = self::$idMap['%P72%'];
 
 		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => '*' );
-		$result = $this->doApiRequest( $params )[0];
+		$res = $this->doApiRequest( $params );
+		$result = $res[0];
 
 		$this->assertEquals( 1, $result['success'] );
 		$this->assertEquals( '', $result['searchinfo']['search'] );
@@ -99,7 +100,8 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 		$p56 = self::$idMap['%P56%'];
 
 		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'test');
-		$result = $this->doApiRequest( $params )[0];
+		$res = $this->doApiRequest( $params );
+		$result = $res[0];
 
 		$this->assertEquals( 1, $result['success'] );
 		$this->assertEquals( 'test', $result['searchinfo']['search'] );
