@@ -63,14 +63,21 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
  	* @expectedException InvalidArgumentException
  	*/
 	public function testSuggestionWithoutEntityOrProperties() {
-		$this->paramsParser->parseAndValidate( array( 'entity' => null, 'properties' => null, 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
+		$this->paramsParser->parseAndValidate( array( 'entity' => null, 'properties' => null) );
 	}
 
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testSuggestionWithEntityAndProperties() {
-		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => array('P31'), 'continue' => 10, 'limit' => 5, 'language' => 'en', 'search' => 'asd') );
+		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => array('P31') ) );
+	}
+
+	/**
+	 * @expectedException InvalidArgumentException
+	 */
+	public function testSuggestionWithNonNumericContinue() {
+		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => null, 'continue' => 'drop') );
 	}
 
 }

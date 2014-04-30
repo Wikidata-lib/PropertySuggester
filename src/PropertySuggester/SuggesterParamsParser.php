@@ -45,6 +45,9 @@ class SuggesterParamsParser {
 		if ( !( $result->entity XOR $result->properties ) ) {
 			throw new InvalidArgumentException( 'provide either entity-id parameter \'entity\' or a list of properties \'properties\'' );
 		}
+		if ( !( is_numeric( $params['continue'] ) || is_null( $params['continue'] ) ) ) {
+			throw new InvalidArgumentException( 'continue must be int!' );
+		}
 
 		// The entityselector doesn't allow a search for '' so '*' gets mapped to ''
 		if ( $params['search'] !== '*' ) {
@@ -54,7 +57,7 @@ class SuggesterParamsParser {
 		}
 
 		$result->limit = $params['limit'];
-		$result->continue = $params['continue'];
+		$result->continue = (int)$params['continue'];
 		$result->resultSize = $result->limit + $result->continue;
 		$result->language = $params['language'];
 
