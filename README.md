@@ -33,5 +33,6 @@ suggestions. You can use [PropertySuggester-Python](https://github.com/Wikidata-
 generate this data from a wikidata dump.
 
 * run ```composer dump-autoload``` in the extension folder (if installed without composer)
+* add ```require_once "$IP/extensions/PropertySuggester/PropertySuggester.php";``` to your localsettings
 * run ```maintenance/update.php``` to create the neccessary table
-* follow the Readme of PropertySuggester-Python to generate and load suggestion data
+* follow the readme of PropertySuggester-Python to generate and load suggestion data
