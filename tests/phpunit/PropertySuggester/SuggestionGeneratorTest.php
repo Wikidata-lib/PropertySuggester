@@ -75,7 +75,14 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$result = $this->suggestionGenerator->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
 
 		$this->assertEquals( array( $suggestions[0], $suggestions[2] ), $result );
+	}
 
+	public function testFilterSuggestionsWithoutSearch() {
+		$resultSize = 2;
+
+		$result = $this->suggestionGenerator->filterSuggestions( array( 1, 2, 3, 4 ), '', 'en', $resultSize );
+
+		$this->assertEquals( array( 1, 2 ), $result );
 	}
 
 	public function testGenerateSuggestionsWithPropertyList() {

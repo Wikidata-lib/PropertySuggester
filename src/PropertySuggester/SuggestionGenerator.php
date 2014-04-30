@@ -96,7 +96,7 @@ class SuggestionGenerator {
 	 */
 	public function filterSuggestions( array $suggestions, $search, $language, $resultSize ) {
 		if ( !$search ) {
-			return $suggestions;
+			return array_slice( $suggestions, 0, $resultSize );
 		}
 		$ids = $this->getMatchingIDs( $search, $language );
 

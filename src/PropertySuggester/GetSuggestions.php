@@ -169,14 +169,14 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::getParamDescription()
 	 */
 	public function getParamDescription() {
-		return array_merge( parent::getParamDescription(), array(
+		return array(
 			'entity' => 'Suggest attributes for given entity',
 			'properties' => 'Identifier for the site on which the corresponding page resides',
 			'size' => 'Specify number of suggestions to be returned',
 			'language' => 'language for result',
 			'limit' => 'Maximal number of results',
 			'continue' => 'Offset where to continue a search'
-		) );
+		);
 	}
 
 	/**
@@ -191,7 +191,7 @@ class GetSuggestions extends ApiBase {
 	/**
 	 * @see ApiBase::getExamples()
 	 */
-	protected function getExamples() {
+	public function getExamples() {
 		return array(
 			'api.php?action=wbsgetsuggestions&entity=Q4'
 			=> 'Get suggestions for entity 4',
