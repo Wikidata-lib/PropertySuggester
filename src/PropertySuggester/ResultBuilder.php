@@ -85,7 +85,12 @@ class ResultBuilder {
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
 		$entry['rating'] = $suggestion->getProbability();
 
-		foreach ( $clusteredTerms[$id->getSerialization()] as $term ) {
+		if ( isset( $clusteredTerms[$id->getSerialization()] ) ) {
+			$matchingTerms = $clusteredTerms[$id->getSerialization()];
+		} else {
+			$matchingTerms = array();
+		}
+		foreach ( $matchingTerms as $term ) {
 			/** @var $term Term */
 			switch ( $term->getType() ) {
 				case Term::TYPE_LABEL:
@@ -98,6 +103,9 @@ class ResultBuilder {
 					$this->checkAndSetAlias( $entry, $term );
 					break;
 			}
+		}
+		if ( !isset($entry['label'] ) ) {
+			$entry['label'] = $id->getSerialization();
 		}
 		return $entry;
 	}
