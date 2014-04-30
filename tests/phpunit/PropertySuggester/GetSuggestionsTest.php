@@ -22,9 +22,14 @@ use Wikibase\Test\Api\WikibaseApiTestCase;
 /**
  * @covers PropertySuggester\GetSuggestions
  * @covers PropertySuggester\ResultBuilder
+ *
  * @group PropertySuggester
- * @group Database
  * @group API
+ * @group Wikibase
+ * @group WikibaseAPI
+ * @group WikibaseRepo
+ * @group BreakingTheSlownessBarrier
+ * @group Database
  * @group medium
  */
 class GetSuggestionTest extends WikibaseApiTestCase {
@@ -87,11 +92,9 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 		$p56 = self::$idMap['%P56%'];
 		$p72 = self::$idMap['%P72%'];
 
-		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => '*' );
+		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => '*', 'continue' => 0 );
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
-
-		var_dump($result);
 
 		$this->assertEquals( 1, $result['success'] );
 		$this->assertEquals( '', $result['searchinfo']['search'] );
@@ -104,7 +107,7 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 		$p56 = self::$idMap['%P56%'];
 
 		// TODO add terms to do a useful search!
-		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'IdontExist');
+		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'IdontExist', 'continue' => 0);
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
 

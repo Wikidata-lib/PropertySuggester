@@ -67,7 +67,8 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
-		$params = $this->paramsParser->parseAndValidate( $this->extractRequestParams() );
+		$extracted = $this->extractRequestParams();
+		$params = $this->paramsParser->parseAndValidate( $extracted );
 
 		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
 

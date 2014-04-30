@@ -3,6 +3,7 @@
 namespace PropertySuggester\Suggesters;
 
 use LoadBalancerSingle;
+use InvalidArgumentException;
 use MediaWikiTestCase;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
@@ -93,19 +94,17 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	/**
-	 * @expectedException \InvalidArgumentException
+	 * @expectedException InvalidArgumentException
 	 */
 	public function testInvalidLimit() {
 		$this->suggester->suggestByPropertyIds( array(), '10', 0.01 );
-		$this->fail();
 	}
 
 	/**
-	 * @expectedException \InvalidArgumentException
+	 * @expectedException InvalidArgumentException
 	 */
 	public function testInvalidMinProbability() {
 		$this->suggester->suggestByPropertyIds( array(), 10, '0.01' );
-		$this->fail();
 	}
 
 }
