@@ -32,6 +32,7 @@ class MySQLImporter implements Importer {
 					TERMINATED BY $delimiter
 				LINES
 					TERMINATED BY '\\n'
+				IGNORE 1 LINES
 				(pid1, qid1, pid2, count, probability, context)
 				SET qid1 = nullif(@vtwo, '')
 			" );
