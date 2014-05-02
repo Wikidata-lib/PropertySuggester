@@ -3,8 +3,8 @@
 namespace PropertySuggester\UpdateTable\Importer;
 
 use DatabaseBase;
+use UnexpectedValueException;
 use PropertySuggester\UpdateTable\ImportContext;
-use InvalidArgumentException;
 
 /**
  * A strategy, which imports entries from CSV file into DB table, used as fallback, when no special import commands
@@ -40,13 +40,15 @@ class BasicImporter implements Importer {
 	 * @param $fileHandle
 	 * @param DatabaseBase $db
 	 * @param ImportContext $importContext
+	 * @throws UnexpectedValueException
 	 */
 	private function doImport( $fileHandle, DatabaseBase $db, ImportContext $importContext ) {
 		$accumulator = array();
 		$i = 0;
 		$header = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() ); //this is to get the csv-header
-		if( $header != array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ) ) {
-			throw new InvalidArgumentException( "provided csv-file does not match the expected format:\n'pid1', 'qid1', 'pid2', 'count', 'probability', 'context'" );
+		$expectedHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
+		if( $header != $expectedHeader ) {
+			throw new UnexpectedValueException( "provided csv-file does not match the expected format:\n" . join( ',', $expectedHeader ) );
 		}
 		while ( true ) {
 			$data = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() );
