@@ -4,6 +4,7 @@ namespace PropertySuggester\UpdateTable\Importer;
 
 use DatabaseBase;
 use PropertySuggester\UpdateTable\ImportContext;
+use InvalidArgumentException;
 
 /**
  * A strategy, which imports entries from CSV file into DB table, used as fallback, when no special import commands
@@ -41,11 +42,14 @@ class BasicImporter implements Importer {
 	 * @param ImportContext $importContext
 	 */
 	private function doImport( $fileHandle, DatabaseBase $db, ImportContext $importContext ) {
-		$accumulator = Array();
+		$accumulator = array();
 		$i = 0;
-
+		$header = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() ); //this is to get the csv-header
+		if( $header != array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ) ) {
+			throw new InvalidArgumentException( "provided csv-file does not match the expected format:\n'pid1', 'qid1', 'pid2', 'count', 'probability', 'context'" );
+		}
 		while ( true ) {
-			$data = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter());
+			$data = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() );
 
 			if ( $data == false || ++$i > 1000 ) {
 				$db->insert( $importContext->getTargetTableName(), $accumulator );

@@ -32,6 +32,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 
 	public function getRows() {
 		$rows1 = array();
+		$rows1[] = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
 		$rows1[] = array( 1, null, 2, 100, 0.1, 'item' );
 		$rows1[] = array( 1, null, 3, 50, 0.05, 'item' );
 		$rows1[] = array( 2, null, 3, 100, 0.1, 'item' );
@@ -39,6 +40,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 		$rows1[] = array( 3, null, 1, 123, 0.5, 'item' );
 
 		$rows2 = array();
+		$rows2[] = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
 		for ($i=0; $i<1100; $i++) {
 			$rows2[] = array( $i, null, 2, 100, 0.1, 'item' );
 		}
@@ -76,14 +78,14 @@ class UpdateTableTest extends MediaWikiTestCase {
 				'wbs_propertypairs',
 				array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ),
 				array(),
-				$rows
+				array_slice( $rows, 1 ) //header is not inserted into DB
 			);
 		} else { // assertSelect is too slow to compare 1100 rows... just check the size
 			$this->assertSelect(
 				'wbs_propertypairs',
 				array( 'count' => 'count(*)' ),
 				array(),
-				array( array( count( $rows ) ) )
+				array( array( count( $rows ) -1 ) )
 			);
 		}
 	}

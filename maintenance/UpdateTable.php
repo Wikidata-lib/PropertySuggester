@@ -9,6 +9,7 @@ use PropertySuggester\UpdateTable\Importer\Importer;
 use PropertySuggester\UpdateTable\Importer\MySQLImporter;
 use PropertySuggester\UpdateTable\Importer\PostgresImporter;
 use PropertySuggester\UpdateTable\ImportContext;
+use InvalidArgumentException;
 
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
@@ -60,7 +61,13 @@ class UpdateTable extends Maintenance {
 
 		$importContext = $this->createImportContext( $lb, $tableName, $fullPath );
 		$insertionStrategy = $this->createImportStrategy( $useInsert );
-		$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
+
+		try {
+			$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
+		} catch (InvalidArgumentException $e) {
+			$this->error( "Import failed: " . $e->getMessage() );
+			exit;
+		}
 
 		if ( !$success ) {
 			$this->error( "Failed to run import to db" );
