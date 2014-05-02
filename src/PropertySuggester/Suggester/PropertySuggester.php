@@ -49,7 +49,7 @@ class PropertySuggester implements EntitySuggester {
 	 */
 	public function setPropertyIds( array $propertyIds )
 	{
-		$this->$numericPropertyIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds);
+		$this->numericPropertyIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class PropertySuggester implements EntitySuggester {
 	public function setItem( Item $item )
 	{
 		$snaks = $item->getAllSnaks();
-		$this->$numericPropertyIds = array_map( array( $this, 'getNumericIdFromSnak' ), $snaks);
+		$this->numericPropertyIds = array_map( array( $this, 'getNumericIdFromSnak' ), $snaks);
 	}
 
 	/**
@@ -72,9 +72,10 @@ class PropertySuggester implements EntitySuggester {
 	 * @return array|\PropertySuggester\Suggestion[]
 	 * @throws \InvalidArgumentException
 	 */
-	public function getSuggestions() {
-		if ( !$this->$numericPropertyIds ) {
-			return array();
+	public function &getSuggestions() {
+		if ( !$this->numericPropertyIds ) {
+			$a = array();
+			return $a;
 		}
 		if ( !is_int( $this->limit ) ) {
 			throw new InvalidArgumentException('$limit must be int!');
@@ -82,14 +83,14 @@ class PropertySuggester implements EntitySuggester {
 		if ( !is_float( $this->minProbability ) ) {
 			throw new InvalidArgumentException('$minProbability must be float!');
 		}
-		$excludedIds = array_merge( $this->$numericPropertyIds, $this->deprecatedPropertyIds );
-		$count = count( $this->$numericPropertyIds );
+		$excludedIds = array_merge( $this->numericPropertyIds, $this->deprecatedPropertyIds );
+		$count = count( $this->numericPropertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $dbr->makeList( $this->$numericPropertyIds ) . ')',
+			array( 'pid1 IN (' . $dbr->makeList( $this->numericPropertyIds ) . ')',
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' ),
 			__METHOD__,
 			array(

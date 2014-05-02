@@ -2,11 +2,14 @@
 
 namespace PropertySuggester;
 
+use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\StoreFactory;
 use Wikibase\Term;
 use Wikibase\TermIndex;
 use Wikibase\DataModel\Entity\EntityId;
+use ApiMain;
 
 /**
  * SearchResultsWithSuggestions builds Json-compatible array structure after merging suggestions with search results
@@ -14,7 +17,7 @@ use Wikibase\DataModel\Entity\EntityId;
  * @author BP2013N2
  * @licence GNU GPL v2+
  */
-class SearchResultsWithSuggestions {
+class SearchResultWithSuggestions {
 
 	/** @var $EntityTitleLookup */
 	protected $entityTitleLookup;
@@ -34,7 +37,7 @@ class SearchResultsWithSuggestions {
 	 * @param $entityType
 	 */
 	public function __construct( $suggester, $params, $entityType ) {
-		$this->searchPattern = '/^' . preg_quote( $params->$search, '/' ) . '/i';
+		$this->searchPattern = '/^' . preg_quote( $params->search, '/' ) . '/i';
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
 
@@ -45,7 +48,7 @@ class SearchResultsWithSuggestions {
 
 		// merge with search result if possible and necessary
 		if ( $this->resultSize() < $params->internalResultListSize && $params->search !== '' ) {
-			$this->supplementEntries( $params->internalResultListSize, $params->search, $params->language, $entityType );
+			$this->supplementEntries( $params->internalResultListSize, $params->search, $params->language, $entityType, $params->request );
 		}
 
 		$this->searchResult = array_slice( $this->searchResult, $params->continue, $params->limit );
@@ -62,11 +65,11 @@ class SearchResultsWithSuggestions {
 	 * @return array
 	 */
 	public function &getResultDictionary() {
-		return $this->$searchResult;
+		return $this->searchResult;
 	}
 
 	/**
-	 * @param array $suggestions
+	 * @param Suggestion[] $suggestions
 	 * @param $language
 	 * @param string $entityType
 	 * @return array
@@ -80,10 +83,10 @@ class SearchResultsWithSuggestions {
 		$terms = $this->termIndex->getTermsOfEntities( $propertyIds, $entityType, $language );
 		$clusteredTerms = $this->clusterTerms( $terms );
 
-		$this->$searchResult = array();
+		$this->searchResult = array();
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getEntityId();
-			$this->$searchResult[] = $this->buildEntry( $id, $clusteredTerms, $suggestion );
+			$this->searchResult[] = $this->buildEntry( $id, $clusteredTerms, $suggestion );
 		}
 	}
 
@@ -151,16 +154,17 @@ class SearchResultsWithSuggestions {
 	 * @param $search
 	 * @param $language
 	 * @param $entityType
+	 * @param $baseRequest
 	 */
-	private function supplementEntries( $resultSize, $search, $language, $entityType ) {
+	private function supplementEntries( $resultSize, $search, $language, $entityType, $baseRequest ) {
 		if ( $entityType === 'property' ) {
 			$type = Property::ENTITY_TYPE;
 		} else {
-			$type = Item::ENITY_TYPE;
+			$type = Item::ENTITY_TYPE;
 		}
 
-		$searchEntitiesParameters = new DerivativeRequest(
-			$this->getRequest(),
+		$searchEntitiesParameters = new \DerivativeRequest(
+			$baseRequest,
 			array(
 				'limit' => $resultSize + 1,
 				'continue' => 0,
@@ -190,7 +194,7 @@ class SearchResultsWithSuggestions {
 			$existingKeys[$entry['id']] = true;
 		}
 
-		$distinctCount = $this->getSize();
+		$distinctCount = $this->resultSize();
 		foreach ( $searchApiResult as $result ) {
 			if ( !array_key_exists( $result['id'], $existingKeys ) ) {
 				$this->searchResult[] = $result;

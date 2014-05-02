@@ -2,25 +2,22 @@
 
 namespace PropertySuggester;
 
+use WebRequest;
+
 /**
  * Stores the suggester params
  */
 class Params {
 
 	/**
-	 * @var string|null
-	 */
-	public $entity;
-
-	/**
-	 * @var array
-	 */
-	public $properties;
-
-	/**
 	 * @var string
 	 */
 	public $search;
+
+	/**
+	 * @var WebRequest
+	 */
+	public $request;
 
 	/**
 	 * the maximum number of suggestions the suggester should return

@@ -32,9 +32,14 @@ class FilteredSuggestions {
 	private $filteredSuggestions;
 
 	public function __construct( EntitySuggester $suggester, Params $params ) {
-		$this->$entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
 		$this->filterSuggestions( $suggester->getSuggestions(), $params->search, $params->language, $params->internalResultListSize );
+	}
+
+	public function &getSuggestions()
+	{
+		return $this->filteredSuggestions;
 	}
 
 	/**
@@ -43,7 +48,7 @@ class FilteredSuggestions {
 	 * @param $language
 	 * @param $resultSize
 	 */
-	public function filterSuggestions( array $allSuggestions, $search, $language, $resultSize ) {
+	private function filterSuggestions( array $allSuggestions, $search, $language, $resultSize ) {
 		if ( !$search ) {
 			$this->filteredSuggestions = $allSuggestions;
 		}

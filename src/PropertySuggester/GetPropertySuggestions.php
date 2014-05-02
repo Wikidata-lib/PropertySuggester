@@ -4,8 +4,6 @@ namespace PropertySuggester;
 
 use ApiBase;
 use PropertySuggester\Suggester\PropertySuggester;
-use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\StoreFactory;
 use Wikibase\Utils;
 use InvalidArgumentException;
 
@@ -14,7 +12,7 @@ use InvalidArgumentException;
  *
  * @licence GNU GPL v2+
  */
-class GetPropertySuggestions extends ApiBase {
+class GetPropertySuggestions extends GetSuggestionsApiBase {
 
 	/**
 	 * @see ApiBase::execute()
@@ -23,14 +21,18 @@ class GetPropertySuggestions extends ApiBase {
 		global $wgPropertySuggesterDeprecatedIds;
 		global $wgPropertySuggesterMinProbability;
 
+		$requestParams = $this->extractRequestParams();
+		if ( !( $requestParams['entity'] XOR $requestParams['properties'] ) ) {
+			throw new InvalidArgumentException( 'provide either entity-id parameter \'entity\' or a list of properties \'properties\'' );
+		}
 		$paramsParser = new ParamsParser( 500, $wgPropertySuggesterMinProbability );
-		$params = $paramsParser->parseAndValidate( $this->extractRequestParams() );
+		$params = $paramsParser->parseAndValidate( $requestParams, $this->getRequest() );
 
-		$suggester = new PropertySuggester( wfGetLB( DB_SLAVE ), $params->entity, $params->minProbability );
+		$suggester = new PropertySuggester( wfGetLB( DB_SLAVE ), $params->internalResultListSize, $params->minProbability );
 		$suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
-		$suggester->setItem($this->getItemFromNumericId($params->entity));
+		$suggester->setItem( $this->getItemFromNumericId( $requestParams['entity'] ) );
 
-		$searchResult = new SearchResultsWithSuggestions( $suggester, $params, "property" );
+		$searchResult = new SearchResultWithSuggestions( $suggester, $params, "property" );
 
 		$this->buildResult( $searchResult, $params->internalResultListSize, $params->search );
 
@@ -69,43 +71,6 @@ class GetPropertySuggestions extends ApiBase {
 		$this->getResult()->addValue( 'searchinfo', 'search', $params->search )
 
 		*/
-	}
-
-	/**
-	 * @param $numericItemId
-	 * @return null|\Wikibase\Item
-	 * @throws InvalidArgumentException
-	 */
-	private function getItemFromNumericId($numericItemId)
-	{
-		$entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$id = new ItemId( $numericItemId );
-		$item = $entityLookup->getEntity( $id );
-		if( $item == null ){
-			throw new InvalidArgumentException( 'Item ' . $id . ' could not be found' );
-		}
-		return $item;
-	}
-
-	private function buildResult( SearchResultsWithSuggestions &$searchResult, $resultSize, $search ) {
-		$searchResultDictionary = $searchResult->getResultDictionary();
-
-		$this->setIndexedTags( $searchResultDictionary );
-		$apiResult = $this->getResult();
-		$apiResult->addValue( null, 'search', $searchResultDictionary );
-		if ( $searchResult->resultSize() >= $resultSize ) {
-			$apiResult->getResult()->addValue( null, 'search-continue', $resultSize );
-		}
-		$apiResult->addValue( null, 'success', 1 );
-		$apiResult->addValue( 'searchinfo', 'search', $search );
-	}
-
-
-	private function setIndexedTags( &$searchResultDictionary ) {
-		$this->getResult()->setIndexedTagName( $searchResultDictionary, 'search' );
-		foreach ( $searchResultDictionary as $entry ) {
-			$this->getResult()->setIndexedTagName( $entry['aliases'], 'alias' );
-		}
 	}
 
 

@@ -15,5 +15,5 @@ interface EntitySuggester {
 	/**
 	* @return Suggestion[]
 	*/
-	public function getSuggestions();
+	public function &getSuggestions();
 }

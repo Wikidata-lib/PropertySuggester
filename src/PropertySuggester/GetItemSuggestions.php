@@ -16,34 +16,26 @@ use Wikibase\Utils;
  *
  * @licence GNU GPL v2+
  */
-class GetItemSuggestions extends ApiBase {
+class GetItemSuggestions extends GetSuggestionsApiBase {
 
-	/**
-	 * @var EntityLookup
-	 */
-	private $lookup;
 
-	/**
-	 * @var ValueSuggesterEngine
-	 */
-	private $valueSuggester;
-
-	/**
-	 * @var TermIndex
-	 */
-	private $termIndex;
-
-	public function __construct( ApiMain $main, $name, $prefix = '' ) {
-		parent::__construct( $main, $name, $prefix );
-		$this->lookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
-		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
-		$this->valueSuggester = new ValueSuggester( wfGetLB( DB_SLAVE ) );
-	}
 
 	/**
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
+		global $wgPropertySuggesterMinProbability;
+
+		$paramsParser = new ParamsParser( 500, $wgPropertySuggesterMinProbability );
+		$paramsParser->parseAndValidate( $this->extractRequestParams() );
+
+		$suggester = new ItemSuggester( wfGetLB( DB_SLAVE ), $params->entity, $params->minProbability );
+		$suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
+		$suggester->setItem($this->getItemFromNumericId($params->entity));
+
+		$searchResult = new SearchResultsWithSuggestions( $suggester, $params, "property" );
+
+		$this->buildResult( $searchResult, $params->internalResultListSize, $params->search );
 	}
 
 

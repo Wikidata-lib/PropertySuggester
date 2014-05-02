@@ -30,8 +30,8 @@ global $wgMessagesDirs;
 $wgMessagesDirs['PropertySuggester'] = __DIR__ . '/i18n';
 
 global $wgAPIModules;
-$wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetSuggestions';
-$wgAPIModules['wbsgetvaluesuggestions'] = 'PropertySuggester\GetValueSuggestions';
+$wgAPIModules['wbsgetsuggestions'] = 'PropertySuggester\GetPropertySuggestions';
+$wgAPIModules['wbsgetvaluesuggestions'] = 'PropertySuggester\GetItemSuggestions';
 
 global $wgHooks;
 $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';

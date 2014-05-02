@@ -1,10 +1,11 @@
 <?php
 
-namespace PropertySuggester\ValueSuggester;
+namespace PropertySuggester\Suggester;
 
 use LoadBalancer;
 use PropertySuggester\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\Item;
 use ResultWrapper;
 
 /**
@@ -12,23 +13,52 @@ use ResultWrapper;
  * a Suggester implementation that creates suggestion via MySQL
  * Needs the wbs_propertypairs table filled with pair probabilities.
  */
-class ItemSuggester extends EntitySuggester {
+class ItemSuggester implements EntitySuggester {
 
+	/** @var array */
+	private $statements;
+
+	/** @var int */
+	private $numericPropertyId;
+
+	/** @var float */
+	private $minProbability;
 
 	/**
 	 * @param LoadBalancer $lb
 	 */
 	public function __construct( LoadBalancer $lb ) {
 		$this->lb = $lb;
+		$this->minProbability = 0.025;
+	}
+
+	public function setItem( Item $item )
+	{
+		$this->statements = arra();
+		$snaks = $item->getAllSnaks();
+		foreach($snaks as $snak)
+		{
+			if($snak->getType() === 'value')
+			{
+				$this->statements[] = "(" . $snak->getPropertyId() . "," . $snak->getDataValue() . ")";
+			}
+ 		}
+	}
+
+	public function setNumericPropertyId( $numericPropertyId )
+	{
+		$this->numericPropertyId = $numericPropertyId;
+	}
+
+	public function setMinProbability( $minProbability )
+	{
+		$this->minProbability = $minProbability;
 	}
 
 	/**
-	 * @param $statements
-	 * @param $propertyId
-	 * @param $minProbability
-	 * @return mixed|\PropertySuggester\Suggesters\Suggestion[]
+	 * @return \PropertySuggester\Suggestion[]
 	 */
-	protected function &getValueSuggestionsByStatements( &$statements, $propertyId,  $minProbability )
+	protected function &getSuggestions()
 	{
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
@@ -41,12 +71,12 @@ class ItemSuggester extends EntitySuggester {
 				"value" => "rules.s2ValueId",
 				"pr" => "( 1 - EXP(SUM(LOG(1- ( (rules.occurrences*1.0/property_value_occurrences.occurrences) / (property_property_occurrences.probability ) ))) ) ) "),
 			array( //WHERE
-				"rules.s2Id = $propertyId",
+				"rules.s2Id = $this->numericPropertyId",
 				"property_property_occurrences.pid1 = s1Id",
 				"property_property_occurrences.pid2 = s2Id",
 				"property_value_occurrences.propertyId = s1Id",
 				"property_value_occurrences.valueEntityId = s1ValueId",
-				"(s1Id, s1ValueId) IN (" . join(",", $statements) . ")"),
+				"(s1Id, s1ValueId) IN (" . join(",", $this->statements) . ")"),
 			__METHOD__,
 			array(
 				"GROUP BY" =>  "rules.s2Id, rules.s2ValueId",

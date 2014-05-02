@@ -2,7 +2,7 @@
 
 namespace PropertySuggester;
 
-use InvalidArgumentException;
+use WebRequest;
 
 /**
  * Parses the suggester parameters
@@ -33,18 +33,13 @@ class ParamsParser {
 	/**
 	 * parses and validates the parameters of GetSuggestion
 	 * @param array $params
-	 * @throws InvalidArgumentException
+	 * @param WebRequest $request
 	 * @return Params
 	 */
-	public function parseAndValidate( array $params ) {
+	public function parseAndValidate( array $params, WebRequest $request ) {
 		$result = new Params();
 
-		$result->entity = $params['entity'];
-		$result->properties = $params['properties'];
-
-		if ( !( $result->entity XOR $result->properties ) ) {
-			throw new InvalidArgumentException( 'provide either entity-id parameter \'entity\' or a list of properties \'properties\'' );
-		}
+		$result->request = $request;
 
 		// The entityselector doesn't allow a search for '' so '*' gets mapped to ''
 		if ( $params['search'] !== '*' ) {
@@ -55,7 +50,7 @@ class ParamsParser {
 
 		$result->limit = $params['limit'];
 		$result->continue = $params['continue'];
-		$result->$internalResultListSize = $result->limit + $result->continue;
+		$result->internalResultListSize = $result->limit + $result->continue;
 		$result->language = $params['language'];
 
 		if ( $result->search ) {
@@ -65,7 +60,7 @@ class ParamsParser {
 			$result->suggesterLimit = $this->defaultSuggestionSearchLimit;
 			$result->minProbability = 0.0;
 		} else {
-			$result->suggesterLimit = $result->$internalResultListSize;
+			$result->suggesterLimit = $result->internalResultListSize;
 			$result->minProbability = $this->defaultMinProbability;
 		}
 
