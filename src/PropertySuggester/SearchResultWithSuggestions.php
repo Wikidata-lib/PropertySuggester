@@ -127,7 +127,7 @@ class SearchResultWithSuggestions {
 		$clusteredTerms = array();
 
 		foreach ( $terms as $term ) {
-			$id = $term->getEntityId();
+			$id = $term->getEntityId()->getSerialization();
 			if ( !isset( $clusteredTerms[$id] ) ) {
 				$clusteredTerms[$id] = array();
 			}
