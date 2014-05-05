@@ -7,8 +7,8 @@ use LoadBalancer;
 use PropertySuggester\UpdateTable\Importer\BasicImporter;
 use PropertySuggester\UpdateTable\Importer\Importer;
 use PropertySuggester\UpdateTable\Importer\MySQLImporter;
-use PropertySuggester\UpdateTable\Importer\PostgresImporter;
 use PropertySuggester\UpdateTable\ImportContext;
+use UnexpectedValueException;
 
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
@@ -60,7 +60,13 @@ class UpdateTable extends Maintenance {
 
 		$importContext = $this->createImportContext( $lb, $tableName, $fullPath );
 		$insertionStrategy = $this->createImportStrategy( $useInsert );
-		$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
+
+		try {
+			$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
+		} catch (UnexpectedValueException $e) {
+			$this->error( "Import failed: " . $e->getMessage() );
+			exit;
+		}
 
 		if ( !$success ) {
 			$this->error( "Failed to run import to db" );
@@ -78,8 +84,6 @@ class UpdateTable extends Maintenance {
 		global $wgDBtype;
 		if ( $wgDBtype === 'mysql' and !$useInsert ) {
 			return new MySQLImporter();
-		} elseif ( $wgDBtype === 'postgres' and !$useInsert ) {
-			return new PostgresImporter();
 		} else {
 			return new BasicImporter();
 		}
