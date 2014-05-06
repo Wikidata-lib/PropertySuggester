@@ -19,12 +19,10 @@ class Suggestion {
 	/**
 	 * @param EntityId $entityId
 	 * @param $probability
-	 * @param string $type
 	 */
-	function __construct( EntityId $entityId, $probability, $type = "property" ) {
+	function __construct( EntityId $entityId, $probability ) {
 		$this->entityId = $entityId;
 		$this->probability = $probability;
-		$this->type = $type;
 	}
 
 	/**
@@ -40,13 +38,4 @@ class Suggestion {
 	public function getProbability() {
 		return $this->probability;
 	}
-
-	/**
-	 * returns the type of suggestion
-	 * @return string
-	 */
-	public function getType() {
-		return "property";
-	}
-
 }

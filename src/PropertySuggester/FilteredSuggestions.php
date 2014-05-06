@@ -3,6 +3,7 @@
 namespace PropertySuggester;
 
 use PropertySuggester\Suggester\EntitySuggester;
+use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
@@ -31,9 +32,15 @@ class FilteredSuggestions {
 	/** @var Suggestion[] */
 	private $filteredSuggestions;
 
-	public function __construct( EntitySuggester $suggester, Params $params ) {
+	/**
+	 * @param EntitySuggester $suggester
+	 * @param Params $params
+	 * @param string $entityType
+	 */
+	public function __construct( EntitySuggester $suggester, Params $params, $entityType ) {
 		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
+		$this->entityType = $entityType;
 		$this->filterSuggestions( $suggester->getSuggestions(), $params->search, $params->language, $params->internalResultListSize );
 	}
 
@@ -52,20 +59,23 @@ class FilteredSuggestions {
 		if ( !$search ) {
 			$this->filteredSuggestions = $allSuggestions;
 		}
-		$ids = $this->getMatchingIDs( $search, $language );
+		else
+		{
+			$ids = $this->getMatchingIDs( $search, $language );
 
-		$id_set = array();
-		foreach ( $ids as $id ) {
-			$id_set[$id->getSerialization()] = true;
-		}
+			$id_set = array();
+			foreach ( $ids as $id ) {
+				$id_set[$id->getSerialization()] = true;
+			}
 
-		$this->filteredSuggestions = array();
-		$count = 0;
-		foreach ( $allSuggestions as $suggestion ) {
-			if ( array_key_exists( $suggestion->getEntityId()->getSerialization(), $id_set ) ) {
-				$this->filteredSuggestions[] = $suggestion;
-				if ( ++$count == $resultSize ) {
-					break;
+			$this->filteredSuggestions = array();
+			$count = 0;
+			foreach ( $allSuggestions as $suggestion ) {
+				if ( array_key_exists( $suggestion->getEntityId()->getSerialization(), $id_set ) ) {
+					$this->filteredSuggestions[] = $suggestion;
+					if ( ++$count == $resultSize ) {
+						break;
+					}
 				}
 			}
 		}
@@ -90,7 +100,7 @@ class FilteredSuggestions {
 					'termText' => $search
 				) )
 			),
-			Property::ENTITY_TYPE,
+			$this->entityType,
 			array(
 				'caseSensitive' => false,
 				'prefixSearch' => true,

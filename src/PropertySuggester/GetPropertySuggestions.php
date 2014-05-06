@@ -4,6 +4,7 @@ namespace PropertySuggester;
 
 use ApiBase;
 use PropertySuggester\Suggester\PropertySuggester;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\Utils;
 use InvalidArgumentException;
 
@@ -30,47 +31,11 @@ class GetPropertySuggestions extends GetSuggestionsApiBase {
 
 		$suggester = new PropertySuggester( wfGetLB( DB_SLAVE ), $params->internalResultListSize, $params->minProbability );
 		$suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
-		$suggester->setItem( $this->getItemFromNumericId( $requestParams['entity'] ) );
+		$suggester->setItem( $this->getItemFromId( $requestParams['entity'] ) );
 
-		$searchResult = new SearchResultWithSuggestions( $suggester, $params, "property" );
+		$searchResult = new SearchResultWithSuggestions( $suggester, $params, Property::ENTITY_TYPE );
 
 		$this->buildResult( $searchResult, $params->internalResultListSize, $params->search );
-
-
-		//old method code ->
-		/*
-
-		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
-
-		if ( $params->entity !== null ) {
-			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params->entity, $params->suggesterLimit, $params->minProbability );
-		} else {
-			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params->properties, $params->suggesterLimit, $params->minProbability );
-		}
-		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
-
-		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $params->search );
-		$entries = $resultBuilder->createJSON( $suggestions, $params->language, $params->search );
-
-		// merge with search result if possible and necessary
-		if ( count( $entries ) < $params->resultSize && $params->search !== '' ) {
-			$searchResult = $this->querySearchApi( $params->resultSize, $params->search, $params->language );
-			$entries = $resultBuilder->mergeWithTraditionalSearchResults( $entries, $searchResult, $params->resultSize );
-		}
-
-		// Define Result
-		$slicedEntries = array_slice( $entries, $params->continue, $params->limit );
-		$this->getResult()->setIndexedTagName( $slicedEntries, 'search' );
-		$this->getResult()->addValue( null, 'search', $slicedEntries );
-
-		$this->getResult()->addValue( null, 'success', 1 );
-		if ( count( $entries ) >= $params->resultSize ) {
-			$this->getResult()->addValue( null, 'search-continue', $params->resultSize );
-		};
-		$this->getResult()->addValue( 'searchinfo', 'search', $params->search )
-
-		*/
 	}
 
 

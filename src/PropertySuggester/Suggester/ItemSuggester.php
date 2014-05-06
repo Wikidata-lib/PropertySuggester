@@ -32,59 +32,57 @@ class ItemSuggester implements EntitySuggester {
 		$this->minProbability = 0.025;
 	}
 
-	public function setItem( Item $item )
-	{
-		$this->statements = arra();
+	public function setItem( Item $item ) {
+		$this->statements = array();
 		$snaks = $item->getAllSnaks();
-		foreach($snaks as $snak)
-		{
-			if($snak->getType() === 'value')
-			{
-				$this->statements[] = "(" . $snak->getPropertyId() . "," . $snak->getDataValue() . ")";
+		foreach ( $snaks as $snak ) {
+			if ( $snak->getType() === 'value' ) {
+				$propertyId = (string)$snak->getPropertyId()->getNumericId();
+				if ( $snak->getDataValue()->getType() == 'wikibase-entityid' ) {
+					$valueItemId = substr( $snak->getDataValue()->getEntityId()->getSerialization(), 1 );
+					$this->statements[] = "($propertyId,$valueItemId)";
+				}
 			}
- 		}
+		}
 	}
 
-	public function setNumericPropertyId( $numericPropertyId )
-	{
+	public function setNumericPropertyId( $numericPropertyId ) {
 		$this->numericPropertyId = $numericPropertyId;
 	}
 
-	public function setMinProbability( $minProbability )
-	{
+	public function setMinProbability( $minProbability ) {
 		$this->minProbability = $minProbability;
 	}
 
 	/**
 	 * @return \PropertySuggester\Suggestion[]
 	 */
-	protected function &getSuggestions()
-	{
+	public function &getSuggestions() {
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
 			array( //FROM
 				"vs_statement_pair_occurrences as rules",
 				"vs_statement_occurrences as property_value_occurrences",
-				"wbs_propertypairs as property_property_occurrences"),
+				"wbs_propertypairs as property_property_occurrences" ),
 			array( //SELECT
 				"propertyId" => "rules.s2Id",
 				"value" => "rules.s2ValueId",
-				"pr" => "( 1 - EXP(SUM(LOG(1- ( (rules.occurrences*1.0/property_value_occurrences.occurrences) / (property_property_occurrences.probability ) ))) ) ) "),
+				"pr" => "( 1 - EXP(SUM(LOG(1- ( (rules.occurrences*1.0/property_value_occurrences.occurrences) / (property_property_occurrences.probability ) ))) ) ) " ),
 			array( //WHERE
 				"rules.s2Id = $this->numericPropertyId",
 				"property_property_occurrences.pid1 = s1Id",
 				"property_property_occurrences.pid2 = s2Id",
 				"property_value_occurrences.propertyId = s1Id",
 				"property_value_occurrences.valueEntityId = s1ValueId",
-				"(s1Id, s1ValueId) IN (" . join(",", $this->statements) . ")"),
+				"(s1Id, s1ValueId) IN (" . join( ",", $this->statements ) . ")" ),
 			__METHOD__,
 			array(
-				"GROUP BY" =>  "rules.s2Id, rules.s2ValueId",
-				"HAVING" => "pr > $minProbability",
-				"ORDER BY" => "pr DESC"));
-		$this->lb->reuseConnection($dbr);
+				"GROUP BY" => "rules.s2Id, rules.s2ValueId",
+				"HAVING" => "pr > $this->minProbability",
+				"ORDER BY" => "pr DESC" ) );
+		$this->lb->reuseConnection( $dbr );
 
-		return $this->buildResult($res);
+		return $this->buildResult( $res );
 	}
 
 	/**
@@ -94,8 +92,8 @@ class ItemSuggester implements EntitySuggester {
 	protected function &buildResult( ResultWrapper &$res ) {
 		$resultArray = array();
 		foreach ( $res as $row ) {
-			$valueId = ItemId::newFromNumber( (int) $row->value);
-			$suggestion = new Suggestion($valueId, $row->pr);
+			$valueId = ItemId::newFromNumber( (int)$row->value );
+			$suggestion = new Suggestion( $valueId, $row->pr );
 			$resultArray[] = $suggestion;
 		}
 		return $resultArray;

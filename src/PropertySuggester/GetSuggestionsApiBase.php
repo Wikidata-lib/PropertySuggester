@@ -19,7 +19,7 @@ abstract class GetSuggestionsApiBase extends ApiBase {
 	 * @return null|\Wikibase\Item
 	 * @throws InvalidArgumentException
 	 */
-	protected function getItemFromNumericId($numericItemId)
+	protected function getItemFromId($numericItemId)
 	{
 		$entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$id = new ItemId( $numericItemId );

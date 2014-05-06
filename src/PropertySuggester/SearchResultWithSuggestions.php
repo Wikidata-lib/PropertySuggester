@@ -41,7 +41,7 @@ class SearchResultWithSuggestions {
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 		$this->termIndex = StoreFactory::getStore()->getTermIndex();
 
-		$filteredSuggestions = new FilteredSuggestions( $suggester, $params );
+		$filteredSuggestions = new FilteredSuggestions( $suggester, $params, $entityType );
 		$suggestions = $filteredSuggestions->getSuggestions();
 
 		$this->buildEntries( $suggestions, $params->language, $entityType );
@@ -157,12 +157,6 @@ class SearchResultWithSuggestions {
 	 * @param $baseRequest
 	 */
 	private function supplementEntries( $resultSize, $search, $language, $entityType, $baseRequest ) {
-		if ( $entityType === 'property' ) {
-			$type = Property::ENTITY_TYPE;
-		} else {
-			$type = Item::ENTITY_TYPE;
-		}
-
 		$searchEntitiesParameters = new \DerivativeRequest(
 			$baseRequest,
 			array(
@@ -171,7 +165,7 @@ class SearchResultWithSuggestions {
 				'search' => $search,
 				'action' => 'wbsearchentities',
 				'language' => $language,
-				'type' => $type
+				'type' => $entityType
 			)
 		);
 

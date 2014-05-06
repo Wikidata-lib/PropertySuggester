@@ -4,8 +4,11 @@ namespace PropertySuggester;
 
 use ApiBase;
 use ApiMain;
+use PropertySuggester\Suggester\ItemSuggester;
 use PropertySuggester\ValueSuggesters\ValueSuggester;
 use PropertySuggester\ValueSuggesters\ValueSuggesterEngine;
+use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityLookup;
 use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
@@ -19,25 +22,25 @@ use Wikibase\Utils;
 class GetItemSuggestions extends GetSuggestionsApiBase {
 
 
-
 	/**
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
 		global $wgPropertySuggesterMinProbability;
 
+		$requestParams = $this->extractRequestParams();
 		$paramsParser = new ParamsParser( 500, $wgPropertySuggesterMinProbability );
-		$paramsParser->parseAndValidate( $this->extractRequestParams() );
+		$params = $paramsParser->parseAndValidate( $requestParams, $this->getRequest() );
 
-		$suggester = new ItemSuggester( wfGetLB( DB_SLAVE ), $params->entity, $params->minProbability );
-		$suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
-		$suggester->setItem($this->getItemFromNumericId($params->entity));
+		$suggester = new ItemSuggester( wfGetLB( DB_SLAVE ) );
+		$suggester->setItem( $this->getItemFromId( $requestParams['item'] ) );
+		$suggester->setNumericPropertyId( substr($requestParams['property'],1) );
+		$suggester->setMinProbability( $requestParams['threshold'] );
 
-		$searchResult = new SearchResultsWithSuggestions( $suggester, $params, "property" );
+		$searchResult = new SearchResultWithSuggestions( $suggester, $params, Item::ENTITY_TYPE );
 
 		$this->buildResult( $searchResult, $params->internalResultListSize, $params->search );
 	}
-
 
 
 	/**
@@ -46,20 +49,40 @@ class GetItemSuggestions extends GetSuggestionsApiBase {
 	public function getAllowedParams() {
 		return array(
 			'item' => array(
-				ApiBase::PARAM_TYPE => 'integer',
+				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_REQUIRED => true
 			),
 			'property' => array(
-				ApiBase::PARAM_TYPE => 'integer',
+				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_REQUIRED => true
 			),
 			'threshold' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_REQUIRED => true
 			),
+			'limit' => array(
+				ApiBase::PARAM_TYPE => 'limit',
+				ApiBase::PARAM_DFLT => 7,
+				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
+				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_RANGE_ENFORCE => true,
+			),
+			'continue' => array(
+				ApiBase::PARAM_TYPE => 'limit',
+				ApiBase::PARAM_DFLT => 0,
+				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
+				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
+				ApiBase::PARAM_MIN => 0,
+				ApiBase::PARAM_RANGE_ENFORCE => true,
+			),
 			'language' => array(
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
+			),
+			'search' => array(
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_DFLT => '',
 			)
 		);
 	}
