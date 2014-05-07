@@ -56,7 +56,7 @@ class GetSuggestions extends ApiBase {
 		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 
-		$this->suggester = new SimpleSuggester( wfGetLB( DB_SLAVE ) );
+		$this->suggester = new SimpleSuggester( wfGetLB() );
 
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 

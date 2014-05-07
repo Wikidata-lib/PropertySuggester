@@ -27,7 +27,6 @@ class UpdateTable extends Maintenance {
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
 		$this->addOption( 'use-insert', 'Avoid DBS specific import. Use INSERTs.', false, false );
-		$this->addOption( 'silent', 'Do not show information', false, false );
 	}
 
 	/**
@@ -46,17 +45,14 @@ class UpdateTable extends Maintenance {
 		}
 
 		$useInsert = $this->getOption( 'use-insert' );
-		$showInfo = !$this->getOption( 'silent' );
 		$tableName = 'wbs_propertypairs';
 
 		wfWaitForSlaves( 5 );
-		$lb = wfGetLB( DB_MASTER );
+		$lb = wfGetLB();
 
-		$this->clearTable( $lb, $tableName, $showInfo );
+		$this->clearTable( $lb, $tableName );
 
-		if ( $showInfo ) {
-			$this->output( "loading new entries from file\n" );
-		}
+		$this->output( "loading new entries from file\n" );
 
 		$importContext = $this->createImportContext( $lb, $tableName, $fullPath );
 		$insertionStrategy = $this->createImportStrategy( $useInsert );
@@ -71,9 +67,7 @@ class UpdateTable extends Maintenance {
 		if ( !$success ) {
 			$this->error( "Failed to run import to db" );
 		}
-		if ( $showInfo ) {
-			$this->output( "... Done loading\n" );
-		}
+		$this->output( "... Done loading\n" );
 	}
 
 	/**
@@ -107,14 +101,11 @@ class UpdateTable extends Maintenance {
 	/**
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
-	 * @param boolean $showInfo
 	 */
-	private function clearTable( LoadBalancer $lb, $tableName, $showInfo ) {
+	private function clearTable( LoadBalancer $lb, $tableName ) {
 		$db = $lb->getConnection( DB_MASTER );
 		if ( $db->tableExists( $tableName ) ) {
-			if ( $showInfo ) {
-				$this->output( "removing old entries\n" );
-			}
+			$this->output( "removing old entries\n" );
 			$db->delete( $tableName, '*' );
 		} else {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
