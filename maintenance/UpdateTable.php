@@ -47,7 +47,7 @@ class UpdateTable extends Maintenance {
 		$useInsert = $this->getOption( 'use-insert' );
 		$tableName = 'wbs_propertypairs';
 
-		wfWaitForSlaves( 5 );
+		wfWaitForSlaves();
 		$lb = wfGetLB();
 
 		$this->clearTable( $lb, $tableName );

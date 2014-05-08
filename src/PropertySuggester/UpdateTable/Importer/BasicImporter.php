@@ -54,6 +54,7 @@ class BasicImporter implements Importer {
 			$data = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() );
 
 			if ( $data == false || ++$i > 1000 ) {
+				wfWaitForSlaves();
 				$db->insert( $importContext->getTargetTableName(), $accumulator );
 				if ( $data ) {
 					$accumulator = array();
