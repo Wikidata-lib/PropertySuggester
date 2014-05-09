@@ -56,7 +56,7 @@ class UpdateTable extends Maintenance {
 
 		$this->output( "loading new entries from file\n" );
 
-		$importContext = $this->createImportContext( $lb, $tableName, $fullPath );
+		$importContext = $this->createImportContext( $lb, $tableName, $fullPath, $this->isQuiet() );
 		$insertionStrategy = $this->createImportStrategy( $useInsert );
 
 		try {
@@ -91,13 +91,14 @@ class UpdateTable extends Maintenance {
 	 * @param string $wholePath
 	 * @return ImportContext
 	 */
-	function createImportContext( LoadBalancer $lb, $tableName, $wholePath ) {
+	function createImportContext( LoadBalancer $lb, $tableName, $wholePath, $quiet ) {
 		$importContext = new ImportContext();
 		$importContext->setLb( $lb );
 		$importContext->setTargetTableName( $tableName );
 		$importContext->setCsvFilePath( $wholePath );
 		$importContext->setCsvDelimiter( ',' );
 		$importContext->setBatchSize( $this->mBatchSize );
+		$importContext->setQuiet( $quiet );
 
 		return $importContext;
 	}
