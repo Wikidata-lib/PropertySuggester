@@ -27,6 +27,8 @@ class UpdateTable extends Maintenance {
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
 		$this->addOption( 'use-insert', 'Avoid DBS specific import. Use INSERTs.', false, false );
+		$this->addOption( 'batch-size', 'Number of rows to insert in one query.', false, true );
+		$this->setBatchSize( 1000 );
 	}
 
 	/**
@@ -95,6 +97,8 @@ class UpdateTable extends Maintenance {
 		$importContext->setTargetTableName( $tableName );
 		$importContext->setCsvFilePath( $wholePath );
 		$importContext->setCsvDelimiter( ',' );
+		$importContext->setBatchSize( $this->mBatchSize );
+
 		return $importContext;
 	}
 

@@ -44,6 +44,7 @@ class BasicImporter implements Importer {
 	 */
 	private function doImport( $fileHandle, DatabaseBase $db, ImportContext $importContext ) {
 		$accumulator = array();
+		$batchSize = $importContext->getBatchSize();
 		$i = 0;
 		$header = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() ); //this is to get the csv-header
 		$expectedHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
@@ -53,18 +54,17 @@ class BasicImporter implements Importer {
 		while ( true ) {
 			$data = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() );
 
-			if ( $data == false || ++$i > 1000 ) {
+			if ( $data == false || ++$i % $batchSize == 0 ) {
+				$db->commit( __METHOD__, 'flush' );
 				wfWaitForSlaves();
 				$db->insert( $importContext->getTargetTableName(), $accumulator );
-				if ( $data ) {
-					$accumulator = array();
-					$i = 0;
-				} else {
+				$accumulator = array();
+				if ( $data == false ) {
 					break;
 				}
 			}
 
-			$qid1 = is_numeric($data[1]) ? $data[1] : null;
+			$qid1 = is_numeric( $data[1] ) ? $data[1] : null;
 
 			$accumulator[] = array( 'pid1' => $data[0], 'qid1' => $qid1, 'pid2' => $data[2], 'count' => $data[3],
 									'probability' => $data[4], 'context' => $data[5] );

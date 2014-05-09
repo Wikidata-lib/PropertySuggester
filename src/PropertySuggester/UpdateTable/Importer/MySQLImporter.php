@@ -26,7 +26,7 @@ class MySQLImporter implements Importer {
 		$delimiter = $db->addQuotes( $importContext->getCsvDelimiter() );
 
 		$db->query("
-				LOAD DATA INFILE $fullPath
+				LOAD DATA LOCAL INFILE $fullPath
 				INTO TABLE $dbTableName
 				FIELDS
 					TERMINATED BY $delimiter
