@@ -1,6 +1,6 @@
 
 CREATE TABLE IF NOT EXISTS /*_*/wbs_propertypairs (
-  row_id            INT unsigned    NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  row_id            BIGINT unsigned    NOT NULL PRIMARY KEY AUTO_INCREMENT,
   pid1              INT unsigned    NOT NULL,
   qid1              INT unsigned    NULL,
   pid2              INT unsigned    NOT NULL,

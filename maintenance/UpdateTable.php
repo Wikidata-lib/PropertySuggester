@@ -57,10 +57,10 @@ class UpdateTable extends Maintenance {
 		$this->output( "loading new entries from file\n" );
 
 		$importContext = $this->createImportContext( $lb, $tableName, $fullPath, $this->isQuiet() );
-		$insertionStrategy = $this->createImportStrategy( $useInsert );
+		$importStrategy = $this->createImportStrategy( $useInsert );
 
 		try {
-			$success = $insertionStrategy->importFromCsvFileToDb( $importContext );
+			$success = $importStrategy->importFromCsvFileToDb( $importContext );
 		} catch (UnexpectedValueException $e) {
 			$this->error( "Import failed: " . $e->getMessage() );
 			exit;
