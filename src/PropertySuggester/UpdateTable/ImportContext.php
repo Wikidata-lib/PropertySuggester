@@ -40,6 +40,11 @@ class ImportContext {
 	private $batchSize;
 
 	/**
+	 * @var boolean
+	 */
+	private $quiet;
+
+	/**
 	 * @return string
 	 */
 	public function getCsvDelimiter() {
@@ -108,6 +113,20 @@ class ImportContext {
 	 */
 	public function setBatchSize( $batchSize ) {
 		$this->batchSize = $batchSize;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isQuiet() {
+		return $this->quiet;
+	}
+
+	/**
+	 * @param boolean $quiet
+	 */
+	public function setQuiet( $quiet ) {
+		$this->quiet = $quiet;
 	}
 
 }

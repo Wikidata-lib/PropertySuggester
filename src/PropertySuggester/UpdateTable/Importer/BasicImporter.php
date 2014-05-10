@@ -58,6 +58,9 @@ class BasicImporter implements Importer {
 				$db->commit( __METHOD__, 'flush' );
 				wfWaitForSlaves();
 				$db->insert( $importContext->getTargetTableName(), $accumulator );
+				if ( ! $importContext->isQuiet() ) {
+					print "$i rows inserted";
+				}
 				$accumulator = array();
 				if ( $data == false ) {
 					break;
