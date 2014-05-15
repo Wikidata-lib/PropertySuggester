@@ -59,7 +59,7 @@ class BasicImporter implements Importer {
 				wfWaitForSlaves();
 				$db->insert( $importContext->getTargetTableName(), $accumulator );
 				if ( ! $importContext->isQuiet() ) {
-					print "$i rows inserted";
+					print "$i rows inserted\n";
 				}
 				$accumulator = array();
 				if ( $data == false ) {
