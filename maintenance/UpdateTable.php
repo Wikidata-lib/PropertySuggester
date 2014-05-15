@@ -47,11 +47,12 @@ class UpdateTable extends Maintenance {
 
 		$useInsert = $this->getOption( 'use-insert' );
 		$tableName = 'wbs_propertypairs';
+		$primaryKey = 'row_id';
 
 		wfWaitForSlaves();
 		$lb = wfGetLB();
 
-		$this->clearTable( $lb, $tableName );
+		$this->clearTable( $lb, $tableName, $primaryKey );
 
 		$this->output( "loading new entries from file\n" );
 
@@ -107,7 +108,7 @@ class UpdateTable extends Maintenance {
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
 	 */
-	private function clearTable( LoadBalancer $lb, $tableName ) {
+	private function clearTable( LoadBalancer $lb, $tableName, $primaryKey ) {
 		$db = $lb->getConnection( DB_MASTER );
 		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
@@ -117,7 +118,16 @@ class UpdateTable extends Maintenance {
 		while ( 1 ) {
 			$db->commit( __METHOD__, 'flush' );
 			wfWaitForSlaves();
-			$q = $db->limitResult( "DELETE FROM $tableName", $this->mBatchSize );
+
+			$condition = $db->selectSqlText(
+				$tableName,
+				array( $primaryKey ),
+				array(),
+				__METHOD__,
+				array( 'LIMIT' => $this->mBatchSize	)
+			);
+
+			$q = $db->delete( $tableName, " $primaryKey. in ( " . $condition . " )" );
 			$this->output( "Deleting a batch\n" );
 			$db->query( $q );
 			if ( !$db->affectedRows() ) {
