@@ -27,7 +27,6 @@ class UpdateTable extends Maintenance {
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
 		$this->addOption( 'use-insert', 'Avoid DBS specific import. Use INSERTs.', false, false );
-		$this->addOption( 'batch-size', 'Number of rows to insert in one query.', false, true );
 		$this->setBatchSize( 1000 );
 	}
 
@@ -89,6 +88,7 @@ class UpdateTable extends Maintenance {
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
 	 * @param string $wholePath
+	 * @param bool $quiet
 	 * @return ImportContext
 	 */
 	function createImportContext( LoadBalancer $lb, $tableName, $wholePath, $quiet ) {
@@ -109,11 +109,20 @@ class UpdateTable extends Maintenance {
 	 */
 	private function clearTable( LoadBalancer $lb, $tableName ) {
 		$db = $lb->getConnection( DB_MASTER );
-		if ( $db->tableExists( $tableName ) ) {
-			$this->output( "removing old entries\n" );
-			$db->delete( $tableName, '*' );
-		} else {
+		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
+		}
+
+		$this->output( "removing old entries\n" );
+		while ( 1 ) {
+			$db->commit( __METHOD__, 'flush' );
+			wfWaitForSlaves();
+			$q = $db->limitResult( "DELETE FROM $tableName", $this->mBatchSize );
+			$this->output( "Deleting a batch\n" );
+			$db->query( $q );
+			if ( !$db->affectedRows() ) {
+				break;
+			}
 		}
 		$lb->reuseConnection( $db );
 	}
