@@ -129,7 +129,7 @@ class UpdateTable extends Maintenance {
 			if( $idChunk->numRows() == 0 ) {
 				break;
 			}
-			$ids = [];
+			$ids = array();
 			foreach ( $idChunk as $row ) {
 				$ids[] = ( int ) $row->$primaryKey;
 			}
