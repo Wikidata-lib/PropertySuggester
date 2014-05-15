@@ -107,6 +107,7 @@ class UpdateTable extends Maintenance {
 	/**
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
+	 * @param string $primaryKey
 	 */
 	private function clearTable( LoadBalancer $lb, $tableName, $primaryKey ) {
 		$db = $lb->getConnection( DB_MASTER );
@@ -125,14 +126,14 @@ class UpdateTable extends Maintenance {
 				__METHOD__,
 				array( 'LIMIT' => $this->mBatchSize )
 			);
-			if($idChunk->numRows() == 0) {
+			if( $idChunk->numRows() == 0 ) {
 				break;
 			}
 			$ids = [];
 			foreach ( $idChunk as $row ) {
-				$ids[] = ( int ) $row->row_id;
+				$ids[] = ( int ) $row->$primaryKey;
 			}
-			$db->delete( $tableName, $primaryKey . ' in (' . $db->makeList( $ids ) . ')');
+			$db->delete( $tableName, $primaryKey . ' in (' . $db->makeList( $ids ) . ')' );
 			$this->output( "Deleting a batch\n" );
 		}
 		$lb->reuseConnection( $db );
