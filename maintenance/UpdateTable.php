@@ -47,11 +47,12 @@ class UpdateTable extends Maintenance {
 
 		$useInsert = $this->getOption( 'use-insert' );
 		$tableName = 'wbs_propertypairs';
+		$primaryKey = 'row_id';
 
 		wfWaitForSlaves();
 		$lb = wfGetLB();
 
-		$this->clearTable( $lb, $tableName );
+		$this->clearTable( $lb, $tableName, $primaryKey );
 
 		$this->output( "loading new entries from file\n" );
 
@@ -106,27 +107,37 @@ class UpdateTable extends Maintenance {
 	/**
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
+	 * @param string $primaryKey
 	 */
-	private function clearTable( LoadBalancer $lb, $tableName ) {
+	private function clearTable( LoadBalancer $lb, $tableName, $primaryKey ) {
 		$db = $lb->getConnection( DB_MASTER );
 		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
-
 		$this->output( "removing old entries\n" );
 		while ( 1 ) {
 			$db->commit( __METHOD__, 'flush' );
 			wfWaitForSlaves();
-			$q = $db->limitResult( "DELETE FROM $tableName", $this->mBatchSize );
-			$this->output( "Deleting a batch\n" );
-			$db->query( $q );
-			if ( !$db->affectedRows() ) {
+
+			$idChunk = $db->select(
+				$tableName,
+				array( $primaryKey ),
+				array(),
+				__METHOD__,
+				array( 'LIMIT' => $this->mBatchSize )
+			);
+			if( $idChunk->numRows() == 0 ) {
 				break;
 			}
+			$ids = array();
+			foreach ( $idChunk as $row ) {
+				$ids[] = ( int ) $row->$primaryKey;
+			}
+			$db->delete( $tableName, array( $primaryKey => $ids ) );
+			$this->output( "Deleting a batch\n" );
 		}
 		$lb->reuseConnection( $db );
 	}
-
 }
 
 $maintClass = 'PropertySuggester\Maintenance\UpdateTable';
