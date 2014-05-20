@@ -133,7 +133,7 @@ class UpdateTable extends Maintenance {
 			foreach ( $idChunk as $row ) {
 				$ids[] = ( int ) $row->$primaryKey;
 			}
-			$db->delete( $tableName, $primaryKey . ' in (' . $db->makeList( $ids ) . ')' );
+			$db->delete( $tableName, array( $primaryKey => $ids ) );
 			$this->output( "Deleting a batch\n" );
 		}
 		$lb->reuseConnection( $db );
