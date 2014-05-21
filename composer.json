@@ -1,5 +1,5 @@
 {
-	"name": "propertysuggester/propertysuggester",
+	"name": "propertysuggester/property-suggester",
 	"type": "mediawiki-extension",
 	"description": "Extension for Wikibase to provide usefull suggestions for new properties",
 	"keywords": ["propertysuggester", "wikibase", "wikidata"],
