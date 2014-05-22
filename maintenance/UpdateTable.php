@@ -116,7 +116,7 @@ class UpdateTable extends Maintenance {
 		}
 		$this->output( "removing old entries\n" );
 		if ( $wgDBtype === 'sqlite' ) {
-			$db->query( "TRUNCATE $tableName" );
+			$db->delete( $tableName, "*" );
 		} else {
 			while ( 1 ) {
 				$db->commit( __METHOD__, 'flush' );
