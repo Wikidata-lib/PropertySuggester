@@ -108,20 +108,24 @@ class UpdateTable extends Maintenance {
 	 * @param string $tableName
 	 */
 	private function clearTable( LoadBalancer $lb, $tableName ) {
+		global $wgDBtype;
 		$db = $lb->getConnection( DB_MASTER );
+		$tableName = $db->tableName($tableName);
 		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
-
 		$this->output( "removing old entries\n" );
-		while ( 1 ) {
-			$db->commit( __METHOD__, 'flush' );
-			wfWaitForSlaves();
-
-			$this->output( "Deleting a batch\n" );
-			$db->query( "DELETE FROM $tableName LIMIT $this->mBatchSize" );
-			if ( !$db->affectedRows() ) {
-				break;
+		if ( $wgDBtype === 'sqlite' ) {
+			$db->query( "TRUNCATE $tableName" );
+		} else {
+			while ( 1 ) {
+				$db->commit( __METHOD__, 'flush' );
+				wfWaitForSlaves();
+				$this->output( "Deleting a batch\n" );
+				$db->query( "DELETE FROM $tableName LIMIT $this->mBatchSize" );
+				if ( !$db->affectedRows() ) {
+					break;
+				}
 			}
 		}
 		$lb->reuseConnection( $db );
