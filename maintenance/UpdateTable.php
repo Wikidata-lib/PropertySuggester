@@ -110,7 +110,6 @@ class UpdateTable extends Maintenance {
 	private function clearTable( LoadBalancer $lb, $tableName ) {
 		global $wgDBtype;
 		$db = $lb->getConnection( DB_MASTER );
-		$tableName = $db->tableName($tableName);
 		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
@@ -122,6 +121,7 @@ class UpdateTable extends Maintenance {
 				$db->commit( __METHOD__, 'flush' );
 				wfWaitForSlaves();
 				$this->output( "Deleting a batch\n" );
+				$tableName = $db->tableName($tableName);
 				$db->query( "DELETE FROM $tableName LIMIT $this->mBatchSize" );
 				if ( !$db->affectedRows() ) {
 					break;
