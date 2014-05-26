@@ -53,7 +53,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 	 * @dataProvider getRows
 	 */
 	public function testRewriteNativeStrategy( array $rows ) {
-		$args = array( 'file' => $this->testfilename, 'quiet' => true );
+		$args = array( 'file' => $this->testfilename, 'quiet' => true, 'use-loaddata' => true );
 		$this->runScriptAndAssert( $args, $rows );
 	}
 
@@ -61,7 +61,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 	 * @dataProvider getRows
 	 */
 	public function testRewriteWithSQLInserts( array $rows ) {
-		$args = array( 'file' => $this->testfilename, 'quiet' => true, 'use-insert' => true );
+		$args = array( 'file' => $this->testfilename, 'quiet' => true );
 		$this->runScriptAndAssert( $args, $rows );
 	}
 
