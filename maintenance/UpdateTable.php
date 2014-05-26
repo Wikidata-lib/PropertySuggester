@@ -26,7 +26,7 @@ class UpdateTable extends Maintenance {
 		parent::__construct();
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
-		$this->addOption( 'use-insert', 'Avoid DBS specific import. Use INSERTs.', false, false );
+		$this->addOption( 'use-loaddata', 'Use DBS specific fast import. Use INSERTs.', false, false );
 		$this->setBatchSize( 1000 );
 	}
 
@@ -45,23 +45,22 @@ class UpdateTable extends Maintenance {
 			$this->error( "Cant find $path \n", true );
 		}
 
-		$useInsert = $this->getOption( 'use-insert' );
+		$useLoadData = $this->getOption( 'use-loaddata' );
 		$tableName = 'wbs_propertypairs';
-		$primaryKey = 'row_id';
 
 		wfWaitForSlaves();
 		$lb = wfGetLB();
 
-		$this->clearTable( $lb, $tableName, $primaryKey );
+		$this->clearTable( $lb, $tableName );
 
 		$this->output( "loading new entries from file\n" );
 
 		$importContext = $this->createImportContext( $lb, $tableName, $fullPath, $this->isQuiet() );
-		$importStrategy = $this->createImportStrategy( $useInsert );
+		$importStrategy = $this->createImportStrategy( $useLoadData );
 
 		try {
 			$success = $importStrategy->importFromCsvFileToDb( $importContext );
-		} catch (UnexpectedValueException $e) {
+		} catch ( UnexpectedValueException $e ) {
 			$this->error( "Import failed: " . $e->getMessage() );
 			exit;
 		}
@@ -73,12 +72,12 @@ class UpdateTable extends Maintenance {
 	}
 
 	/**
-	 * @param boolean $useInsert
+	 * @param boolean $useLoadData
 	 * @return Importer
 	 */
-	function createImportStrategy( $useInsert ) {
+	function createImportStrategy( $useLoadData ) {
 		global $wgDBtype;
-		if ( $wgDBtype === 'mysql' and !$useInsert ) {
+		if ( $wgDBtype === 'mysql' and $useLoadData ) {
 			return new MySQLImporter();
 		} else {
 			return new BasicImporter();
@@ -107,37 +106,31 @@ class UpdateTable extends Maintenance {
 	/**
 	 * @param LoadBalancer $lb
 	 * @param string $tableName
-	 * @param string $primaryKey
 	 */
-	private function clearTable( LoadBalancer $lb, $tableName, $primaryKey ) {
+	private function clearTable( LoadBalancer $lb, $tableName ) {
+		global $wgDBtype;
 		$db = $lb->getConnection( DB_MASTER );
 		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
 		}
-		$this->output( "removing old entries\n" );
-		while ( 1 ) {
-			$db->commit( __METHOD__, 'flush' );
-			wfWaitForSlaves();
-
-			$idChunk = $db->select(
-				$tableName,
-				array( $primaryKey ),
-				array(),
-				__METHOD__,
-				array( 'LIMIT' => $this->mBatchSize )
-			);
-			if( $idChunk->numRows() == 0 ) {
-				break;
+		$this->output( "Removing old entries\n" );
+		if ( $wgDBtype === 'sqlite' ) {
+			$db->delete( $tableName, "*" );
+		} else {
+			while ( 1 ) {
+				$db->commit( __METHOD__, 'flush' );
+				wfWaitForSlaves();
+				$this->output( "Deleting a batch\n" );
+				$table = $db->tableName( $tableName );
+				$db->query( "DELETE FROM $table LIMIT $this->mBatchSize" );
+				if ( $db->affectedRows() == 0 ) {
+					break;
+				}
 			}
-			$ids = array();
-			foreach ( $idChunk as $row ) {
-				$ids[] = ( int ) $row->$primaryKey;
-			}
-			$db->delete( $tableName, array( $primaryKey => $ids ) );
-			$this->output( "Deleting a batch\n" );
 		}
 		$lb->reuseConnection( $db );
 	}
+
 }
 
 $maintClass = 'PropertySuggester\Maintenance\UpdateTable';
