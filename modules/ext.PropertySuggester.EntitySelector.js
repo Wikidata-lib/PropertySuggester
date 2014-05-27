@@ -15,7 +15,7 @@
 		_create: function() {
 			var self = this;
 
-			self._oldCreate.apply(self, arguments);
+			self._oldCreate.apply( self, arguments );
 
 			var inputHandler = function() {
 				if ( self.__useSuggester() && self.value() === '' ) {
@@ -55,21 +55,50 @@
 
 		__useSuggester: function() {
 			var entity = this.__getEntity();
-			return this.options.type === 'property' && entity && entity.getType() === 'item' && this.__isInNewStatementView();
+			return this.options.type === 'property' && entity && entity.getType() === 'item';
 		},
 
 		__getEntity: function() {
 			try {
-				var $entityView = this.element.closest( ':wikibase-entityview');
-			} catch (e) {
+				var $entityView = this.element.closest( ':wikibase-entityview' );
+			} catch ( e ) {
 				return null;
 			}
 			var entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
-			if( entity ) {
+			if ( entity ) {
 				return entity;
 			} else {
 				return null;
 			}
+		},
+
+		__getPropertyId: function() {
+			try {
+				var $statementView = this.element.closest( ':wikibase-statementview' );
+			} catch ( e ) {
+				return null;
+			}
+			var statement = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
+			if ( statement ) {
+				return statement.getMainSnak().getPropertyId();
+			} else {
+				return null;
+			}
+		},
+
+		_getPropertyContext: function() {
+			if ( this.__isInNewStatementView() ) {
+				return 'item';
+			} else if ( this.__isQualifier() ) {
+				return 'qualifier';
+			} else {
+				return 'source'
+			}
+		},
+
+		__isQualifier: function() {
+			var $claimView = this.element.closest( '.wb-claim-qualifiers' );
+			return $claimView.length > 0;
 		},
 
 		/**
@@ -79,7 +108,7 @@
 		 * they already have a statementview with a value.
 		 */
 		__isInNewStatementView: function() {
-			var $statementView =  this.element.closest( ':wikibase-statementview' );
+			var $statementView = this.element.closest( ':wikibase-statementview' );
 			var value = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
 			return value === null;
 		},
@@ -90,15 +119,21 @@
 				timeout: this.options.timeout,
 				params: {
 					action: 'wbsgetsuggestions',
-					entity: this.__getEntity().getId(),
 					format: 'json',
 					language: this.options.language,
 					type: this.options.type,
+					context: this._getPropertyContext(),
 					'continue': this.offset
 				}
 			};
+			if (params.params.context == 'item'){
+				params.params.entity = this.__getEntity().getId()
+			} else {
+				params.params.properties = this.__getPropertyId()
+			}
+
 			return params;
 		}
 
-	 });
+	} );
 }( jQuery, mediaWiki ) );
