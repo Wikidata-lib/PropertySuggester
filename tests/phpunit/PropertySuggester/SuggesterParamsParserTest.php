@@ -22,7 +22,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	protected $defaultSuggesterResultSize = 100;
 	protected $defaultMinProbability = 0.01;
     protected $defaultParams = array( 'entity' => null, 'properties' => null, 'continue' => 10, 'limit' => 5,
-									  'language' => 'en', 'search' => '' );
+									  'language' => 'en', 'search' => '', 'context' => 'item' );
     
 	public function setUp() {
 		parent::setUp();
@@ -42,6 +42,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		$this->assertEquals( 5+10, $params->suggesterLimit );
 		$this->assertEquals( $this->defaultMinProbability, $params->minProbability );
 		$this->assertEquals( '', $params->search );
+		$this->assertEquals( 'item', $params->context );
 	}
 
 	public function testSuggesterWithSearchParameters() {
@@ -57,6 +58,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		$this->assertEquals( $this->defaultSuggesterResultSize, $params->suggesterLimit );
 		$this->assertEquals( 0, $params->minProbability );
 		$this->assertEquals( 'asd', $params->search );
+		$this->assertEquals( 'item', $params->context );
 	}
 
 	/**
