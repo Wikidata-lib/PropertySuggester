@@ -173,7 +173,7 @@ class GetSuggestions extends ApiBase {
 			'size' => 'Specify number of suggestions to be returned',
 			'language' => 'language for result',
 			'limit' => 'Maximal number of results',
-			'context' => 'Either item, source or qualifier',
+			'context' => 'Either item, reference or qualifier',
 			'continue' => 'Offset where to continue a search'
 		);
 	}

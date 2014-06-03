@@ -92,7 +92,7 @@
 			} else if ( this.__isQualifier() ) {
 				return 'qualifier';
 			} else {
-				return 'source'
+				return 'reference'
 			}
 		},
 
