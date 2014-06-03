@@ -5,6 +5,7 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
+use ProfileSection;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
@@ -67,6 +68,7 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
+		$profiler = new ProfileSection( __METHOD__ );
 		$extracted = $this->extractRequestParams();
 		$params = $this->paramsParser->parseAndValidate( $extracted );
 
@@ -109,6 +111,7 @@ class GetSuggestions extends ApiBase {
 	 * @return array
 	 */
 	private function querySearchApi( $resultSize, $search, $language ) {
+		$profiler = new ProfileSection( __METHOD__ );
 		$searchEntitiesParameters = new DerivativeRequest(
 			$this->getRequest(),
 			array(

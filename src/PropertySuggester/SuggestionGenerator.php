@@ -10,6 +10,7 @@ use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\EntityLookup;
 use Wikibase\TermIndex;
 use InvalidArgumentException;
+use ProfileSection;
 
 /**
  * API module helper to generate property suggestions.
@@ -95,6 +96,7 @@ class SuggestionGenerator {
 	 * @return Suggestion[]
 	 */
 	public function filterSuggestions( array $suggestions, $search, $language, $resultSize ) {
+		$profiler = new ProfileSection( __METHOD__ );
 		if ( !$search ) {
 			return array_slice( $suggestions, 0, $resultSize );
 		}
