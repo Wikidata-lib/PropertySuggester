@@ -12,7 +12,6 @@ use Wikibase\DataModel\Entity\Property;
 use Wikibase\EntityTitleLookup;
 use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\Repo\WikibaseRepo;
-use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
 use Wikibase\Utils;
 
@@ -53,12 +52,12 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterDeprecatedIds;
 		global $wgPropertySuggesterMinProbability;
 
-		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
-		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$store = WikibaseRepo::getDefaultInstance()->getStore();
+		$this->termIndex = $store->getTermIndex();
+		$this->entityLookup = $store->getEntityLookup();
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 
 		$this->suggester = new SimpleSuggester( wfGetLB() );
-
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 
 		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
