@@ -56,7 +56,7 @@ class ResultBuilder {
 	 * @param string $language
 	 * @return array
 	 */
-	public function createJSON( array $suggestions, $language ) {
+	public function createResultArray( array $suggestions, $language ) {
 		$profiler = new ProfileSection( __METHOD__ );
 		$entries = array();
 		$ids = array();

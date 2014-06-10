@@ -35,7 +35,7 @@ class ResultBuilderTest extends MediaWikiTestCase {
 			new Suggestion( new PropertyId( 'P2' ), 0.5 )
 		);
 
-		$result = $this->resultBuilder->createJSON( $suggestions, 'en' );
+		$result = $this->resultBuilder->createResultArray( $suggestions, 'en' );
 
 		$this->assertArrayEquals( array(), $result );
 	}*/
