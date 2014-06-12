@@ -96,7 +96,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', '14' ) , 100, 0.0 );
+		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', 'P14' ) , 100, 0.0 );
 		$this->assertEquals( $result1, array( 'foo' ) );
 
 	}
