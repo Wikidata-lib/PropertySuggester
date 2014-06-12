@@ -20,10 +20,12 @@
 			self._oldCreate.apply(self, arguments);
 
 			var focusHandler = function( event ) {
-				if ( self.__useSuggester() && self.element.val() === '' ) {
+				if ( self.__useSuggester() && self.element.val() === ''
+					 && !self.options.menu.element.is( ":visible" ) ) {
 					self._minTermLength = 0;
+					self._cache = {}; // is done in the entityselector on eachchange too
 					self.search( event );
-				}
+			}
 			};
 			self.element.on( 'focus', focusHandler );
 
