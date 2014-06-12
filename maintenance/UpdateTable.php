@@ -5,8 +5,6 @@ namespace PropertySuggester\Maintenance;
 use Maintenance;
 use LoadBalancer;
 use PropertySuggester\UpdateTable\Importer\BasicImporter;
-use PropertySuggester\UpdateTable\Importer\Importer;
-use PropertySuggester\UpdateTable\Importer\MySQLImporter;
 use PropertySuggester\UpdateTable\ImportContext;
 use UnexpectedValueException;
 
@@ -26,8 +24,7 @@ class UpdateTable extends Maintenance {
 		parent::__construct();
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
-		$this->addOption( 'use-loaddata', 'Use DBS specific fast import. Use INSERTs.', false, false );
-		$this->setBatchSize( 1000 );
+		$this->setBatchSize( 10000 );
 	}
 
 	/**
@@ -45,7 +42,6 @@ class UpdateTable extends Maintenance {
 			$this->error( "Cant find $path \n", true );
 		}
 
-		$useLoadData = $this->getOption( 'use-loaddata' );
 		$tableName = 'wbs_propertypairs';
 
 		wfWaitForSlaves();
@@ -56,7 +52,7 @@ class UpdateTable extends Maintenance {
 		$this->output( "loading new entries from file\n" );
 
 		$importContext = $this->createImportContext( $lb, $tableName, $fullPath, $this->isQuiet() );
-		$importStrategy = $this->createImportStrategy( $useLoadData );
+		$importStrategy = new BasicImporter();
 
 		try {
 			$success = $importStrategy->importFromCsvFileToDb( $importContext );
@@ -69,19 +65,6 @@ class UpdateTable extends Maintenance {
 			$this->error( "Failed to run import to db" );
 		}
 		$this->output( "... Done loading\n" );
-	}
-
-	/**
-	 * @param boolean $useLoadData
-	 * @return Importer
-	 */
-	function createImportStrategy( $useLoadData ) {
-		global $wgDBtype;
-		if ( $wgDBtype === 'mysql' and $useLoadData ) {
-			return new MySQLImporter();
-		} else {
-			return new BasicImporter();
-		}
 	}
 
 	/**
