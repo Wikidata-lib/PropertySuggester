@@ -14,15 +14,15 @@ final class PropertySuggesterHooks {
 	 * @return bool
 	 */
 	public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) {
-		$entityNamespaces = array_flip( NamespaceUtils::getEntityNamespaces() );
-		$title = $out->getTitle();
-		$namespace = $title->getNamespace();
-		if ( !array_key_exists( $namespace, $entityNamespaces ) ) {
-			return true;
-		}
 		if ( $out->getRequest()->getCheck( 'nosuggestions' ) ) {
 			return true;
 		}
+		$itemNs = NamespaceUtils::getEntityNamespace( CONTENT_MODEL_WIKIBASE_ITEM );
+		$namespace = $out->getTitle()->getNamespace();
+		if ( $namespace != $itemNs ) {
+			return true;
+		}
+
 		$out->addModules( 'ext.PropertySuggester.EntitySelector' );
 		return true;
 	}

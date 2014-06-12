@@ -78,7 +78,7 @@ class SimpleSuggester implements SuggesterEngine {
 				'GROUP BY' => 'pid2',
 				'ORDER BY' => 'prob DESC',
 				'LIMIT'    => $limit,
-				'HAVING'   => "prob > $minProbability"
+				'HAVING'   => "prob > " . $dbr->strencode($minProbability) 
 			)
 		);
 		$this->lb->reuseConnection( $dbr );

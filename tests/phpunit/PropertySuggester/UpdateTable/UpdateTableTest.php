@@ -8,7 +8,6 @@ use PropertySuggester\Maintenance\UpdateTable;
 /**
  * @covers PropertySuggester\maintenance\UpdateTable
  * @covers PropertySuggester\UpdateTable\Importer\BasicImporter
- * @covers PropertySuggester\UpdateTable\Importer\MySQLImporter
  * @covers PropertySuggester\UpdateTable\ImportContext
  * @group PropertySuggester
  * @group Database
