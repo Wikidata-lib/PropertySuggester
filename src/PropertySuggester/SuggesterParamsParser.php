@@ -14,7 +14,7 @@ class SuggesterParamsParser {
 	/**
 	 * @var int
 	 */
-	private $defaultSuggestionSearchLimit;
+	private $defaultSuggestionLimit;
 
 	/**
 	 * @var float
@@ -25,8 +25,8 @@ class SuggesterParamsParser {
 	 * @param int $defaultSuggestionSearchLimit
 	 * @param float $defaultMinProbability
 	 */
-	public function __construct( $defaultSuggestionSearchLimit, $defaultMinProbability ) {
-		$this->defaultSuggestionSearchLimit = $defaultSuggestionSearchLimit;
+	public function __construct( $defaultSuggestionLimit, $defaultMinProbability ) {
+		$this->defaultSuggestionLimit = $defaultSuggestionLimit;
 		$this->defaultMinProbability = $defaultMinProbability;
 	}
 
@@ -59,16 +59,21 @@ class SuggesterParamsParser {
 		$result->limit = $params['limit'];
 		$result->continue = (int)$params['continue'];
 		$result->resultSize = $result->limit + $result->continue;
+
+		if ( $result->resultSize > $this->defaultSuggestionLimit ) {
+			$result->resultSize = $this->defaultSuggestionLimit;
+		}
+
 		$result->language = $params['language'];
 
 		if ( $result->search ) {
 			// the results matching '$search' can be at the bottom of the list
 			// however very low ranked properties are not interesting and can
 			// still be found during the merge with search result later.
-			$result->suggesterLimit = $this->defaultSuggestionSearchLimit;
+			$result->suggesterLimit = $this->defaultSuggestionLimit;
 			$result->minProbability = 0.0;
 		} else {
-			$result->suggesterLimit = $result->limit + $result->continue;
+			$result->suggesterLimit = $result->resultSize;
 			$result->minProbability = $this->defaultMinProbability;
 		}
 
