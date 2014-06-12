@@ -117,16 +117,13 @@ class UpdateTable extends Maintenance {
 		if ( $wgDBtype === 'sqlite' ) {
 			$db->delete( $tableName, "*" );
 		} else {
-			while ( 1 ) {
+			do {
 				$db->commit( __METHOD__, 'flush' );
 				wfWaitForSlaves();
 				$this->output( "Deleting a batch\n" );
 				$table = $db->tableName( $tableName );
 				$db->query( "DELETE FROM $table LIMIT $this->mBatchSize" );
-				if ( $db->affectedRows() == 0 ) {
-					break;
-				}
-			}
+			} while ($db->affectedRows() > 0);
 		}
 		$lb->reuseConnection( $db );
 	}

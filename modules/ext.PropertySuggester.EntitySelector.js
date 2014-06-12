@@ -5,8 +5,10 @@
  * @see ui.suggester._request
  */
 
-( function( $, mw ) {
+( function( $, util, mw ) {
 	'use strict';
+
+	var Item = $.wikibase.entityselector.Item;
 
 	$.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 
@@ -17,39 +19,35 @@
 
 			self._oldCreate.apply( self, arguments );
 
-			var inputHandler = function() {
-				if ( self.__useSuggester() && self.value() === '' ) {
-					self.search( '*' );
-				}
-			};
-			self.element.on( 'input.' + this.widgetName, inputHandler );
-
-			var focusHandler = function() {
-				if ( self.__useSuggester() && self.value() === '' && !self.menu.element.is( ':visible' ) ) {
-					self.search( '*' );
+			var focusHandler = function( event ) {
+				if ( self.__useSuggester() && self.element.val() === '' ) {
+					self._minTermLength = 0;
+					self.search( event );
 				}
 			};
 			self.element.on( 'focus', focusHandler );
 
 		},
 
-		_oldRequest: $.wikibase.entityselector.prototype._request,
+		_oldGetData: $.wikibase.entityselector.prototype._getData,
 
-		_request: function( request, suggest ) {
-			if ( this.__useSuggester() ) {
-				this._term = request.term;
-				if ( !this._continueSearch ) {
-					this.offset = 0;
-				}
+		_getData: function( term ) {
+			var self = this;
 
-				$.extend( this.options.ajax, this.__buildOptions() );
-				if ( this.options.limit !== null ) {
-					this.options.ajax.params.limit = this.options.limit;
-				}
-				$.ui.suggester.prototype._request.apply( this, arguments );
-
+			if ( !self.__useSuggester() ) {
+				return self._oldGetData( term )
 			} else {
-				this._oldRequest.apply( this, arguments );
+				return {
+					action: 'wbsgetsuggestions',
+					search: term,
+					entity: self.__getEntity().getId(),
+					context: this._getPropertyContext(),
+					format: 'json',
+					language: self.options.language,
+					type: self.options.type,
+					'continue': self._cache[term] && self._cache[term].nextSuggestionOffset
+						? self._cache[term].nextSuggestionOffset: 0
+				};
 			}
 		},
 
@@ -108,32 +106,14 @@
 		 * they already have a statementview with a value.
 		 */
 		__isInNewStatementView: function() {
-			var $statementView = this.element.closest( ':wikibase-statementview' );
+			var $statementView =  this.element.closest( ':wikibase-statementview' );
 			var value = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
 			return value === null;
-		},
-
-		__buildOptions: function() {
-			var params = {
-				url: this.options.url,
-				timeout: this.options.timeout,
-				params: {
-					action: 'wbsgetsuggestions',
-					format: 'json',
-					language: this.options.language,
-					type: this.options.type,
-					context: this._getPropertyContext(),
-					'continue': this.offset
-				}
-			};
-			if (params.params.context == 'item'){
-				params.params.entity = this.__getEntity().getId()
-			} else {
-				params.params.properties = this.__getPropertyId()
-			}
-
-			return params;
 		}
+	 });
 
+	$.extend( $.wikibase.entityselector, {
+		Item: Item
 	} );
-}( jQuery, mediaWiki ) );
+
+}( jQuery, util, mediaWiki ) );

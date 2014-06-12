@@ -10,7 +10,7 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\EntityLookup;
+use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\TermIndex;
 use InvalidArgumentException;
 
@@ -45,7 +45,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->lookup = $this->getMock( 'Wikibase\EntityLookup' );
+		$this->lookup = $this->getMock( 'Wikibase\Lib\Store\EntityLookup' );
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 

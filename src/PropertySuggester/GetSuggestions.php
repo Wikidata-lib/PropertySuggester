@@ -5,13 +5,13 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
+use ProfileSection;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\EntityLookup;
 use Wikibase\EntityTitleLookup;
+use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\Repo\WikibaseRepo;
-use Wikibase\StoreFactory;
 use Wikibase\TermIndex;
 use Wikibase\Utils;
 
@@ -52,12 +52,12 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterDeprecatedIds;
 		global $wgPropertySuggesterMinProbability;
 
-		$this->termIndex = StoreFactory::getStore( 'sqlstore' )->getTermIndex();
-		$this->entityLookup = StoreFactory::getStore( 'sqlstore' )->getEntityLookup();
+		$store = WikibaseRepo::getDefaultInstance()->getStore();
+		$this->termIndex = $store->getTermIndex();
+		$this->entityLookup = $store->getEntityLookup();
 		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
 
 		$this->suggester = new SimpleSuggester( wfGetLB() );
-
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 
 		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
@@ -67,6 +67,7 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
+		$profiler = new ProfileSection( __METHOD__ );
 		$extracted = $this->extractRequestParams();
 		$params = $this->paramsParser->parseAndValidate( $extracted );
 
@@ -81,7 +82,7 @@ class GetSuggestions extends ApiBase {
 
 		// Build result Array
 		$resultBuilder = new ResultBuilder( $this->getResult(), $this->termIndex, $this->entityTitleLookup, $params->search );
-		$entries = $resultBuilder->createJSON( $suggestions, $params->language, $params->search );
+		$entries = $resultBuilder->createResultArray( $suggestions, $params->language, $params->search );
 
 		// merge with search result if possible and necessary
 		if ( count( $entries ) < $params->resultSize && $params->search !== '' ) {
@@ -109,6 +110,7 @@ class GetSuggestions extends ApiBase {
 	 * @return array
 	 */
 	private function querySearchApi( $resultSize, $search, $language ) {
+		$profiler = new ProfileSection( __METHOD__ );
 		$searchEntitiesParameters = new DerivativeRequest(
 			$this->getRequest(),
 			array(

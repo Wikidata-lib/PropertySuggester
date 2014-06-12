@@ -45,7 +45,7 @@ class SuggesterParamsParser {
 		if ( !( $result->entity XOR $result->properties ) ) {
 			throw new InvalidArgumentException( 'provide either entity-id parameter \'entity\' or a list of properties \'properties\'' );
 		}
-		if ( !( is_numeric( $params['continue'] ) || is_null( $params['continue'] ) ) ) {
+		if ( !( is_null( $params['continue'] ) || is_numeric( $params['continue'] ) ) ) {
 			throw new InvalidArgumentException( 'continue must be int!' );
 		}
 
