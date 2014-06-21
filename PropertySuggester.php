@@ -16,7 +16,7 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 }
 
 global $wgExtensionCredits;
-$wgExtensionCredits['other'][] = array(
+$wgExtensionCredits['wikibase'][] = array(
 	'path' => __FILE__,
 	'name' => 'PropertySuggester',
 	'author' => array( 'Christian Dullweber', 'Moritz Finke', 'Felix Niemeyer', 'Virginia Weidhaas' ),
