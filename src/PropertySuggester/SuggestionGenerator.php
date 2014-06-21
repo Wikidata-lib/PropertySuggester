@@ -49,7 +49,7 @@ class SuggestionGenerator {
 	 * @return array
 	 */
 	public function generateSuggestionsByItem( $item, $limit, $minProbability ) {
-		$id = new  ItemId( $item );
+		$id = new ItemId( $item );
 		$item = $this->entityLookup->getEntity( $id );
 		if( $item == null ){
 			throw new InvalidArgumentException( 'Item ' . $id . ' could not be found' );
