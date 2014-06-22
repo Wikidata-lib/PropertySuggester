@@ -110,7 +110,6 @@ class SimpleSuggester implements SuggesterEngine {
 			$valuePair = explode( ';', $pair );
 			$pid = substr( $valuePair[0], 1 );
 			$ids[] = $pid;
-			$idTuples[] = $this->buildTuple( $pid, 0);
 		}
 		return $this->getSuggestions( $ids, $idTuples, count($propertyValuePairs), $limit );
 	}
