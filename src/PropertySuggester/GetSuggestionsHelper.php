@@ -56,17 +56,12 @@ class GetSuggestionsHelper {
 	/**
 	 * Provide comma separated list of property ids
 	 *
-	 * @param string $propertyList
+	 * @param $propertyValuePairs
 	 * @param int $limit
 	 * @return Suggestion[]
 	 */
-    public function generateSuggestionsByPropertyList( $propertyList, $limit ) {
-        $splitList = explode( ',', $propertyList );
-        $properties = array();
-        foreach ( $splitList as $id ) {
-            $properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
-        }
-        $suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit );
+    public function generateSuggestionsByPropertyValuePairs( $propertyValuePairs, $limit ) {
+        $suggestions = $this->suggester->suggestByPropertyValuePairs( $propertyValuePairs, $limit );
         return $suggestions;
     }
 

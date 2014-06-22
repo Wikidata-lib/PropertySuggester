@@ -26,6 +26,15 @@ interface SuggesterEngine {
 	public function suggestByItem( Item $item, $limit );
 
 	/**
+	 * @see SuggesterEngine::suggestByPropertyValuePairs
+	 *
+	 * @param propertyValuePairs
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+	public function suggestByPropertyValuePairs($propertyValuePairs, $limit );
+
+	/**
 	 * @param int[] $numericIds
 	 * @return void
 	 */

@@ -83,7 +83,7 @@ class GetSuggestions extends ApiBase {
 		if ( $params["entity"] !== null ) {
 			$suggestions = $helper->generateSuggestionsByItem( $params["entity"], $suggesterLimit );
 		} else {
-			$suggestions = $helper->generateSuggestionsByPropertyList( $params['properties'], $suggesterLimit );
+			$suggestions = $helper->generateSuggestionsByPropertyValuePairs( $params['properties'], $suggesterLimit );
 		}
 		$suggestions = $helper->filterSuggestions( $suggestions, $search, $language, $resultSize );
 

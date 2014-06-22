@@ -94,6 +94,28 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
+	 * @see SuggesterEngine::suggestByPropertyValuePairs
+	 *
+	 * @param propertyValuePairs
+	 * @param int $limit
+	 * @return Suggestion[]
+	 */
+	public function suggestByPropertyValuePairs( $propertyValuePairs, $limit ) {
+		$pairs = explode( ',', $propertyValuePairs);
+		$idTuples = array();
+		$ids = array();
+		foreach( $pairs as $pair ){
+			$tuple = str_replace( ";", ",", $pair );
+			$idTuples[] = $tuple;
+			$valuePair = explode( ';', $pair );
+			$pid = substr( $valuePair[0], 1 );
+			$ids[] = $pid;
+			$idTuples[] = $this->buildTuple( $pid, 0);
+		}
+		return $this->getSuggestions( $ids, $idTuples, count($propertyValuePairs), $limit );
+	}
+
+	/**
 	 * @see SuggesterEngine::suggestByEntity
 	 *
 	 * @param Item $item
