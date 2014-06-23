@@ -5,6 +5,7 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancer;
 use ProfileSection;
 use InvalidArgumentException;
+use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
@@ -78,7 +79,7 @@ class SimpleSuggester implements SuggesterEngine {
 				'GROUP BY' => 'pid2',
 				'ORDER BY' => 'prob DESC',
 				'LIMIT'    => $limit,
-				'HAVING'   => "prob > $minProbability"
+				'HAVING'   => 'prob > ' . floatval( $minProbability )
 			)
 		);
 		$this->lb->reuseConnection( $dbr );
@@ -111,8 +112,8 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$snaks = $item->getAllSnaks();
-		$numericIds = array_unique( array_map( array( $this, 'getNumericIdFromSnak' ), $snaks ) );
+		$claims = $item->getClaims();
+		$numericIds = array_unique( array_map( array( $this, 'getNumericIdFromClaim' ), $claims ) );
 		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
 	}
 
@@ -132,8 +133,8 @@ class SimpleSuggester implements SuggesterEngine {
 		return $resultArray;
 	}
 
-	private function getNumericIdFromSnak( Snak $snak ) {
-		return $snak->getPropertyId()->getNumericId();
+	private function getNumericIdFromClaim( Claim $claim ) {
+		return $claim->getMainSnak()->getPropertyId()->getNumericId();
 	}
 
 	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {

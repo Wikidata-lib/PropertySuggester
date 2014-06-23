@@ -42,13 +42,14 @@ class SuggestionGenerator {
 	}
 
 	/**
-	 * @param string $item - An item id
+	 * @param string $itemIdString - An item id
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @param string $context
 	 * @throws \InvalidArgumentException
 	 * @return array
 	 */
+
 	public function generateSuggestionsByItem( $itemIdString, $limit, $minProbability, $context ) {
 		$id = new  ItemId( $itemIdString );
 		$item = $this->entityLookup->getEntity( $id );
@@ -60,35 +61,21 @@ class SuggestionGenerator {
 	}
 
 	/**
-	 * @param string[] $propertyList - A list of property ids
+	 * @param string[] $propertyIdList - A list of property-id-strings
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @param string $context
 	 * @return Suggestion[]
 	 */
-	public function generateSuggestionsByPropertyList( array $propertyList, $limit, $minProbability, $context ) {
-		$properties = array();
-		foreach ( $propertyList as $id ) {
-			$properties[] = PropertyId::newFromNumber( $this->getNumericPropertyId( $id ) );
+	public function generateSuggestionsByPropertyList( array $propertyIdList, $limit, $minProbability, $context ) {
+		$propertyIds = array();
+		foreach ( $propertyIdList as $stringId ) {
+			$propertyIds[] = new PropertyId( $stringId );
 		}
-		$suggestions = $this->suggester->suggestByPropertyIds( $properties, $limit, $minProbability, $context );
+
+		$suggestions = $this->suggester->suggestByPropertyIds( $propertyIds, $limit, $minProbability, $context );
 		return $suggestions;
 	}
-
-	/**
-	 * Accepts strings of the format "P123" or "123" and returns
-	 * the id as int. Returns 0 if the string is not of the specified format.
-	 *
-	 * @param string $propertyId
-	 * @return int
-	 */
-	protected function getNumericPropertyId( $propertyId ) {
-		if ( strlen( $propertyId ) && strtolower( $propertyId[0] ) === 'p' ) {
-			return (int)substr( $propertyId, 1 );
-		}
-		return (int)$propertyId;
-	}
-
 
 	/**
 	 * @param Suggestion[] $suggestions

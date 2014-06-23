@@ -6,9 +6,9 @@ statements to an item.
 [![Build Status](https://travis-ci.org/Wikidata-lib/PropertySuggester.svg?branch=master)](https://travis-ci.org/Wikidata-lib/PropertySuggester)
 [![Coverage Status](https://coveralls.io/repos/Wikidata-lib/PropertySuggester/badge.png?branch=master)](https://coveralls.io/r/Wikidata-lib/PropertySuggester?branch=master)
 
-On [Packagist](https://packagist.org/packages/propertysuggester/propertysuggester):
-[![Latest Stable Version](https://poser.pugx.org/propertysuggester/propertysuggester/v/stable.png)](https://packagist.org/packages/propertysuggester/propertysuggester)
-[![License](https://poser.pugx.org/propertysuggester/propertysuggester/license.png)](https://packagist.org/packages/propertysuggester/propertysuggester)
+On [Packagist](https://packagist.org/packages/propertysuggester/property-suggester):
+[![Latest Stable Version](https://poser.pugx.org/propertysuggester/property-suggester/v/stable.png)](https://packagist.org/packages/propertysuggester/propertysuggester)
+[![License](https://poser.pugx.org/propertysuggester/property-suggester/license.png)](https://packagist.org/packages/propertysuggester/propertysuggester)
 
 ## Installation
 
