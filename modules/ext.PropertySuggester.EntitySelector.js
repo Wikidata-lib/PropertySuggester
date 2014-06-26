@@ -39,10 +39,9 @@
 			if ( !self.__useSuggester() ) {
 				return self._oldGetData( term )
 			} else {
-				return {
+				var data = {
 					action: 'wbsgetsuggestions',
 					search: term,
-					entity: self.__getEntity().getId(),
 					context: this._getPropertyContext(),
 					format: 'json',
 					language: self.options.language,
@@ -50,6 +49,12 @@
 					'continue': self._cache[term] && self._cache[term].nextSuggestionOffset
 						? self._cache[term].nextSuggestionOffset: 0
 				};
+				if (data.context == 'item') {
+					data.entity = self.__getEntity().getId();
+				} else {
+					data.properties = self.__getPropertyId();
+				}
+				return data;
 			}
 		},
 
