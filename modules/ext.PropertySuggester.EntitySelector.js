@@ -77,6 +77,7 @@
 
 		/**
 		 * Get the entity from the surrounding entityview or return null
+		 * @return {wikibase.Entity|null}
 		 */
 		_getEntity: function() {
 			try {
