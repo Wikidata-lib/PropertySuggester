@@ -39,8 +39,7 @@
 		/**
 		 *
 		 * @param {string} term
-		 * @returns {*}
-		 * @private
+		 * @return {Object}
 		 */
 		_getData: function( term ) {
 			var self = this;
@@ -68,7 +67,7 @@
 		},
 
 		/**
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		_useSuggester: function() {
 			var entity = this._getEntity();
@@ -96,7 +95,7 @@
 		/**
 		 * Returns the property id for the enclosing statementview or null if no property is selected yet.
 		 *
-		 * @returns {string|null}
+		 * @return {string|null}
 		 */
 		_getPropertyId: function() {
 			try {
@@ -116,7 +115,7 @@
 		 * Returns either 'item', 'qualifier', 'reference' or null depending on the context of the entityselector.
 		 * 'item' is returned in case that the selector is for a new property in an item.
 		 *
-		 * @returns {string}
+		 * @return {string}
 		 */
 		_getPropertyContext: function() {
 			if( this._isInNewStatementView() ) {
@@ -131,7 +130,7 @@
 		},
 
 		/**
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		_isQualifier: function() {
 			var $claimview = this.element.closest( ':wikibase-claimview, :wikibase-statementview' );
@@ -143,7 +142,7 @@
 		},
 
 		/**
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		_isReference: function() {
 			var $referenceview = this.element.closest( ':wikibase-referenceview' );
@@ -152,7 +151,7 @@
 
 		/**
 		 * detect if this is a new statement view.
-		 * @returns {boolean}
+		 * @return {boolean}
 		 */
 		_isInNewStatementView: function() {
 			var $statementView = this.element.closest( ':wikibase-statementview' );
