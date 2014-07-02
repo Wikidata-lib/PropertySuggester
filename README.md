@@ -34,5 +34,16 @@ generate this data from a wikidata dump.
 
 * run ```composer dump-autoload``` in the extension folder (if installed without composer)
 * add ```require_once "$IP/extensions/PropertySuggester/PropertySuggester.php";``` to your localsettings
-* run ```maintenance/update.php``` to create the neccessary table
+* run ```maintenance/update.php``` to create the necessary table
 * follow the readme of PropertySuggester-Python to generate and load suggestion data
+
+### Configuration
+
+* $wgPropertySuggesterMinProbability - a float that sets a minimum threshold for suggestions (default 0.05)
+* $wgPropertySuggesterDeprecatedIds - a list of ints that blacklist suggestions
+
+## Release notes
+
+### 1.0 (2014-07-01)
+
+* Provide Property-Suggestions based on correlations to other properties in the item

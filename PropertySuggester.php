@@ -39,11 +39,15 @@ $wgHooks['BeforePageDisplay'][] = 'PropertySuggesterHooks::onBeforePageDisplay';
 $wgHooks['UnitTestsList'][] = 'PropertySuggesterHooks::onUnitTestsList';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PropertySuggesterHooks::onCreateSchema';
 
+$remoteExtPathParts = explode(
+	DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR, __DIR__, 2
+);
+
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 	'scripts'       => array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
 	'dependencies'  => array( 'jquery.wikibase.entityselector' ),
 	'localBasePath' => __DIR__,
-	'remoteExtPath' => 'PropertySuggester',
+	'remoteExtPath' => $remoteExtPathParts[1],
 );
 
 
