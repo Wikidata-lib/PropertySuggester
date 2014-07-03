@@ -67,7 +67,7 @@ class SuggesterParamsParser {
 		$result->language = $params['language'];
 		$result->context = $params['context'];
 
-		if ( $result->search || $result->context != 'item' ) {
+		if ( $result->search ) {
 			// the results matching '$search' can be at the bottom of the list
 			// however very low ranked properties are not interesting and can
 			// still be found during the merge with search result later.

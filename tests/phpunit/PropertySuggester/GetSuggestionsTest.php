@@ -106,7 +106,6 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 	public function testExecutionWithSearch() {
 		$p56 = self::$idMap['%P56%'];
 
-		// TODO add terms to do a useful search!
 		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'IdontExist', 'continue' => 0, 'context' => 'item');
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];

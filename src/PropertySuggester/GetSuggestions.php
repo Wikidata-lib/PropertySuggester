@@ -199,7 +199,11 @@ class GetSuggestions extends ApiBase {
 			'api.php?action=wbsgetsuggestions&entity=Q4&continue=10&limit=5'
 			=> 'Get suggestions for entity 4 from rank 10 to 15',
 			'api.php?action=wbsgetsuggestions&properties=P31|P21'
-			=> 'Get suggestions for the property combination P21 and P31'
+			=> 'Get suggestions for the property combination P21 and P31',
+			'api.php?action=wbsgetsuggestions&properties=P21&context=qualifier'
+			=> 'Get suggestions for the qualifier that are used with P21',
+			'api.php?action=wbsgetsuggestions&properties=P21&context=reference'
+			=> 'Get suggestions for the references that are used with P21'
 		);
 	}
 
