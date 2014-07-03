@@ -41,8 +41,12 @@ generate this data from a wikidata dump.
 
 * $wgPropertySuggesterMinProbability - a float that sets a minimum threshold for suggestions (default 0.05)
 * $wgPropertySuggesterDeprecatedIds - a list of ints that blacklist suggestions
+* $wgPropertySuggesterInitialSuggestions - a list of ints that will be suggested when no statements exist
 
 ## Release notes
+
+### 2.0.7
+* Suggest initial properties
 
 ### 2.0.6 (2015-02-20)
 * No longer use Wikibase\Utils as it was renamed

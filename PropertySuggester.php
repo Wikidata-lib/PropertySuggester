@@ -61,5 +61,10 @@ $wgPropertySuggesterClassifyingPropertyIds = array(
 	31 // instance of
 );
 
+global $wgPropertySuggesterInitialSuggestions;
+$wgPropertySuggesterInitialSuggestions = array(
+	31, // instance of
+	279 // subclass of
+);
 global $wgPropertySuggesterMinProbability;
 $wgPropertySuggesterMinProbability = 0.05;
