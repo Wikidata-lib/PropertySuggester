@@ -2,7 +2,7 @@
     "@metadata": {
         "authors": []
     },
-    "propertysuggester-desc": "Shows suggested properties for items.",
+    "propertysuggester-desc": "Shows suggested properties for wikibase items.",
     "propertysuggester": "Property Suggester",
     "propertysuggester-intro": "This is the PropertySuggester."
 }
