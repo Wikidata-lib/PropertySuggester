@@ -49,6 +49,11 @@ class SuggesterParams {
 	public $continue;
 
 	/**
+	 * @var string
+	 */
+	public $context;
+
+	/**
 	 * @var int
 	 */
 	public $resultSize;

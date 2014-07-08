@@ -65,6 +65,7 @@ class SuggesterParamsParser {
 		}
 
 		$result->language = $params['language'];
+		$result->context = $params['context'];
 
 		if ( $result->search ) {
 			// the results matching '$search' can be at the bottom of the list

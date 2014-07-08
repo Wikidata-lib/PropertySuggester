@@ -74,9 +74,9 @@ class GetSuggestions extends ApiBase {
 		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
 
 		if ( $params->entity !== null ) {
-			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params->entity, $params->suggesterLimit, $params->minProbability );
+			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params->entity, $params->suggesterLimit, $params->minProbability, $params->context );
 		} else {
-			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params->properties, $params->suggesterLimit, $params->minProbability );
+			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params->properties, $params->suggesterLimit, $params->minProbability, $params->context );
 		}
 		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
 
@@ -154,6 +154,10 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
 			),
+			'context' => array(
+				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_DFLT => 'item',
+			),
 			'search' => array(
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_DFLT => '',
@@ -171,6 +175,7 @@ class GetSuggestions extends ApiBase {
 			'size' => 'Specify number of suggestions to be returned',
 			'language' => 'language for result',
 			'limit' => 'Maximal number of results',
+			'context' => 'Either item, reference or qualifier',
 			'continue' => 'Offset where to continue a search'
 		);
 	}
@@ -194,7 +199,11 @@ class GetSuggestions extends ApiBase {
 			'api.php?action=wbsgetsuggestions&entity=Q4&continue=10&limit=5'
 			=> 'Get suggestions for entity 4 from rank 10 to 15',
 			'api.php?action=wbsgetsuggestions&properties=P31|P21'
-			=> 'Get suggestions for the property combination P21 and P31'
+			=> 'Get suggestions for the property combination P21 and P31',
+			'api.php?action=wbsgetsuggestions&properties=P21&context=qualifier'
+			=> 'Get suggestions for the qualifier that are used with P21',
+			'api.php?action=wbsgetsuggestions&properties=P21&context=reference'
+			=> 'Get suggestions for the references that are used with P21'
 		);
 	}
 

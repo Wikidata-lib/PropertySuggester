@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 1.1 (soon)
+* Suggest properties for qualifiers and references based on the property of the mainsnak
+
 ### 1.0 (2014-07-01)
 
 * Provide Property-Suggestions based on correlations to other properties in the item

@@ -57,7 +57,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	public function testSuggestByPropertyIds() {
 		$ids = array( new PropertyId( 'p1' ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0 );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0, 'item' );
 
 		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
 		$this->assertEquals( 0.1, $res[0]->getProbability(), '', 0.0001 );
@@ -71,7 +71,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
 
-		$res = $this->suggester->suggestByItem( $item, 100, 0.0 );
+		$res = $this->suggester->suggestByItem( $item, 100, 0.0, 'item' );
 
 		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
 		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
@@ -82,7 +82,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$this->suggester->setDeprecatedPropertyIds( array( 2 ) );
 
-		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0 );
+		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0, 'item' );
 
 		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
 		$this->assertNotContains( 2 , $resultIds );
@@ -90,21 +90,21 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testEmptyResult() {
-		$this->assertEmpty( $this->suggester->suggestByPropertyIds( array(), 10, 0.01 ) );
+		$this->assertEmpty( $this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' ) );
 	}
 
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testInvalidLimit() {
-		$this->suggester->suggestByPropertyIds( array(), '10', 0.01 );
+		$this->suggester->suggestByPropertyIds( array(), '10', 0.01, 'item' );
 	}
 
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testInvalidMinProbability() {
-		$this->suggester->suggestByPropertyIds( array(), 10, '0.01' );
+		$this->suggester->suggestByPropertyIds( array(), 10, '0.01', 'item' );
 	}
 
 }

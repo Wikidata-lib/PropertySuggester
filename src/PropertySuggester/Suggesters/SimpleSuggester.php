@@ -47,10 +47,11 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int[] $propertyIds
 	 * @param int $limit
 	 * @param float $minProbability
+	 * @param string $context
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $propertyIds, $limit, $minProbability ) {
+	protected function getSuggestions( array $propertyIds, $limit, $minProbability, $context ) {
 		$profiler = new ProfileSection( __METHOD__ );
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
@@ -64,7 +65,6 @@ class SimpleSuggester implements SuggesterEngine {
 
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
 		$count = count( $propertyIds );
-		$context = 'item'; // only 'item' is supported at the moment
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
 		$res = $dbr->select(
@@ -92,13 +92,14 @@ class SimpleSuggester implements SuggesterEngine {
 	 *
 	 * @param PropertyId[] $propertyIds
 	 * @param int $limit
-	 * @param float $minProbability
+ 	 * @param float $minProbability
+	 * @param string $context
 	 * @return Suggestion[]
 	 */
-	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability ) {
+	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability, $context ) {
 		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds );
 
-		return $this->getSuggestions( $numericIds, $limit, $minProbability );
+		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
 	}
 
 	/**
@@ -106,13 +107,14 @@ class SimpleSuggester implements SuggesterEngine {
 	 *
 	 * @param Item $item
 	 * @param int $limit
-	 * @param float $minProbability
+  	 * @param float $minProbability
+	 * @param string $context
 	 * @return Suggestion[]
 	 */
-	public function suggestByItem( Item $item, $limit, $minProbability ) {
+	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
 		$claims = $item->getClaims();
 		$numericIds = array_unique( array_map( array( $this, 'getNumericIdFromClaim' ), $claims ) );
-		return $this->getSuggestions( $numericIds, $limit, $minProbability );
+		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
 	}
 
 	/**

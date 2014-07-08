@@ -96,7 +96,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', 'P14' ) , 100, 0.0 );
+		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', 'P14' ) , 100, 0.0, 'item' );
 		$this->assertEquals( $result1, array( 'foo' ) );
 
 	}
@@ -119,7 +119,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $item ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result3 = $this->suggestionGenerator->generateSuggestionsByItem( 'Q42', 100, 0.0 );
+		$result3 = $this->suggestionGenerator->generateSuggestionsByItem( 'Q42', 100, 0.0, 'item' );
 		$this->assertEquals( $result3, array( 'foo' ) );
 	}
 
@@ -134,7 +134,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $itemId ) )
 			->will( $this->returnValue( null ) );
 
-		$this->suggestionGenerator->generateSuggestionsByItem( 'Q41', 100, 0.0 );
+		$this->suggestionGenerator->generateSuggestionsByItem( 'Q41', 100, 0.0, 'item' );
 	}
 
 }
