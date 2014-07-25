@@ -17,12 +17,12 @@ The recommended way to use this library is via [Composer](http://getcomposer.org
 ### Composer
 
 To add this package as a local, per-project dependency to your project, simply add a
-dependency on `propertysuggester/propertysuggester` to your project's `composer.json` file.
+dependency on `propertysuggester/property-suggester` to your project's `composer.json` file.
 Here is a minimal example of a `composer.json` file:
 
     {
         "require": {
-            "propertysuggester/propertysuggester": "*"
+            "propertysuggester/property-suggester": "*"
         }
     }
 
