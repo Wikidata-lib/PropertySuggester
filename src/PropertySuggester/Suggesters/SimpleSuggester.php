@@ -25,6 +25,11 @@ class SimpleSuggester implements SuggesterEngine {
 	private $deprecatedPropertyIds = array();
 
 	/**
+	 * @var int[]
+	 */
+	private $classifyingProperties = array(31);
+
+	/**
 	 * @var LoadBalancer
 	 */
 	private $lb;
@@ -71,7 +76,7 @@ class SimpleSuggester implements SuggesterEngine {
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
 			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
-				   'qid1' => null,
+				   'qid1' => 0,
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
 				   'context' => $context ),
 			__METHOD__,
@@ -85,6 +90,56 @@ class SimpleSuggester implements SuggesterEngine {
 		$this->lb->reuseConnection( $dbr );
 
 		return $this->buildResult( $res );
+	}
+
+	/**
+	 * @param int[] $idTuples
+	 * @param int $count
+	 * @param int $limit
+	 * @param float $minProbability
+	 * @param string $context
+	 * @return Suggestion[]
+	 */
+	protected function getPropertySuggestions( array $ids, array $idTuples, $count, $limit, $minProbability, $context ) {
+		if ( !$idTuples ) {
+			return array();
+		}
+		if ( !is_int( $limit ) ) {
+			throw new InvalidArgumentException('$limit must be int!');
+		}
+		if ( !is_float( $minProbability ) ) {
+			throw new InvalidArgumentException( '$minProbability must be float!' );
+		}
+		if ( !$idTuples ) {
+			return array();
+		}
+
+		$excludedIds = array_merge( $ids, $this->deprecatedPropertyIds );
+
+		$dbr = $this->lb->getConnection( DB_SLAVE );
+		$res = $dbr->select(
+			'wbs_propertypairs',
+			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
+			array( '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')',
+				   'pid2 NOT IN (' . str_replace( "'", '', $dbr->makeList( $excludedIds ) ) . ')',
+			       'context' => $context ),
+			__METHOD__,
+			array(
+				'GROUP BY' => 'pid2',
+				'ORDER BY' => 'prob DESC',
+				'LIMIT'	   => $limit,
+				'HAVING'   => 'prob > ' . floatval( $minProbability )
+			)
+		);
+		$this->lb->reuseConnection( $dbr );
+
+		$resultArray = array();
+		foreach ( $res as $row ) {
+			$pid = PropertyId::newFromNumber( (int)$row->pid );
+			$suggestion = new Suggestion( $pid, $row->prob );
+			$resultArray[] = $suggestion;
+		}
+		return $resultArray;
 	}
 
 	/**
@@ -107,14 +162,46 @@ class SimpleSuggester implements SuggesterEngine {
 	 *
 	 * @param Item $item
 	 * @param int $limit
-  	 * @param float $minProbability
+	 * @param float $minProbability
 	 * @param string $context
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$claims = $item->getClaims();
-		$numericIds = array_unique( array_map( array( $this, 'getNumericIdFromClaim' ), $claims ) );
-		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
+		$snaks = $item->getAllSnaks();
+		$ids = array();
+		$idTuples = array();
+		if ( $context == "item"){
+			foreach ( $snaks as $snak ) {
+				$numericId = $snak->getPropertyId()->getNumericId();
+				$ids[] = $numericId;
+				if (! in_array( $numericId, $this->classifyingProperties ) ) {
+					$idTuples[] = $this->buildTuple($numericId, 0);
+				}
+				else {
+					if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
+						$dataValue = $snak->getDataValue();
+						$id = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
+						$idTuples[] = $this->buildTuple( $snak->getPropertyId()->getNumericId(), $id );
+					}
+				}
+			}
+			return $this->getPropertySuggestions( $ids, $idTuples, count($snaks), $limit, $minProbability, $context );
+		}
+		foreach ( $snaks as $snak ) {
+			$numericId = $snak->getPropertyId()->getNumericId();
+			$idTuples[] = $this->buildTuple( $numericId, 0 );
+		}
+		return $this->getSuggestions( $ids, $idTuples, count($snaks), $limit, $minProbability, $context );
+	}
+
+	/**
+	 * @param string $a
+	 * @param string $b
+	 * @return string
+	 */
+	public function buildTuple( $a, $b ){
+		$tuple = '('. $a .', '. $b .')';
+		return $tuple;
 	}
 
 	/**
