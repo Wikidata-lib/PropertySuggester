@@ -50,13 +50,15 @@ class SimpleSuggester implements SuggesterEngine {
 
 	/**
 	 * @param int[] $propertyIds
+	 * @param string[] $idTuples
 	 * @param int $limit
+	 * @param int $count
 	 * @param float $minProbability
 	 * @param string $context
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $propertyIds, $limit, $minProbability, $context ) {
+	protected function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
 		$profiler = new ProfileSection( __METHOD__ );
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
@@ -72,10 +74,16 @@ class SimpleSuggester implements SuggesterEngine {
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
+		if (context == 'item'){
+			$condition = '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')';
+		}
+		else{
+			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
+		}
 		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
+			array( $condition,
 				   'qid1' => 0,
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
 				   'context' => $context ),
@@ -85,61 +93,11 @@ class SimpleSuggester implements SuggesterEngine {
 				'ORDER BY' => 'prob DESC',
 				'LIMIT'    => $limit,
 				'HAVING'   => 'prob > ' . floatval( $minProbability )
-			)
-		);
+				)
+			);
 		$this->lb->reuseConnection( $dbr );
 
 		return $this->buildResult( $res );
-	}
-
-	/**
-	 * @param int[] $idTuples
-	 * @param int $count
-	 * @param int $limit
-	 * @param float $minProbability
-	 * @param string $context
-	 * @return Suggestion[]
-	 */
-	protected function getPropertySuggestions( array $ids, array $idTuples, $count, $limit, $minProbability, $context ) {
-		if ( !$idTuples ) {
-			return array();
-		}
-		if ( !is_int( $limit ) ) {
-			throw new InvalidArgumentException('$limit must be int!');
-		}
-		if ( !is_float( $minProbability ) ) {
-			throw new InvalidArgumentException( '$minProbability must be float!' );
-		}
-		if ( !$idTuples ) {
-			return array();
-		}
-
-		$excludedIds = array_merge( $ids, $this->deprecatedPropertyIds );
-
-		$dbr = $this->lb->getConnection( DB_SLAVE );
-		$res = $dbr->select(
-			'wbs_propertypairs',
-			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')',
-				   'pid2 NOT IN (' . str_replace( "'", '', $dbr->makeList( $excludedIds ) ) . ')',
-			       'context' => $context ),
-			__METHOD__,
-			array(
-				'GROUP BY' => 'pid2',
-				'ORDER BY' => 'prob DESC',
-				'LIMIT'	   => $limit,
-				'HAVING'   => 'prob > ' . floatval( $minProbability )
-			)
-		);
-		$this->lb->reuseConnection( $dbr );
-
-		$resultArray = array();
-		foreach ( $res as $row ) {
-			$pid = PropertyId::newFromNumber( (int)$row->pid );
-			$suggestion = new Suggestion( $pid, $row->prob );
-			$resultArray[] = $suggestion;
-		}
-		return $resultArray;
 	}
 
 	/**
@@ -185,13 +143,13 @@ class SimpleSuggester implements SuggesterEngine {
 					}
 				}
 			}
-			return $this->getPropertySuggestions( $ids, $idTuples, count($snaks), $limit, $minProbability, $context );
+			return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
 		}
 		foreach ( $snaks as $snak ) {
 			$numericId = $snak->getPropertyId()->getNumericId();
 			$idTuples[] = $this->buildTuple( $numericId, 0 );
 		}
-		return $this->getSuggestions( $ids, $idTuples, count($snaks), $limit, $minProbability, $context );
+		return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
 	}
 
 	/**
@@ -218,10 +176,6 @@ class SimpleSuggester implements SuggesterEngine {
 			$resultArray[] = $suggestion;
 		}
 		return $resultArray;
-	}
-
-	private function getNumericIdFromClaim( Claim $claim ) {
-		return $claim->getMainSnak()->getPropertyId()->getNumericId();
 	}
 
 	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {
