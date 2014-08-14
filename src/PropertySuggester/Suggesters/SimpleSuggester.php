@@ -111,8 +111,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability, $context ) {
 		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds );
-
-		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
+		return $this->getSuggestions( $numericIds, array(), $limit, $minProbability, $context );
 	}
 
 	/**
@@ -128,26 +127,19 @@ class SimpleSuggester implements SuggesterEngine {
 		$snaks = $item->getAllSnaks();
 		$ids = array();
 		$idTuples = array();
-		if ( $context == "item"){
-			foreach ( $snaks as $snak ) {
-				$numericId = $snak->getPropertyId()->getNumericId();
-				$ids[] = $numericId;
-				if (! in_array( $numericId, $this->classifyingProperties ) ) {
-					$idTuples[] = $this->buildTuple($numericId, 0);
-				}
-				else {
-					if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
-						$dataValue = $snak->getDataValue();
-						$id = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
-						$idTuples[] = $this->buildTuple( $snak->getPropertyId()->getNumericId(), $id );
-					}
-				}
-			}
-			return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
-		}
 		foreach ( $snaks as $snak ) {
 			$numericId = $snak->getPropertyId()->getNumericId();
-			$idTuples[] = $this->buildTuple( $numericId, 0 );
+			$ids[] = $numericId;
+			if (! in_array( $numericId, $this->classifyingProperties ) ) {
+				$idTuples[] = $this->buildTuple( $numericId, 0 );
+			}
+			else {
+				if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
+					$dataValue = $snak->getDataValue();
+					$id = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
+					$idTuples[] = $this->buildTuple( $snak->getPropertyId()->getNumericId(), $id );
+				}
+			}
 		}
 		return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
 	}
@@ -180,6 +172,10 @@ class SimpleSuggester implements SuggesterEngine {
 
 	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {
 		return $propertyId->getNumericId();
+	}
+
+	private function getNumericIdFromClaim( Claim $claim ) {
+		return $claim->getMainSnak()->getPropertyId()->getNumericId();
 	}
 
 }
