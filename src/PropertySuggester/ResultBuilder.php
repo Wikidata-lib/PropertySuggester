@@ -5,10 +5,10 @@ namespace PropertySuggester;
 use ApiResult;
 use ProfileSection;
 use PropertySuggester\Suggesters\Suggestion;
-use Wikibase\EntityTitleLookup;
 use Wikibase\Term;
 use Wikibase\TermIndex;
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\Lib\Store\EntityTitleLookup;
 
 /**
  * ResultBuilder builds Json-compatible array structure from suggestions
