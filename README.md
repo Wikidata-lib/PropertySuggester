@@ -44,7 +44,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
-### 1.1 (soon)
+### 1.1.1 (dev)
+* Update namespace of EntityTitleLookup, per change in Wikibase.
+
+### 1.1 (2014-07-25)
 * Suggest properties for qualifiers and references based on the property of the mainsnak
 
 ### 1.0 (2014-07-01)
