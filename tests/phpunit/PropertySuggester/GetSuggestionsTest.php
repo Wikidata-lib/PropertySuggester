@@ -115,6 +115,18 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 		$this->assertCount( 0, $result['search'] );
 	}
 
+	public function testExecutionWithInvalidContext() {
+		$p56 = self::$idMap['%P56%'];
+		$params = array(
+			'action' => 'wbsgetsuggestions',
+			'properties' => $p56,
+			'context' => 'delete all the things!'
+		);
+
+		$this->setExpectedException( 'UsageException' );
+		$res = $this->doApiRequest( $params );
+	}
+
 	public function testGetAllowedParams() {
 		$this->assertNotEmpty( $this->getSuggestions->getAllowedParams() );
 	}

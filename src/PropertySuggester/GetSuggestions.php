@@ -155,7 +155,7 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
 			),
 			'context' => array(
-				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_TYPE => array( 'item', 'qualifier', 'reference' ),
 				ApiBase::PARAM_DFLT => 'item',
 			),
 			'search' => array(
