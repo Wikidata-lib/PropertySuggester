@@ -5,9 +5,10 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancerSingle;
 use InvalidArgumentException;
 use MediaWikiTestCase;
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Claim\Statement;
+use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 
 /**
@@ -66,7 +67,8 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testSuggestByItem() {
-		$item = Item::newFromArray( array( 'entity' => 'q42' ) );
+		$item = Item::newEmpty();
+		$item->setId( new ItemId( 'Q42' ) );
 		$statement = new Statement( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) );
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
