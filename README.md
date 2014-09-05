@@ -44,7 +44,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
-### 1.1.1 (dev)
+### 1.1.2 (2014-09-05)
+* Wikibase Data Model 1.0 compatibility fixes.
+
+### 1.1.1 (2014-08-27)
 * Update namespace of EntityTitleLookup, per change in Wikibase.
 
 ### 1.1 (2014-07-25)
