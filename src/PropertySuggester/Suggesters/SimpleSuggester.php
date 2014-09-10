@@ -74,7 +74,7 @@ class SimpleSuggester implements SuggesterEngine {
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
-		if (context == 'item'){
+		if ($context == 'item'){
 			$condition = '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')';
 		}
 		else{
@@ -124,18 +124,18 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$snaks = $item->getAllSnaks();
+		$claims = $item->getClaims();
 		$ids = array();
 		$idTuples = array();
-		foreach ( $snaks as $snak ) {
-			$numericId = $snak->getPropertyId()->getNumericId();
+		foreach ( $claims as $claim ) {
+			$numericId = $this->getNumericIdFromClaim( $claim );
 			$ids[] = $numericId;
 			if (! in_array( $numericId, $this->classifyingProperties ) ) {
 				$idTuples[] = $this->buildTuple( $numericId, 0 );
 			}
 			else {
-				if ( $snak->getDataValue()->getType() === "wikibase-entityid" ) {
-					$dataValue = $snak->getDataValue();
+				if ( $claim->getMainSnak()->getType() === "wikibase-entityid" ) {
+					$dataValue = $claim->getMainSnak()->getDataValue();
 					$id = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
 					$idTuples[] = $this->buildTuple( $snak->getPropertyId()->getNumericId(), $id );
 				}
