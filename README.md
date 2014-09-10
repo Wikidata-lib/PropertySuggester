@@ -17,12 +17,12 @@ The recommended way to use this library is via [Composer](http://getcomposer.org
 ### Composer
 
 To add this package as a local, per-project dependency to your project, simply add a
-dependency on `propertysuggester/propertysuggester` to your project's `composer.json` file.
+dependency on `propertysuggester/property-suggester` to your project's `composer.json` file.
 Here is a minimal example of a `composer.json` file:
 
     {
         "require": {
-            "propertysuggester/propertysuggester": "*"
+            "propertysuggester/property-suggester": "*"
         }
     }
 
@@ -44,7 +44,13 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
-### 1.1 (soon)
+### 1.1.2 (2014-09-05)
+* Wikibase Data Model 1.0 compatibility fixes.
+
+### 1.1.1 (2014-08-27)
+* Update namespace of EntityTitleLookup, per change in Wikibase.
+
+### 1.1 (2014-07-25)
 * Suggest properties for qualifiers and references based on the property of the mainsnak
 
 ### 1.0 (2014-07-01)

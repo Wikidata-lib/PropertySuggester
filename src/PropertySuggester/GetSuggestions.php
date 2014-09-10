@@ -9,8 +9,8 @@ use ProfileSection;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\EntityTitleLookup;
 use Wikibase\Lib\Store\EntityLookup;
+use Wikibase\Lib\Store\EntityTitleLookup;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\TermIndex;
 use Wikibase\Utils;
@@ -155,7 +155,7 @@ class GetSuggestions extends ApiBase {
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
 			),
 			'context' => array(
-				ApiBase::PARAM_TYPE => 'string',
+				ApiBase::PARAM_TYPE => array( 'item', 'qualifier', 'reference' ),
 				ApiBase::PARAM_DFLT => 'item',
 			),
 			'search' => array(

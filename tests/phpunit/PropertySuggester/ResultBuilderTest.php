@@ -22,7 +22,7 @@ class ResultBuilderTest extends MediaWikiTestCase {
 		parent::setUp();
 		$apiMain =  $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
 
-		$entityTitleLookup = $this->getMock( 'Wikibase\EntityTitleLookup' );
+		$entityTitleLookup = $this->getMock( 'Wikibase\Lib\Store\EntityTitleLookup' );
 		$termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$result = new ApiResult( $apiMain );
 
