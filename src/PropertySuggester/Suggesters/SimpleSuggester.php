@@ -9,7 +9,6 @@ use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
-use Wikibase\DataModel\Snak\Snak;
 
 /**
  * a Suggester implementation that creates suggestion via MySQL
@@ -52,7 +51,6 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int[] $propertyIds
 	 * @param string[] $idTuples
 	 * @param int $limit
-	 * @param int $count
 	 * @param float $minProbability
 	 * @param string $context
 	 * @throws InvalidArgumentException
@@ -74,7 +72,7 @@ class SimpleSuggester implements SuggesterEngine {
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
-		if ($context == 'item'){
+		if ($context === 'item'){
 			$condition = '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')';
 		}
 		else{
@@ -84,7 +82,6 @@ class SimpleSuggester implements SuggesterEngine {
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
 			array( $condition,
-				   'qid1' => 0,
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
 				   'context' => $context ),
 			__METHOD__,
@@ -134,10 +131,10 @@ class SimpleSuggester implements SuggesterEngine {
 				$idTuples[] = $this->buildTuple( $numericId, 0 );
 			}
 			else {
-				if ( $claim->getMainSnak()->getType() === "wikibase-entityid" ) {
+				if ( $claim->getMainSnak()->getType() === "value" ) {
 					$dataValue = $claim->getMainSnak()->getDataValue();
 					$id = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
-					$idTuples[] = $this->buildTuple( $snak->getPropertyId()->getNumericId(), $id );
+					$idTuples[] = $this->buildTuple( $this->getNumericIdFromClaim( $claim ), $id );
 				}
 			}
 		}
