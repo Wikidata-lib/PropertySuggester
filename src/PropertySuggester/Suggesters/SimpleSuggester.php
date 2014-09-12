@@ -26,7 +26,7 @@ class SimpleSuggester implements SuggesterEngine {
 	/**
 	 * @var int[]
 	 */
-	private $classifyingProperties = array(31);
+	private $classifyingProperties = array();
 
 	/**
 	 * @var LoadBalancer
@@ -45,6 +45,13 @@ class SimpleSuggester implements SuggesterEngine {
 	 */
 	public function setDeprecatedPropertyIds( array $deprecatedPropertyIds ) {
 		$this->deprecatedPropertyIds = $deprecatedPropertyIds;
+	}
+
+	/**
+	 * @param int[] $classifyingPropertyIds
+	 */
+	public function setClassifyingPropertyIds( array $classifyingPropertyIds ) {
+		$this->classifyingProperties = $classifyingPropertyIds;
 	}
 
 	/**
