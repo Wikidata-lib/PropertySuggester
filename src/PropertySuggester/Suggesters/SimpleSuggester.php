@@ -5,7 +5,7 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancer;
 use ProfileSection;
 use InvalidArgumentException;
-use Wikibase\DataModel\Claim\Claim;
+use Wikibase\DataModel\Statement\Statement;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
@@ -128,20 +128,20 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$claims = $item->getClaims();
+		$statements = $item->getStatements()->toArray();
 		$ids = array();
 		$idTuples = array();
-		foreach ( $claims as $claim ) {
-			$numericId = $this->getNumericIdFromClaim( $claim );
-			$ids[] = $numericId;
-			if (! in_array( $numericId, $this->classifyingProperties ) ) {
-				$idTuples[] = $this->buildTuple( $numericId, 0 );
+		foreach ( $statements as $statement ) {
+			$numericPropertyId = $this->getNumericIdFromPropertyId( $statement->getMainSnak()->getPropertyId() );
+			$ids[] = $numericPropertyId;
+			if (! in_array( $numericPropertyId, $this->classifyingProperties ) ) {
+				$idTuples[] = $this->buildTuple( $numericPropertyId, 0 );
 			}
 			else {
-				if ( $claim->getMainSnak()->getType() === "value" ) {
-					$dataValue = $claim->getMainSnak()->getDataValue();
-					$id = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
-					$idTuples[] = $this->buildTuple( $this->getNumericIdFromClaim( $claim ), $id );
+				if ( $statement->getMainSnak()->getType() === "value" ) {
+					$dataValue = $statement->getMainSnak()->getDataValue();
+					$numericEntityId = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
+					$idTuples[] = $this->buildTuple( $numericPropertyId, $numericEntityId );
 				}
 			}
 		}
@@ -176,10 +176,6 @@ class SimpleSuggester implements SuggesterEngine {
 
 	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {
 		return $propertyId->getNumericId();
-	}
-
-	private function getNumericIdFromClaim( Claim $claim ) {
-		return $claim->getMainSnak()->getPropertyId()->getNumericId();
 	}
 
 }
