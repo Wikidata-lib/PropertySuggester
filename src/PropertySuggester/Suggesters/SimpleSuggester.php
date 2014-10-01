@@ -79,11 +79,11 @@ class SimpleSuggester implements SuggesterEngine {
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
-		if ($context === 'item'){
-			$condition = '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')';
+		if ( empty( $idTuples ) ){
+			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
 		}
 		else{
-			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
+			$condition = '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')';
 		}
 		$res = $dbr->select(
 			'wbs_propertypairs',

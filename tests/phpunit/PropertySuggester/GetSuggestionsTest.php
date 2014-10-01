@@ -72,7 +72,7 @@ class GetSuggestionTest extends WikibaseApiTestCase {
 		$ip56 = (int)substr( $p56, 1 );
 		$ip72 = (int)substr( $p72, 1 );
 
-		$row = array( 'pid1' => $ip56, 'qid1' => null, 'pid2' => $ip72, 'count' => 1,
+		$row = array( 'pid1' => $ip56, 'qid1' => 0, 'pid2' => $ip72, 'count' => 1,
 			'probability' => 0.3, 'context' => 'item' );
 
 		$this->db->insert( 'wbs_propertypairs', array( $row ) );
