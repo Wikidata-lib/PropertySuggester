@@ -5,7 +5,7 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancer;
 use ProfileSection;
 use InvalidArgumentException;
-use Wikibase\DataModel\Statement\Statement;
+use \Wikibase\DataModel\Statement\Statement;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
@@ -135,7 +135,7 @@ class SimpleSuggester implements SuggesterEngine {
 			$numericPropertyId = $this->getNumericIdFromPropertyId( $statement->getMainSnak()->getPropertyId() );
 			$ids[] = $numericPropertyId;
 			if (! in_array( $numericPropertyId, $this->classifyingProperties ) ) {
-				$idTuples[] = $this->buildTuple( $numericPropertyId, 0 );
+				$idTuples[] = $this->buildTuple( $numericPropertyId, '0' );
 			}
 			else {
 				if ( $statement->getMainSnak()->getType() === "value" ) {
