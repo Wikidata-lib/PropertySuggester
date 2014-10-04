@@ -83,7 +83,7 @@ class SimpleSuggester implements SuggesterEngine {
 			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
 		}
 		else{
-			$condition = '(pid1, qid1) IN (' . str_replace( "'", '', $dbr->makeList( $idTuples ) ) . ')';
+			$condition = str_replace( "'", '', $dbr->makeList( $idTuples, LIST_OR ) );
 		}
 		$res = $dbr->select(
 			'wbs_propertypairs',
@@ -135,13 +135,13 @@ class SimpleSuggester implements SuggesterEngine {
 			$numericPropertyId = $this->getNumericIdFromPropertyId( $statement->getMainSnak()->getPropertyId() );
 			$ids[] = $numericPropertyId;
 			if (! in_array( $numericPropertyId, $this->classifyingProperties ) ) {
-				$idTuples[] = $this->buildTuple( $numericPropertyId, '0' );
+				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, '0' );
 			}
 			else {
 				if ( $statement->getMainSnak()->getType() === "value" ) {
 					$dataValue = $statement->getMainSnak()->getDataValue();
 					$numericEntityId = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
-					$idTuples[] = $this->buildTuple( $numericPropertyId, $numericEntityId );
+					$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericEntityId );
 				}
 			}
 		}
@@ -153,8 +153,8 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param string $b
 	 * @return string
 	 */
-	public function buildTuple( $a, $b ){
-		$tuple = '('. $a .', '. $b .')';
+	public function buildTupleCondition( $pid, $qid ){
+		$tuple = '(pid1 = '. $pid .' AND qid1 = '. $qid .')';
 		return $tuple;
 	}
 
