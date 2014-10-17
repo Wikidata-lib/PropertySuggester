@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 1.1.3 (2014-10-17)
+* Wikibase Data Model 2.0 compatibility fixes.
+
 ### 1.1.2 (2014-09-05)
 * Wikibase Data Model 1.0 compatibility fixes.
 
