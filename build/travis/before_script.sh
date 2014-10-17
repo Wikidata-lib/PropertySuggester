@@ -12,7 +12,7 @@ cd ..
 wget https://github.com/wikimedia/mediawiki-core/archive/master.tar.gz
 tar -zxf master.tar.gz
 rm master.tar.gz
-mv mediawiki-core-master wiki
+mv mediawiki-master wiki
 
 # checkout wikibase
 wget https://github.com/wikimedia/mediawiki-extensions-Wikibase/archive/master.tar.gz
