@@ -5,11 +5,11 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancerSingle;
 use InvalidArgumentException;
 use MediaWikiTestCase;
-use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
+use Wikibase\DataModel\Statement\Statement;
 
 /**
  * @covers PropertySuggester\Suggesters\SimpleSuggester
