@@ -5,11 +5,12 @@ namespace PropertySuggester;
 use MediaWikiTestCase;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
+use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Claim\Statement;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
+use Wikibase\DataModel\Statement\Statement;
 use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\TermIndex;
 use InvalidArgumentException;
@@ -104,7 +105,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	public function testGenerateSuggestionsWithItem() {
 		$item = Item::newEmpty();
 		$item->setId( new ItemId( 'Q42' ) );
-		$statement = new Statement( new PropertySomeValueSnak( new PropertyId( 'P12' ) ) );
+		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P12' ) ) ) );
 		$statement->setGuid( 'claim0' ); // otherwise "InvalidArgumentException: Can't add a Claim without a GUID."
 		$item->addClaim( $statement );
 

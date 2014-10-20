@@ -5,11 +5,12 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancerSingle;
 use InvalidArgumentException;
 use MediaWikiTestCase;
-use Wikibase\DataModel\Statement\Statement;
+use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
+use Wikibase\DataModel\Statement\Statement;
 
 /**
  * @covers PropertySuggester\Suggesters\SimpleSuggester
@@ -33,11 +34,11 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	public function addDBData() {
 		$rows = array();
-		$rows[] = $this->row( 1, 0, 2, 100, 0.1, 'item' );
-		$rows[] = $this->row( 1, 0, 3, 50, 0.05, 'item' );
-		$rows[] = $this->row( 2, 0, 3, 100, 0.3, 'item' );
-		$rows[] = $this->row( 2, 0, 4, 200, 0.2, 'item' );
-		$rows[] = $this->row( 3, 0, 1, 100, 0.5, 'item' );
+		$rows[] = $this->row( 1, null, 2, 100, 0.1, 'item' );
+		$rows[] = $this->row( 1, null, 3, 50, 0.05, 'item' );
+		$rows[] = $this->row( 2, null, 3, 100, 0.3, 'item' );
+		$rows[] = $this->row( 2, null, 4, 200, 0.2, 'item' );
+		$rows[] = $this->row( 3, null, 1, 100, 0.5, 'item' );
 
 		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
@@ -69,9 +70,9 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	public function testSuggestByItem() {
 		$item = Item::newEmpty();
 		$item->setId( new ItemId( 'Q42' ) );
-		$statement = new Statement( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) );
+		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) ) );
 		$statement->setGuid( 'claim0' );
-		$item->getStatements()->addStatement( $statement );
+		$item->addClaim( $statement );
 
 		$res = $this->suggester->suggestByItem( $item, 100, 0.0, 'item' );
 
