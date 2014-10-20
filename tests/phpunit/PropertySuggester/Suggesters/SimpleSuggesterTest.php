@@ -34,11 +34,11 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	public function addDBData() {
 		$rows = array();
-		$rows[] = $this->row( 1, null, 2, 100, 0.1, 'item' );
-		$rows[] = $this->row( 1, null, 3, 50, 0.05, 'item' );
-		$rows[] = $this->row( 2, null, 3, 100, 0.3, 'item' );
-		$rows[] = $this->row( 2, null, 4, 200, 0.2, 'item' );
-		$rows[] = $this->row( 3, null, 1, 100, 0.5, 'item' );
+		$rows[] = $this->row( 1, 0, 2, 100, 0.1, 'item' );
+		$rows[] = $this->row( 1, 0, 3, 50, 0.05, 'item' );
+		$rows[] = $this->row( 2, 0, 3, 100, 0.3, 'item' );
+		$rows[] = $this->row( 2, 0, 4, 200, 0.2, 'item' );
+		$rows[] = $this->row( 3, 0, 1, 100, 0.5, 'item' );
 
 		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
