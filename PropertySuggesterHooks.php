@@ -1,6 +1,6 @@
 <?php
 
-use Wikibase\NamespaceUtils;
+use Wikibase\Repo\WikibaseRepo;
 
 final class PropertySuggesterHooks {
 
@@ -17,9 +17,11 @@ final class PropertySuggesterHooks {
 		if ( $out->getRequest()->getCheck( 'nosuggestions' ) ) {
 			return true;
 		}
-		$itemNs = NamespaceUtils::getEntityNamespace( CONTENT_MODEL_WIKIBASE_ITEM );
-		$namespace = $out->getTitle()->getNamespace();
-		if ( $namespace != $itemNs ) {
+
+		$entityNamespaceLookup = WikibaseRepo::getDefaultInstance()->getEntityNamespaceLookup();
+		$itemNamespace = $entityNamespaceLookup->getEntityNamespace( CONTENT_MODEL_WIKIBASE_ITEM );
+
+		if ( $out->getTitle()->getNamespace() !== $itemNamespace ) {
 			return true;
 		}
 
