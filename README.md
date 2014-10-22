@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 1.1.4 (2014-10-22)
+* Replace usage of Wikibase\NamespaceUtils for compatibility with Wikibase Repo.
+
 ### 1.1.3 (2014-10-17)
 * Wikibase Data Model 2.0 compatibility fixes.
 
