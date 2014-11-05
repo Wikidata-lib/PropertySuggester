@@ -5,7 +5,6 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancer;
 use ProfileSection;
 use InvalidArgumentException;
-use \Wikibase\DataModel\Statement\Statement;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
@@ -26,7 +25,7 @@ class SimpleSuggester implements SuggesterEngine {
 	/**
 	 * @var int[]
 	 */
-	private $classifyingProperties = array();
+	private $classifyingPropertyIds = array();
 
 	/**
 	 * @var LoadBalancer
@@ -51,7 +50,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int[] $classifyingPropertyIds
 	 */
 	public function setClassifyingPropertyIds( array $classifyingPropertyIds ) {
-		$this->classifyingProperties = $classifyingPropertyIds;
+		$this->classifyingPropertyIds = array_flip( $classifyingPropertyIds );
 	}
 
 	/**
@@ -134,7 +133,7 @@ class SimpleSuggester implements SuggesterEngine {
 		foreach ( $statements as $statement ) {
 			$numericPropertyId = $this->getNumericIdFromPropertyId( $statement->getMainSnak()->getPropertyId() );
 			$ids[] = $numericPropertyId;
-			if ( !in_array( $numericPropertyId, $this->classifyingProperties ) ) {
+			if ( !isset( $this->classifyingPropertyIds[$numericPropertyId] ) ) {
 				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, '0' );
 			}
 			else {
@@ -154,7 +153,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return string
 	 */
 	private function buildTupleCondition( $pid, $qid ){
-		$tuple = '(pid1 = '. $pid .' AND qid1 = '. $qid .')';
+		$tuple = '(pid1 = '. ( int )$pid .' AND qid1 = '. ( int )$qid .')';
 		return $tuple;
 	}
 
