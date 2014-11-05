@@ -21,7 +21,8 @@ $wgExtensionCredits['wikibase'][] = array(
 	'name' => 'PropertySuggester',
 	'author' => array( 'Christian Dullweber', 'Moritz Finke', 'Felix Niemeyer', 'Virginia Weidhaas' ),
 	'url' => 'https://github.com/Wikidata-lib/PropertySuggester',
-	'descriptionmsg' => 'propertysuggester-desc'
+	'descriptionmsg' => 'propertysuggester-desc',
+	'license-name' => 'GPL-2.0+'
 );
 
 global $wgExtensionMessagesFiles;
