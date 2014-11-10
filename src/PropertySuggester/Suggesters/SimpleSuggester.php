@@ -5,11 +5,9 @@ namespace PropertySuggester\Suggesters;
 use LoadBalancer;
 use ProfileSection;
 use InvalidArgumentException;
-use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
-use Wikibase\DataModel\Snak\Snak;
 
 /**
  * a Suggester implementation that creates suggestion via MySQL
@@ -23,6 +21,11 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @var int[]
 	 */
 	private $deprecatedPropertyIds = array();
+
+	/**
+	 * @var int[]
+	 */
+	private $classifyingPropertyIds = array();
 
 	/**
 	 * @var LoadBalancer
@@ -44,14 +47,22 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
+	 * @param int[] $classifyingPropertyIds
+	 */
+	public function setClassifyingPropertyIds( array $classifyingPropertyIds ) {
+		$this->classifyingPropertyIds = array_flip( $classifyingPropertyIds );
+	}
+
+	/**
 	 * @param int[] $propertyIds
+	 * @param string[] $idTuples
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @param string $context
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $propertyIds, $limit, $minProbability, $context ) {
+	protected function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
 		$profiler = new ProfileSection( __METHOD__ );
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
@@ -67,11 +78,16 @@ class SimpleSuggester implements SuggesterEngine {
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
+		if ( empty( $idTuples ) ){
+			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
+		}
+		else{
+			$condition = $dbr->makeList( $idTuples, LIST_OR );
+		}
 		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')',
-				   'qid1' => null,
+			array( $condition,
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
 				   'context' => $context ),
 			__METHOD__,
@@ -80,8 +96,8 @@ class SimpleSuggester implements SuggesterEngine {
 				'ORDER BY' => 'prob DESC',
 				'LIMIT'    => $limit,
 				'HAVING'   => 'prob > ' . floatval( $minProbability )
-			)
-		);
+				)
+			);
 		$this->lb->reuseConnection( $dbr );
 
 		return $this->buildResult( $res );
@@ -98,8 +114,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability, $context ) {
 		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds );
-
-		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
+		return $this->getSuggestions( $numericIds, array(), $limit, $minProbability, $context );
 	}
 
 	/**
@@ -107,14 +122,39 @@ class SimpleSuggester implements SuggesterEngine {
 	 *
 	 * @param Item $item
 	 * @param int $limit
-  	 * @param float $minProbability
+	 * @param float $minProbability
 	 * @param string $context
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$claims = $item->getClaims();
-		$numericIds = array_unique( array_map( array( $this, 'getNumericIdFromClaim' ), $claims ) );
-		return $this->getSuggestions( $numericIds, $limit, $minProbability, $context );
+		$statements = $item->getStatements()->toArray();
+		$ids = array();
+		$idTuples = array();
+		foreach ( $statements as $statement ) {
+			$numericPropertyId = $this->getNumericIdFromPropertyId( $statement->getMainSnak()->getPropertyId() );
+			$ids[] = $numericPropertyId;
+			if ( !isset( $this->classifyingPropertyIds[$numericPropertyId] ) ) {
+				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, '0' );
+			}
+			else {
+				if ( $statement->getMainSnak()->getType() === "value" ) {
+					$dataValue = $statement->getMainSnak()->getDataValue();
+					$numericEntityId = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
+					$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericEntityId );
+				}
+			}
+		}
+		return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
+	}
+
+	/**
+	 * @param int $a
+	 * @param int $b
+	 * @return string
+	 */
+	private function buildTupleCondition( $pid, $qid ){
+		$tuple = '(pid1 = '. ( int )$pid .' AND qid1 = '. ( int )$qid .')';
+		return $tuple;
 	}
 
 	/**
@@ -131,10 +171,6 @@ class SimpleSuggester implements SuggesterEngine {
 			$resultArray[] = $suggestion;
 		}
 		return $resultArray;
-	}
-
-	private function getNumericIdFromClaim( Claim $claim ) {
-		return $claim->getMainSnak()->getPropertyId()->getNumericId();
 	}
 
 	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {

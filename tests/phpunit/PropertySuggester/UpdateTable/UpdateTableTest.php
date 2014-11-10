@@ -30,16 +30,16 @@ class UpdateTableTest extends MediaWikiTestCase {
 
 	public function getRows() {
 		$rows1 = array(
-			array( 1, null, 2, 100, 0.1, 'item' ),
-			array( 1, null, 3, 50, 0.05, 'item' ),
-			array( 2, null, 3, 100, 0.1, 'item' ),
-			array( 2, null, 4, 200, 0.2, 'item' ),
-			array( 3, null, 1, 123, 0.5, 'item' )
+			array( 1, 0, 2, 100, 0.1, 'item' ),
+			array( 1, 0, 3, 50, 0.05, 'item' ),
+			array( 2, 0, 3, 100, 0.1, 'item' ),
+			array( 2, 0, 4, 200, 0.2, 'item' ),
+			array( 3, 0, 1, 123, 0.5, 'item' )
 		);
 
 		$rows2 = array();
 		for ($i=0; $i<1100; $i++) {
-			$rows2[] = array( $i, null, 2, 100, 0.1, 'item' );
+			$rows2[] = array( $i, 0, 2, 100, 0.1, 'item' );
 		}
 
 		return array(

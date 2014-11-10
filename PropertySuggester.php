@@ -51,10 +51,15 @@ $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 	'remoteExtPath' => $remoteExtPathParts[1],
 );
 
-
 global $wgPropertySuggesterDeprecatedIds;
 $wgPropertySuggesterDeprecatedIds = array(
 	107 // ( DEPRECATED main type )
 );
+
+global $wgPropertySuggesterClassifyingPropertyIds;
+$wgPropertySuggesterClassifyingPropertyIds = array(
+	31 // instance of
+);
+
 global $wgPropertySuggesterMinProbability;
 $wgPropertySuggesterMinProbability = 0.05;

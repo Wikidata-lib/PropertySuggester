@@ -67,7 +67,7 @@ class BasicImporter implements Importer {
 				}
 			}
 
-			$qid1 = is_numeric( $data[1] ) ? $data[1] : null;
+			$qid1 = is_numeric( $data[1] ) ? $data[1] : 0;
 
 			$accumulator[] = array( 'pid1' => $data[0], 'qid1' => $qid1, 'pid2' => $data[2], 'count' => $data[3],
 									'probability' => $data[4], 'context' => $data[5] );
