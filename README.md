@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.0.0 (2014-11-10)
+* Consider classifying properties (needs version 2.0.0 of PropertySuggester-Python)
+
 ### 1.1.4 (2014-10-22)
 * Replace usage of Wikibase\NamespaceUtils for compatibility with Wikibase Repo.
 * Specified GPL-2.0+ license
