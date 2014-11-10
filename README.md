@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 1.1.5 (2014-11-10)
+* Adjust to new version of DataModel JavaScript
+
 ### 1.1.4 (2014-10-22)
 * Replace usage of Wikibase\NamespaceUtils for compatibility with Wikibase Repo.
 
