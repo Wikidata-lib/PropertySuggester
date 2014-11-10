@@ -105,7 +105,7 @@
 			}
 			var statement = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
 			if( statement ) {
-				return statement.getMainSnak().getPropertyId();
+				return statement.getClaim().getMainSnak().getPropertyId();
 			} else {
 				return null;
 			}

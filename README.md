@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.0.1 (dev)
+Adjust to new version of DataModel-JavaScript
+
 ### 2.0.0 (2014-11-10)
 * Consider classifying properties (needs version 2.0.0 of PropertySuggester-Python)
 
