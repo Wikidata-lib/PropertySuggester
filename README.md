@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.0.2 (2014-12-17)
+* Fix TermIndex method call in ResultBuilder
+
 ### 2.0.1 (2014-11-11)
 Adjust to new version of DataModel-JavaScript
 
