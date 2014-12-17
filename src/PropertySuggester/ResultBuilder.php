@@ -65,7 +65,12 @@ class ResultBuilder {
 			$ids[] = $id;
 		}
 		//See SearchEntities
-		$terms = $this->termIndex->getTermsOfEntities( $ids, 'property', $language );
+		$terms = $this->termIndex->getTermsOfEntities(
+			$ids,
+			'property',
+			null,
+			array( $language )
+		);
 		$clusteredTerms = $this->clusterTerms( $terms );
 
 		foreach ( $suggestions as $suggestion ) {
