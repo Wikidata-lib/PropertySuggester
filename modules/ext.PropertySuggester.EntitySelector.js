@@ -99,11 +99,11 @@
 		 */
 		_getPropertyId: function() {
 			try {
-				var $statementView = this.element.closest( ':wikibase-statementview' );
+				var $statementview = this.element.closest( ':wikibase-statementview' );
 			} catch( e ) {
 				return null;
 			}
-			var statement = $statementView.length > 0 ? $statementView.data( 'statementview' ).option( 'value' ) : null;
+			var statement = $statementview.length > 0 ? $statementview.data( 'statementview' ).option( 'value' ) : null;
 			if( statement ) {
 				return statement.getClaim().getMainSnak().getPropertyId();
 			} else {
@@ -133,12 +133,12 @@
 		 * @return {boolean}
 		 */
 		_isQualifier: function() {
-			var $claimview = this.element.closest( ':wikibase-claimview, :wikibase-statementview' );
-			var claimview = $claimview.data( 'claimview' ) || $claimview.data( 'statementview' );
-			if( !claimview ) {
+			var $statementview = this.element.closest( ':wikibase-statementview' );
+			var statementview = $statementview.data( 'statementview' );
+			if( !statementview ) {
 				return false;
 			}
-			return this.element.closest( claimview.$qualifiers ).length > 0;
+			return this.element.closest( statementview.$qualifiers ).length > 0;
 		},
 
 		/**
@@ -154,9 +154,9 @@
 		 * @return {boolean}
 		 */
 		_isInNewStatementView: function() {
-			var $statementView = this.element.closest( ':wikibase-statementview' );
-			var value = ( $statementView.length > 0 )
-				? $statementView.data( 'statementview' ).option( 'value' )
+			var $statementview = this.element.closest( ':wikibase-statementview' );
+			var value = ( $statementview.length > 0 )
+				? $statementview.data( 'statementview' ).option( 'value' )
 				: null;
 			return value === null;
 		}
