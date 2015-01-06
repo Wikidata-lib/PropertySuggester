@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.0.3 (2015-01-06)
+* Adjust to removal of claimview
+
 ### 2.0.2 (2014-12-17)
 * Fix TermIndex method call in ResultBuilder
 
