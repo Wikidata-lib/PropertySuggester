@@ -26,9 +26,9 @@
 			var focusHandler = function( event ) {
 				if( self._useSuggester() && self.element.val() === ''
 					&& !self.options.menu.element.is( ":visible" ) ) {
-					self._minTermLength = 0;
+					self.options.minTermLength = 0;
 					self._cache = {}; // is done in the entityselector on eachchange too
-					self.search( event );
+					self.search();
 				}
 			};
 			self.element.on( 'focus', focusHandler );
