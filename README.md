@@ -44,6 +44,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.0.4 (2015-01-13)
+* Adjust to changes in ValueView 0.10.0.
+
 ### 2.0.3 (2015-01-06)
 * Adjust to removal of claimview
 
