@@ -67,7 +67,6 @@ class ResultBuilder {
 		//See SearchEntities
 		$terms = $this->termIndex->getTermsOfEntities(
 			$ids,
-			'property',
 			null,
 			array( $language )
 		);
