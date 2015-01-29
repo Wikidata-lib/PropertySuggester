@@ -44,7 +44,7 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
-### 2.0.5 (2015-01-19)
+### 2.0.5 (2015-01-29)
 * Fix TermIndex method call in ResultBuilder
 
 ### 2.0.4 (2015-01-13)
