@@ -3,7 +3,6 @@
 namespace PropertySuggester\Suggesters;
 
 use LoadBalancer;
-use ProfileSection;
 use InvalidArgumentException;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
@@ -63,7 +62,6 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	protected function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
 		}
