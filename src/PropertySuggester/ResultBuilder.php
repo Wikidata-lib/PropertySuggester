@@ -3,7 +3,6 @@
 namespace PropertySuggester;
 
 use ApiResult;
-use ProfileSection;
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\Term;
 use Wikibase\TermIndex;
@@ -57,7 +56,6 @@ class ResultBuilder {
 	 * @return array
 	 */
 	public function createResultArray( array $suggestions, $language ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		$entries = array();
 		$ids = array();
 		foreach ( $suggestions as $suggestion ) {
@@ -154,7 +152,6 @@ class ResultBuilder {
 	 * @return array representing Json
 	 */
 	public function mergeWithTraditionalSearchResults( array &$entries, array $searchResults, $resultSize ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		// Avoid duplicates
 		$existingKeys = array();
 		foreach ( $entries as $entry ) {
