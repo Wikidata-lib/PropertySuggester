@@ -12,7 +12,6 @@ use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\Lib\Store\EntityTitleLookup;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\TermIndex;
-use Wikibase\Utils;
 
 /**
  * API module to get property suggestions.
@@ -30,6 +29,11 @@ class GetSuggestions extends ApiBase {
 	 * @var EntityTitleLookup
 	 */
 	private $entityTitleLookup;
+
+	/**
+	 * @var string[]
+	 */
+	private $languageCodes;
 
 	/**
 	 * @var SuggesterEngine
@@ -52,10 +56,13 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterMinProbability;
 		global $wgPropertySuggesterClassifyingPropertyIds;
 
-		$store = WikibaseRepo::getDefaultInstance()->getStore();
+		$wikibaseRepo = WikibaseRepo::getDefaultInstance();
+		$store = $wikibaseRepo->getStore();
+
 		$this->termIndex = $store->getTermIndex();
 		$this->entityLookup = $store->getEntityLookup();
-		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
+		$this->entityTitleLookup = $wikibaseRepo->getEntityTitleLookup();
+		$this->languageCodes = $wikibaseRepo->getTermsLanguages()->getLanguages();
 
 		$this->suggester = new SimpleSuggester( wfGetLB() );
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
@@ -150,7 +157,7 @@ class GetSuggestions extends ApiBase {
 			),
 			'continue' => null,
 			'language' => array(
-				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+				ApiBase::PARAM_TYPE => $this->languageCodes,
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
 			),
 			'context' => array(
