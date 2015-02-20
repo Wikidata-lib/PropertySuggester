@@ -44,6 +44,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.0.6 (2015-02-20)
+* No longer use Wikibase\Utils as it was renamed
+* Remove obvious function-level profiling
+
 ### 2.0.5 (2015-01-29)
 * Fix TermIndex method call in ResultBuilder
 
