@@ -5,6 +5,7 @@ namespace PropertySuggester;
 use ApiBase;
 use ApiMain;
 use DerivativeRequest;
+use ObjectCache;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
@@ -58,13 +59,20 @@ class GetSuggestions extends ApiBase {
 
 		$wikibaseRepo = WikibaseRepo::getDefaultInstance();
 		$store = $wikibaseRepo->getStore();
+		$settings = $wikibaseRepo->getSettings();
 
 		$this->termIndex = $store->getTermIndex();
 		$this->entityLookup = $store->getEntityLookup();
 		$this->entityTitleLookup = $wikibaseRepo->getEntityTitleLookup();
 		$this->languageCodes = $wikibaseRepo->getTermsLanguages()->getLanguages();
 
-		$this->suggester = new SimpleSuggester( wfGetLB() );
+		$this->suggester = new SimpleSuggester(
+			wfGetLB(),
+			ObjectCache::getInstance( $settings->getSetting( 'sharedCacheType' ) ),
+			$settings->getSetting( 'sharedCacheKeyPrefix' ),
+			$settings->getSetting( 'sharedCacheDuration' )
+		);
+
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 		$this->suggester->setClassifyingPropertyIds( $wgPropertySuggesterClassifyingPropertyIds );
 

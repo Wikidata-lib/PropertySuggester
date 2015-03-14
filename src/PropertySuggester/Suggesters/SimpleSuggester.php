@@ -2,11 +2,14 @@
 
 namespace PropertySuggester\Suggesters;
 
+use BagOStuff;
+use DatabaseBase;
 use LoadBalancer;
 use InvalidArgumentException;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use ResultWrapper;
+use RuntimeException;
 
 /**
  * a Suggester implementation that creates suggestion via MySQL
@@ -32,10 +35,41 @@ class SimpleSuggester implements SuggesterEngine {
 	private $lb;
 
 	/**
-	 * @param LoadBalancer $lb
+	 * @var BagOStuff
 	 */
-	public function __construct( LoadBalancer $lb ) {
+	private $cache;
+
+	/**
+	 * @var string
+	 */
+	private $cacheKeyPrefix;
+
+	/**
+	 * @var int
+	 */
+	private $cacheDuration;
+
+	/**
+	 * @param LoadBalancer $lb
+	 * @param BagOStuff $cache
+	 * @param string $cacheKeyPrefix
+	 * @param int $cacheDuration
+	 */
+	public function __construct( LoadBalancer $lb, BagOStuff $cache, $cacheKeyPrefix,
+		$cacheDuration
+	) {
+		if ( !is_string( $cacheKeyPrefix ) ) {
+			throw new InvalidArgumentException( '$cacheKeyPrefix must be a string.' );
+		}
+
+		if ( !is_int( $cacheDuration ) ) {
+			throw new InvalidArgumentException( '$cacheDuration must be an int.' );
+		}
+
 		$this->lb = $lb;
+		$this->cache = $cache;
+		$this->cacheKeyPrefix = $cacheKeyPrefix;
+		$this->cacheDuration = $cacheDuration;
 	}
 
 	/**
@@ -68,37 +102,93 @@ class SimpleSuggester implements SuggesterEngine {
 		if ( !is_float( $minProbability ) ) {
 			throw new InvalidArgumentException( '$minProbability must be float!' );
 		}
-		if ( !$propertyIds ) {
-			return array();
-		}
-
-		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
-		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_SLAVE );
-		if ( empty( $idTuples ) ){
-			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
-		}
-		else{
-			$condition = $dbr->makeList( $idTuples, LIST_OR );
-		}
+		$count = $this->getPropertyCount( $dbr, $propertyIds );
+
 		$res = $dbr->select(
 			'wbs_propertypairs',
 			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( $condition,
-				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
-				   'context' => $context ),
+			$this->makeGetSuggestionsConditions( $dbr, $propertyIds, $idTuples, $context ),
 			__METHOD__,
 			array(
 				'GROUP BY' => 'pid2',
 				'ORDER BY' => 'prob DESC',
-				'LIMIT'    => $limit,
+				'LIMIT'	=> $limit,
 				'HAVING'   => 'prob > ' . floatval( $minProbability )
-				)
-			);
+			)
+		);
+
 		$this->lb->reuseConnection( $dbr );
 
 		return $this->buildResult( $res );
+	}
+
+	/**
+	 * @param DatabaseBase $dbr
+	 * @param int[] $propertyIds
+	 *
+	 * @throws RuntimeException
+	 * @return int
+	 */
+	private function getPropertyCount( DatabaseBase $dbr, array $propertyIds ) {
+		$count = count( $propertyIds );
+
+		if ( $count === 0 ) {
+			$cacheKey = $this->cacheKeyPrefix . ':' . 'Suggester:PropertyCount';
+			$count = $this->cache->get( $cacheKey );
+
+			if ( $count === false ) {
+				$res = $dbr->selectRow(
+					'wbs_propertypairs',
+					'count(distinct(pid1)) as count',
+					array(),
+					__METHOD__
+				);
+
+				if ( !$res ) {
+					throw new RuntimeException( 'Failed to obtain property count.' );
+				}
+
+				$count = (int)$res->count;
+				$this->cache->set( $cacheKey, $count, $this->cacheDuration );
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * @param DatabaseBase $dbr
+	 * @param int[] $propertyIds
+	 * @param string[] $idTuples
+	 * @param string $context
+	 *
+	 * @return string[]
+	 */
+	private function makeGetSuggestionsConditions( DatabaseBase $dbr, array $propertyIds,
+		array $idTuples, $context
+	) {
+		$conditions = array(
+			'context' => $context
+		);
+
+		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
+
+		if ( !empty( $excludedIds ) ) {
+			array_unshift( $conditions, 'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')' );
+		}
+
+		if ( !empty( $propertyIds ) ) {
+			if ( empty( $idTuples ) ) {
+				array_unshift( $conditions,  'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')' );
+			}
+			else{
+				array_unshift( $conditions, $dbr->makeList( $idTuples, LIST_OR ) );
+			}
+		}
+
+		return $conditions;
 	}
 
 	/**
@@ -111,6 +201,10 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability, $context ) {
+		if ( empty( $propertyIds ) ) {
+			return array();
+		}
+
 		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds );
 		return $this->getSuggestions( $numericIds, array(), $limit, $minProbability, $context );
 	}
