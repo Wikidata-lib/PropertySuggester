@@ -160,8 +160,8 @@ class SimpleSuggester implements SuggesterEngine {
 
 	/**
 	 * @param DatabaseBase $dbr
-	 * @param int[] $propertyIds
-	 * @param string[] $idTuples
+	 * @param int[] $propertyIds used property ids in an item.
+	 * @param string[] $idTuples numericPropertyId => numericEntityId pairs used in an item.
 	 * @param string $context
 	 *
 	 * @return string[]

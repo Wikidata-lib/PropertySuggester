@@ -68,8 +68,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testSuggestByItem() {
-		$item = new Item();
-		$item->setId( new ItemId( 'Q42' ) );
+		$item = new Item( new ItemId( 'Q42' ) );
 		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) ) );
 		$statement->setGuid( 'claim0' );
 		$item->addClaim( $statement );
