@@ -24,7 +24,7 @@ use Wikibase\DataModel\Statement\Statement;
 class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var SuggesterEngine
+	 * @var SimpleSuggester
 	 */
 	protected $suggester;
 
@@ -94,6 +94,12 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	public function testEmptyResult() {
 		$this->assertEmpty( $this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' ) );
+	}
+
+	public function testInitialSuggestionsResult() {
+		$this->suggester->setInitialSuggestions( array( 42 ) );
+		$this->assertEquals( array( new Suggestion( new PropertyId( "P42" ), 1.0) ),
+							 $this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' ) );
 	}
 
 	/**

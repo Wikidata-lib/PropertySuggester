@@ -27,6 +27,11 @@ class SimpleSuggester implements SuggesterEngine {
 	private $classifyingPropertyIds = array();
 
 	/**
+	 * @var Suggestion[]
+	 */
+	private $initialSuggestions = array();
+
+	/**
 	 * @var LoadBalancer
 	 */
 	private $lb;
@@ -53,6 +58,18 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
+	 * @param int[] $initialSuggestionIds
+	 */
+	public function setInitialSuggestions( array $initialSuggestionIds ) {
+		$suggestions = array();
+		foreach ( $initialSuggestionIds as $id ) {
+			$suggestions[] = new Suggestion( PropertyId::newFromNumber( $id ), 1.0 );
+		}
+
+		$this->initialSuggestions = $suggestions;
+	}
+
+	/**
 	 * @param int[] $propertyIds
 	 * @param string[] $idTuples
 	 * @param int $limit
@@ -69,7 +86,7 @@ class SimpleSuggester implements SuggesterEngine {
 			throw new InvalidArgumentException( '$minProbability must be float!' );
 		}
 		if ( !$propertyIds ) {
-			return array();
+			return $this->initialSuggestions;
 		}
 
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
