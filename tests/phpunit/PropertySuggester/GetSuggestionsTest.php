@@ -32,7 +32,7 @@ use Wikibase\Test\Api\WikibaseApiTestCase;
  * @group Database
  * @group medium
  */
-class GetSuggestionTest extends WikibaseApiTestCase {
+class GetSuggestionsTest extends WikibaseApiTestCase {
 
 	/** @var EntityId[] */
 	private static $idMap;
