@@ -54,7 +54,7 @@ class ResultBuilder {
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
-	 * @return array
+	 * @return array[]
 	 */
 	public function createResultArray( array $suggestions, $language ) {
 		$profiler = new ProfileSection( __METHOD__ );
@@ -82,13 +82,13 @@ class ResultBuilder {
 
 	/**
 	 * @param EntityId $id
-	 * @param array $clusteredTerms
+	 * @param array[] $clusteredTerms
 	 * @param Suggestion $suggestion
-	 * @return array $entry
+	 * @return array
 	 */
 	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ) {
 		$entry = array();
-		$entry['id'] = $id->getPrefixedId();
+		$entry['id'] = $id->getSerialization();
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
 		$entry['rating'] = $suggestion->getProbability();
 
@@ -149,10 +149,10 @@ class ResultBuilder {
 	}
 
 	/**
-	 * @param array $entries
-	 * @param array $searchResults
+	 * @param array[] $entries
+	 * @param array[] $searchResults
 	 * @param int $resultSize
-	 * @return array representing Json
+	 * @return array[] representing Json
 	 */
 	public function mergeWithTraditionalSearchResults( array &$entries, array $searchResults, $resultSize ) {
 		$profiler = new ProfileSection( __METHOD__ );
