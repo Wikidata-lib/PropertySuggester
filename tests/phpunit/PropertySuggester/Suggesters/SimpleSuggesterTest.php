@@ -2,15 +2,13 @@
 
 namespace PropertySuggester\Suggesters;
 
-use LoadBalancerSingle;
 use InvalidArgumentException;
+use LoadBalancerSingle;
 use MediaWikiTestCase;
-use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
-use Wikibase\DataModel\Statement\Statement;
 
 /**
  * @covers PropertySuggester\Suggesters\SimpleSuggester
@@ -68,11 +66,10 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testSuggestByItem() {
-		$item = Item::newEmpty();
-		$item->setId( new ItemId( 'Q42' ) );
-		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) ) );
-		$statement->setGuid( 'claim0' );
-		$item->addClaim( $statement );
+		$item = new Item( new ItemId( 'Q42' ) );
+		$snak = new PropertySomeValueSnak( new PropertyId( 'P1' ) );
+		$guid = 'claim0';
+		$item->getStatements()->addNewStatement( $snak, null, null, $guid );
 
 		$res = $this->suggester->suggestByItem( $item, 100, 0.0, 'item' );
 

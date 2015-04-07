@@ -103,13 +103,11 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	}
 
 	public function testGenerateSuggestionsWithItem() {
-		$item = Item::newEmpty();
-		$item->setId( new ItemId( 'Q42' ) );
-		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P12' ) ) ) );
-		$statement->setGuid( 'claim0' ); // otherwise "InvalidArgumentException: Can't add a Claim without a GUID."
-		$item->addClaim( $statement );
-
 		$itemId = new ItemId( 'Q42' );
+		$item = new Item( $itemId );
+		$snak = new PropertySomeValueSnak( new PropertyId( 'P12' ) );
+		$guid = 'claim0';
+		$item->getStatements()->addNewStatement( $snak, null, null, $guid );
 
 		$this->lookup->expects( $this->once() )
 			->method( 'getEntity' )
