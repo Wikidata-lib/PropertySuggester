@@ -20,11 +20,10 @@ class ResultBuilderTest extends MediaWikiTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$apiMain =  $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
 
 		$entityTitleLookup = $this->getMock( 'Wikibase\Lib\Store\EntityTitleLookup' );
 		$termIndex = $this->getMock( 'Wikibase\TermIndex' );
-		$result = new ApiResult( $apiMain );
+		$result = new ApiResult( false ); // $maxSize, no limit
 
 		$this->resultBuilder = new ResultBuilder( $result, $termIndex, $entityTitleLookup, '' );
 	}

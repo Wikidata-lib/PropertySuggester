@@ -4,6 +4,7 @@ namespace PropertySuggester;
 
 use ApiBase;
 use ApiMain;
+use ApiResult;
 use DerivativeRequest;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
@@ -101,7 +102,7 @@ class GetSuggestions extends ApiBase {
 
 		// Define Result
 		$slicedEntries = array_slice( $entries, $params->continue, $params->limit );
-		$this->getResult()->setIndexedTagName( $slicedEntries, 'search' );
+		ApiResult::setIndexedTagName( $slicedEntries, 'search' );
 		$this->getResult()->addValue( null, 'search', $slicedEntries );
 
 		$this->getResult()->addValue( null, 'success', 1 );
@@ -130,11 +131,20 @@ class GetSuggestions extends ApiBase {
 				'type' => Property::ENTITY_TYPE
 			)
 		);
+
 		$api = new ApiMain( $searchEntitiesParameters );
 		$api->execute();
-		$apiResult = $api->getResultData();
-		$searchResult = $apiResult['search'];
-		return $searchResult;
+
+		$apiResult = $api->getResult()->getResultData(
+			null,
+			array(
+				'BC' => array(),
+				'Types' => array(),
+				'Strip' => 'all'
+			)
+		);
+
+		return $apiResult['search'];
 	}
 
 	/**
