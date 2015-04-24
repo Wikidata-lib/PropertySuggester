@@ -139,7 +139,7 @@ class ResultBuilder {
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();
-				$this->result->setIndexedTagName( $entry['aliases'], 'alias' );
+				ApiResult::setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 			$entry['aliases'][] = $term->getText();
 		}
