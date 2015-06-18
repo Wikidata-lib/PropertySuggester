@@ -81,17 +81,43 @@ class GetSuggestions extends ApiBase {
 		$extracted = $this->extractRequestParams();
 		$params = $this->paramsParser->parseAndValidate( $extracted );
 
-		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
+		$suggestionGenerator = new SuggestionGenerator(
+			$this->entityLookup,
+			$this->termIndex,
+			$this->suggester
+		);
 
 		if ( $params->entity !== null ) {
-			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params->entity, $params->suggesterLimit, $params->minProbability, $params->context );
+			$suggestions = $suggestionGenerator->generateSuggestionsByItem(
+				$params->entity,
+				$params->suggesterLimit,
+				$params->minProbability,
+				$params->context
+			);
 		} else {
-			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params->properties, $params->suggesterLimit, $params->minProbability, $params->context );
+			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList(
+				$params->properties,
+				$params->suggesterLimit,
+				$params->minProbability,
+				$params->context
+			);
 		}
-		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
 
-		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $this->termIndex, $this->entityTitleLookup, $params->search );
+		$suggestions = $suggestionGenerator->filterSuggestions(
+			$suggestions,
+			$params->search,
+			$params->language,
+			$params->resultSize
+		);
+
+		// Build result array
+		$resultBuilder = new ResultBuilder(
+			$this->getResult(),
+			$this->termIndex,
+			$this->entityTitleLookup,
+			$params->search
+		);
+
 		$entries = $resultBuilder->createResultArray( $suggestions, $params->language, $params->search );
 
 		// merge with search result if possible and necessary
