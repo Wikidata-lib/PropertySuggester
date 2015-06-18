@@ -50,7 +50,11 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
-		$this->suggestionGenerator = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
+		$this->suggestionGenerator = new SuggestionGenerator(
+			$this->lookup,
+			$this->termIndex,
+			$this->suggester
+		);
 	}
 
 	public function testFilterSuggestions() {

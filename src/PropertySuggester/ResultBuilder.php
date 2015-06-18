@@ -4,7 +4,7 @@ namespace PropertySuggester;
 
 use ApiResult;
 use PropertySuggester\Suggesters\Suggestion;
-use Wikibase\Term;
+use Wikibase\TermIndexEntry;
 use Wikibase\TermIndex;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\Lib\Store\EntityTitleLookup;
@@ -43,7 +43,12 @@ class ResultBuilder {
 	 * @param EntityTitleLookup $entityTitleLookup
 	 * @param string $search
 	 */
-	public function __construct( ApiResult $result, TermIndex $termIndex, EntityTitleLookup $entityTitleLookup, $search ) {
+	public function __construct(
+		ApiResult $result,
+		TermIndex $termIndex,
+		EntityTitleLookup $entityTitleLookup,
+		$search
+	) {
 		$this->entityTitleLookup = $entityTitleLookup;
 		$this->termIndex = $termIndex;
 		$this->result = $result;
@@ -95,15 +100,15 @@ class ResultBuilder {
 			$matchingTerms = array();
 		}
 		foreach ( $matchingTerms as $term ) {
-			/** @var $term Term */
+			/** @var $term TermIndexEntry */
 			switch ( $term->getType() ) {
-				case Term::TYPE_LABEL:
+				case TermIndexEntry::TYPE_LABEL:
 					$entry['label'] = $term->getText();
 					break;
-				case Term::TYPE_DESCRIPTION:
+				case TermIndexEntry::TYPE_DESCRIPTION:
 					$entry['description'] = $term->getText();
 					break;
-				case Term::TYPE_ALIAS:
+				case TermIndexEntry::TYPE_ALIAS:
 					$this->checkAndSetAlias( $entry, $term );
 					break;
 			}
@@ -115,8 +120,8 @@ class ResultBuilder {
 	}
 
 	/**
-	 * @param Term[] $terms
-	 * @return Term[][]
+	 * @param TermIndexEntry[] $terms
+	 * @return TermIndexEntry[][]
 	 */
 	private function clusterTerms( array $terms ) {
 		$clusteredTerms = array();
@@ -133,9 +138,9 @@ class ResultBuilder {
 
 	/**
 	 * @param array $entry
-	 * @param Term $term
+	 * @param TermIndexEntry $term
 	 */
-	private function checkAndSetAlias( array &$entry, Term $term ) {
+	private function checkAndSetAlias( array &$entry, TermIndexEntry $term ) {
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();
