@@ -53,7 +53,6 @@
 					context: this._getPropertyContext(),
 					format: 'json',
 					language: self.options.language,
-					type: self.options.type,
 					'continue': self._cache[term] && self._cache[term].nextSuggestionOffset
 						? self._cache[term].nextSuggestionOffset : 0
 				};
