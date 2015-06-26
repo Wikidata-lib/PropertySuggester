@@ -118,18 +118,16 @@ class SuggestionGenerator {
 	 * @return PropertyId[]
 	 */
 	private function getMatchingIDs( $search, $language ) {
-		$ids = $this->termIndex->getMatchingIDs(
+		$termIndexEntries = $this->termIndex->getTopMatchingTerms(
 			array(
 				new TermIndexEntry( array(
-					'termType' => TermIndexEntry::TYPE_LABEL,
-					'termLanguage' => $language,
-					'termText' => $search
-				) ),
-				new TermIndexEntry( array(
-					'termType' => TermIndexEntry::TYPE_ALIAS,
 					'termLanguage' => $language,
 					'termText' => $search
 				) )
+			),
+			array(
+				TermIndexEntry::TYPE_LABEL,
+				TermIndexEntry::TYPE_ALIAS,
 			),
 			Property::ENTITY_TYPE,
 			array(
@@ -137,6 +135,12 @@ class SuggestionGenerator {
 				'prefixSearch' => true,
 			)
 		);
+
+		$ids = array();
+		foreach ( $termIndexEntries as $entry ) {
+			$ids[] = $entry->getEntityId();
+		}
+
 		return $ids;
 	}
 
