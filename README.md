@@ -45,6 +45,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.3.0 (2015-06-26)
+* Replace use of Wikibase\TermIndex::getMatchingIDs with Wikibase\TermIndex::getTopMatchingTerms.
+* EntitySelector no longer passes "type" parameter to wbsgetsuggestions which avoids an "Unrecognized parameter" warning.
+
 ### 2.2.1 (2015-06-18)
 * Replace use of Wikibase\Term with Wikibase\TermIndexEntry, per change in Wikibase.
 
