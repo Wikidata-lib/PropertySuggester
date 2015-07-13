@@ -29,7 +29,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	protected $suggestionGenerator;
 
 	/**
-	 * @var SuggesterEngine|
+	 * @var SuggesterEngine
 	 */
 	protected $suggester;
 
