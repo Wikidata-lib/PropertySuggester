@@ -8,6 +8,7 @@ use InvalidArgumentException;
 /**
  * @covers PropertySuggester\SuggesterParams
  * @covers PropertySuggester\SuggesterParamsParser
+ *
  * @group PropertySuggester
  * @group API
  * @group medium
@@ -21,17 +22,30 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 
 	protected $defaultSuggesterResultSize = 100;
 	protected $defaultMinProbability = 0.01;
-    protected $defaultParams = array( 'entity' => null, 'properties' => null, 'continue' => 10, 'limit' => 5,
-									  'language' => 'en', 'search' => '', 'context' => 'item' );
+    protected $defaultParams = array(
+		'entity' => null,
+		'properties' => null,
+		'continue' => 10,
+		'limit' => 5,
+		'language' => 'en',
+		'search' => '',
+		'context' => 'item',
+	);
     
 	public function setUp() {
 		parent::setUp();
-		$this->paramsParser = new SuggesterParamsParser( $this->defaultSuggesterResultSize, $this->defaultMinProbability );
+		$this->paramsParser = new SuggesterParamsParser(
+			$this->defaultSuggesterResultSize,
+			$this->defaultMinProbability
+		);
 	}
 
 	public function testSuggesterParameters() {
 		$params = $this->paramsParser->parseAndValidate(
-			array_merge( $this->defaultParams, array( 'entity' => 'Q1', 'search' => '*') )
+			array_merge(
+				$this->defaultParams,
+				array( 'entity' => 'Q1', 'search' => '*')
+			)
 		);
 
 		$this->assertEquals( 'Q1', $params->entity );
@@ -62,24 +76,30 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	}
 
 	/**
- 	* @expectedException InvalidArgumentException
- 	*/
+	 * @expectedException InvalidArgumentException
+	 */
 	public function testSuggestionWithoutEntityOrProperties() {
-		$this->paramsParser->parseAndValidate( array( 'entity' => null, 'properties' => null) );
+		$this->paramsParser->parseAndValidate(
+			array( 'entity' => null, 'properties' => null )
+		);
 	}
 
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testSuggestionWithEntityAndProperties() {
-		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => array('P31') ) );
+		$this->paramsParser->parseAndValidate(
+			array( 'entity' => 'Q1', 'properties' => array( 'P31' ) )
+		);
 	}
 
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testSuggestionWithNonNumericContinue() {
-		$this->paramsParser->parseAndValidate( array( 'entity' => 'Q1', 'properties' => null, 'continue' => 'drop') );
+		$this->paramsParser->parseAndValidate(
+			array( 'entity' => 'Q1', 'properties' => null, 'continue' => 'drop' )
+		);
 	}
 
 }

@@ -9,6 +9,7 @@ use PropertySuggester\Maintenance\UpdateTable;
  * @covers PropertySuggester\maintenance\UpdateTable
  * @covers PropertySuggester\UpdateTable\Importer\BasicImporter
  * @covers PropertySuggester\UpdateTable\ImportContext
+ *
  * @group PropertySuggester
  * @group Database
  * @group medium
@@ -38,7 +39,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 		);
 
 		$rows2 = array();
-		for ($i=0; $i<1100; $i++) {
+		for ( $i=0; $i<1100; $i++ ) {
 			$rows2[] = array( $i, 0, 2, 100, 0.1, 'item' );
 		}
 

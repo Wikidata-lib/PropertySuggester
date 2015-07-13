@@ -2,19 +2,9 @@
 
 namespace PropertySuggester;
 
-use MediaWikiTestCase;
-use PropertySuggester\Suggesters\SuggesterEngine;
-use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\DataModel\Entity\Item;
-use Wikibase\DataModel\Snak\PropertySomeValueSnak;
-use Wikibase\DataModel\Statement\Statement;
-use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\EntityLookup;
 use Wikibase\Repo\WikibaseRepo;
-use InvalidArgumentException;
 use Wikibase\Test\Repo\Api\WikibaseApiTestCase;
 
 /**
@@ -46,12 +36,14 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
 
-		$apiMain = $this->getMockBuilder( 'ApiMain' )->disableOriginalConstructor()->getMockForAbstractClass();
+		$apiMain = $this->getMockBuilder( 'ApiMain' )
+			->disableOriginalConstructor()
+			->getMockForAbstractClass();
 		$this->getSuggestions = new GetSuggestions( $apiMain, 'wbgetsuggestion' );
 	}
 
 	public function addDBData() {
-		if (!self::$hasSetup) {
+		if ( !self::$hasSetup ) {
 			$store = WikibaseRepo::getDefaultInstance()->getEntityStore();
 
 			$prop = Property::newFromType( 'string' );
@@ -82,7 +74,11 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 		$ip56 = (int)substr( $p56, 1 );
 		$ip72 = (int)substr( $p72, 1 );
 
-		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2' ),  array( 'pid1' => $ip56, 'pid2' => $ip72) );
+		$res = $this->db->select(
+			'wbs_propertypairs',
+			array( 'pid1', 'pid2' ),
+			array( 'pid1' => $ip56, 'pid2' => $ip72 )
+		);
 		$this->assertEquals( 1, $res->numRows() );
 	}
 
@@ -90,7 +86,12 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 		$p56 = self::$idMap['%P56%'];
 		$p72 = self::$idMap['%P72%'];
 
-		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => '*', 'context' => 'item' );
+		$params = array(
+			'action' => 'wbsgetsuggestions',
+			'properties' => $p56,
+			'search' => '*',
+			'context' => 'item'
+		);
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
 
@@ -104,7 +105,13 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 	public function testExecutionWithSearch() {
 		$p56 = self::$idMap['%P56%'];
 
-		$params = array( 'action' => 'wbsgetsuggestions', 'properties' => $p56, 'search' => 'IdontExist', 'continue' => 0, 'context' => 'item');
+		$params = array(
+			'action' => 'wbsgetsuggestions',
+			'properties' => $p56,
+			'search' => 'IdontExist',
+			'continue' => 0,
+			'context' => 'item'
+		);
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
 
