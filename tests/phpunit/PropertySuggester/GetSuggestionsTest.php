@@ -15,8 +15,7 @@ use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\EntityLookup;
 use Wikibase\Repo\WikibaseRepo;
 use InvalidArgumentException;
-use Wikibase\Test\Api\EntityTestHelper;
-use Wikibase\Test\Api\WikibaseApiTestCase;
+use Wikibase\Test\Repo\Api\WikibaseApiTestCase;
 
 /**
  * @covers PropertySuggester\GetSuggestions
