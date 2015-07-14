@@ -5,12 +5,10 @@ namespace PropertySuggester;
 use MediaWikiTestCase;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
-use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\Statement\Statement;
 use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\TermIndex;
 use InvalidArgumentException;
@@ -18,6 +16,7 @@ use Wikibase\TermIndexEntry;
 
 /**
  * @covers PropertySuggester\SuggestionGenerator
+ * 
  * @group PropertySuggester
  * @group API
  * @group medium
@@ -104,7 +103,12 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	public function testFilterSuggestionsWithoutSearch() {
 		$resultSize = 2;
 
-		$result = $this->suggestionGenerator->filterSuggestions( array( 1, 2, 3, 4 ), '', 'en', $resultSize );
+		$result = $this->suggestionGenerator->filterSuggestions(
+			array( 1, 2, 3, 4 ),
+			'',
+			'en',
+			$resultSize
+		);
 
 		$this->assertEquals( array( 1, 2 ), $result );
 	}
@@ -120,7 +124,12 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', 'P14' ) , 100, 0.0, 'item' );
+		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList(
+			array( 'P12', 'p13', 'P14' ),
+			100,
+			0.0,
+			'item'
+		);
 		$this->assertEquals( $result1, array( 'foo' ) );
 
 	}

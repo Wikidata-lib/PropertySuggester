@@ -7,6 +7,7 @@ use MediaWikiTestCase;
 
 /**
  * @covers PropertySuggester\ResultBuilder
+ *
  * @group PropertySuggester
  * @group API
  * @group medium
@@ -28,17 +29,6 @@ class ResultBuilderTest extends MediaWikiTestCase {
 		$this->resultBuilder = new ResultBuilder( $result, $termIndex, $entityTitleLookup, '' );
 	}
 
-/*	public function testBuildJson() {
-		$suggestions = array(
-			new Suggestion( new PropertyId( 'P1' ), 0.3 ),
-			new Suggestion( new PropertyId( 'P2' ), 0.5 )
-		);
-
-		$result = $this->resultBuilder->createResultArray( $suggestions, 'en' );
-
-		$this->assertArrayEquals( array(), $result );
-	}*/
-
 	public function testMergeWithTraditionalSearchResults() {
 		$suggesterResult = array(
 			array( 'id' =>  '8' ),
@@ -55,7 +45,11 @@ class ResultBuilderTest extends MediaWikiTestCase {
 			array( 'id' => '16' )
 		);
 
-		$mergedResult = $this->resultBuilder->mergeWithTraditionalSearchResults( $suggesterResult, $searchResult, 5 );
+		$mergedResult = $this->resultBuilder->mergeWithTraditionalSearchResults(
+			$suggesterResult,
+			$searchResult,
+			5
+		);
 
 		$expected = array(
 			array( 'id' =>  '8' ),

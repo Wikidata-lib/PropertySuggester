@@ -14,6 +14,7 @@ use Wikibase\DataModel\Snak\PropertySomeValueSnak;
  * @covers PropertySuggester\Suggesters\SimpleSuggester
  * @covers PropertySuggester\Suggesters\SuggesterEngine
  * @covers PropertySuggester\Suggesters\Suggestion
+ *
  * @group PropertySuggester
  * @group API
  * @group Database
@@ -27,7 +28,14 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	protected $suggester;
 
 	private function row( $pid1, $qid1, $pid2, $count, $probability, $context ) {
-		return array( 'pid1' => $pid1, 'qid1' => $qid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability, 'context' => $context );
+		return array(
+			'pid1' => $pid1,
+			'qid1' => $qid1,
+			'pid2' => $pid2,
+			'count' => $count,
+			'probability' => $probability,
+			'context' => $context
+		);
 	}
 
 	public function addDBData() {
@@ -45,7 +53,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		parent::setUp();
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
-		$lb = new LoadBalancerSingle( array("connection" => $this->db ) );
+		$lb = new LoadBalancerSingle( array( "connection" => $this->db ) );
 		$this->suggester = new SimpleSuggester( $lb );
 	}
 
@@ -84,9 +92,11 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0, 'item' );
 
-		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
-		$this->assertNotContains( 2 , $resultIds );
-		$this->assertContains( 3 , $resultIds );
+		$resultIds = array_map( function ( Suggestion $r ) {
+			return $r->getPropertyId()->getNumericId();
+		}, $res );
+		$this->assertNotContains( 2, $resultIds );
+		$this->assertContains( 3, $resultIds );
 	}
 
 	public function testEmptyResult() {
@@ -95,8 +105,10 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	public function testInitialSuggestionsResult() {
 		$this->suggester->setInitialSuggestions( array( 42 ) );
-		$this->assertEquals( array( new Suggestion( new PropertyId( "P42" ), 1.0) ),
-							 $this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' ) );
+		$this->assertEquals(
+			array( new Suggestion( new PropertyId( "P42" ), 1.0 ) ),
+			$this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' )
+		);
 	}
 
 	/**
