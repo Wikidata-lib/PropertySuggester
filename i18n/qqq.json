@@ -1,8 +1,8 @@
 {
     "@metadata": {
-        "authors": []
+        "authors": [
+            "Christian Dullweber"
+        ]
     },
-    "propertysuggester-desc": "{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}",
-    "propertysuggester": "Property Suggester",
-    "propertysuggester-intro": "introduces suggester"
+    "propertysuggester-desc": "{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}"
 }
