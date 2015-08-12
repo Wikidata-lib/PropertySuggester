@@ -7,7 +7,7 @@ use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
-use Wikibase\Lib\Store\EntityLookup;
+use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\TermIndex;
 use Wikibase\TermIndexEntry;
 use InvalidArgumentException;

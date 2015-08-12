@@ -7,9 +7,9 @@ use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\TermIndex;
 use InvalidArgumentException;
 use Wikibase\TermIndexEntry;
@@ -46,7 +46,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->lookup = $this->getMock( 'Wikibase\Lib\Store\EntityLookup' );
+		$this->lookup = $this->getMock( 'Wikibase\DataModel\Services\Lookup\EntityLookup' );
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 

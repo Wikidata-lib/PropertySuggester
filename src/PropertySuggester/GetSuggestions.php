@@ -9,7 +9,7 @@ use DerivativeRequest;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\Lib\Store\EntityLookup;
+use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\Lib\Store\EntityTitleLookup;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\TermIndex;
