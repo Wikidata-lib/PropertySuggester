@@ -45,6 +45,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.4.0 (2015-08-12)
+* Require DataModelServices ~1.1
+* Use EntityLookup interface from DataModelServices to replace removed WikibaseLib interface
+
 ### 2.3.1 (2015-07-13)
 * Fix use of WikibaseApiTestCase due to namespace change
 
