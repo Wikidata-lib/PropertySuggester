@@ -3,6 +3,7 @@
 namespace PropertySuggester;
 
 use MediaWikiTestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\PropertyId;
@@ -29,7 +30,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	protected $suggestionGenerator;
 
 	/**
-	 * @var SuggesterEngine
+	 * @var SuggesterEngine|PHPUnit_Framework_MockObject_MockObject
 	 */
 	protected $suggester;
 
@@ -39,7 +40,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	protected $lookup;
 
 	/**
-	 * @var TermIndex
+	 * @var TermIndex|PHPUnit_Framework_MockObject_MockObject
 	 */
 	protected $termIndex;
 
