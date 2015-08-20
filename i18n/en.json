@@ -1,8 +1,9 @@
 {
     "@metadata": {
-        "authors": []
+        "authors": [
+            "Christian Dullweber",
+            "Katie Filbert"
+        ]
     },
-    "propertysuggester-desc": "Shows suggested properties for wikibase items.",
-    "propertysuggester": "Property Suggester",
-    "propertysuggester-intro": "This is the PropertySuggester."
+    "propertysuggester-desc": "Suggests properties when adding Wikibase statements."
 }
