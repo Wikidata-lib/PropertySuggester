@@ -3,9 +3,8 @@
 namespace PropertySuggester;
 
 use ApiResult;
-use ProfileSection;
 use PropertySuggester\Suggesters\Suggestion;
-use Wikibase\Term;
+use Wikibase\TermIndexEntry;
 use Wikibase\TermIndex;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\Lib\Store\EntityTitleLookup;
@@ -44,7 +43,12 @@ class ResultBuilder {
 	 * @param EntityTitleLookup $entityTitleLookup
 	 * @param string $search
 	 */
-	public function __construct( ApiResult $result, TermIndex $termIndex, EntityTitleLookup $entityTitleLookup, $search ) {
+	public function __construct(
+		ApiResult $result,
+		TermIndex $termIndex,
+		EntityTitleLookup $entityTitleLookup,
+		$search
+	) {
 		$this->entityTitleLookup = $entityTitleLookup;
 		$this->termIndex = $termIndex;
 		$this->result = $result;
@@ -54,10 +58,9 @@ class ResultBuilder {
 	/**
 	 * @param Suggestion[] $suggestions
 	 * @param string $language
-	 * @return array
+	 * @return array[]
 	 */
 	public function createResultArray( array $suggestions, $language ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		$entries = array();
 		$ids = array();
 		foreach ( $suggestions as $suggestion ) {
@@ -67,7 +70,6 @@ class ResultBuilder {
 		//See SearchEntities
 		$terms = $this->termIndex->getTermsOfEntities(
 			$ids,
-			'property',
 			null,
 			array( $language )
 		);
@@ -82,13 +84,13 @@ class ResultBuilder {
 
 	/**
 	 * @param EntityId $id
-	 * @param array $clusteredTerms
+	 * @param array[] $clusteredTerms
 	 * @param Suggestion $suggestion
-	 * @return array $entry
+	 * @return array
 	 */
 	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ) {
 		$entry = array();
-		$entry['id'] = $id->getPrefixedId();
+		$entry['id'] = $id->getSerialization();
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
 		$entry['rating'] = $suggestion->getProbability();
 
@@ -98,15 +100,15 @@ class ResultBuilder {
 			$matchingTerms = array();
 		}
 		foreach ( $matchingTerms as $term ) {
-			/** @var $term Term */
+			/** @var $term TermIndexEntry */
 			switch ( $term->getType() ) {
-				case Term::TYPE_LABEL:
+				case TermIndexEntry::TYPE_LABEL:
 					$entry['label'] = $term->getText();
 					break;
-				case Term::TYPE_DESCRIPTION:
+				case TermIndexEntry::TYPE_DESCRIPTION:
 					$entry['description'] = $term->getText();
 					break;
-				case Term::TYPE_ALIAS:
+				case TermIndexEntry::TYPE_ALIAS:
 					$this->checkAndSetAlias( $entry, $term );
 					break;
 			}
@@ -118,8 +120,8 @@ class ResultBuilder {
 	}
 
 	/**
-	 * @param Term[] $terms
-	 * @return Term[][]
+	 * @param TermIndexEntry[] $terms
+	 * @return TermIndexEntry[][]
 	 */
 	private function clusterTerms( array $terms ) {
 		$clusteredTerms = array();
@@ -136,26 +138,25 @@ class ResultBuilder {
 
 	/**
 	 * @param array $entry
-	 * @param Term $term
+	 * @param TermIndexEntry $term
 	 */
-	private function checkAndSetAlias( array &$entry, Term $term ) {
+	private function checkAndSetAlias( array &$entry, TermIndexEntry $term ) {
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();
-				$this->result->setIndexedTagName( $entry['aliases'], 'alias' );
+				ApiResult::setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 			$entry['aliases'][] = $term->getText();
 		}
 	}
 
 	/**
-	 * @param array $entries
-	 * @param array $searchResults
+	 * @param array[] $entries
+	 * @param array[] $searchResults
 	 * @param int $resultSize
-	 * @return array representing Json
+	 * @return array[] representing Json
 	 */
 	public function mergeWithTraditionalSearchResults( array &$entries, array $searchResults, $resultSize ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		// Avoid duplicates
 		$existingKeys = array();
 		foreach ( $entries as $entry ) {

@@ -9,16 +9,21 @@ use PropertySuggester\Maintenance\UpdateTable;
  * @covers PropertySuggester\maintenance\UpdateTable
  * @covers PropertySuggester\UpdateTable\Importer\BasicImporter
  * @covers PropertySuggester\UpdateTable\ImportContext
+ *
  * @group PropertySuggester
  * @group Database
  * @group medium
  */
 class UpdateTableTest extends MediaWikiTestCase {
 
-	/** @var string */
+	/**
+	 * @var string
+	 */
 	protected $testfilename;
 
-	/** @var string[] */
+	/**
+	 * @var string[]
+	 */
 	protected $rowHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
 
 	public function setUp() {
@@ -34,17 +39,17 @@ class UpdateTableTest extends MediaWikiTestCase {
 			array( 1, 0, 3, 50, 0.05, 'item' ),
 			array( 2, 0, 3, 100, 0.1, 'item' ),
 			array( 2, 0, 4, 200, 0.2, 'item' ),
-			array( 3, 0, 1, 123, 0.5, 'item' )
+			array( 3, 0, 1, 123, 0.5, 'item' ),
 		);
 
 		$rows2 = array();
-		for ($i=0; $i<1100; $i++) {
+		for ( $i = 0; $i < 1100; $i++ ) {
 			$rows2[] = array( $i, 0, 2, 100, 0.1, 'item' );
 		}
 
 		return array(
 			array( $rows1 ),
-			array( $rows2 )
+			array( $rows2 ),
 		);
 	}
 

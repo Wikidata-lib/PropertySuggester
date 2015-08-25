@@ -3,7 +3,6 @@
 namespace PropertySuggester\Suggesters;
 
 use LoadBalancer;
-use ProfileSection;
 use InvalidArgumentException;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
@@ -26,6 +25,11 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @var int[]
 	 */
 	private $classifyingPropertyIds = array();
+
+	/**
+	 * @var Suggestion[]
+	 */
+	private $initialSuggestions = array();
 
 	/**
 	 * @var LoadBalancer
@@ -54,6 +58,18 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
+	 * @param int[] $initialSuggestionIds
+	 */
+	public function setInitialSuggestions( array $initialSuggestionIds ) {
+		$suggestions = array();
+		foreach ( $initialSuggestionIds as $id ) {
+			$suggestions[] = new Suggestion( PropertyId::newFromNumber( $id ), 1.0 );
+		}
+
+		$this->initialSuggestions = $suggestions;
+	}
+
+	/**
 	 * @param int[] $propertyIds
 	 * @param string[] $idTuples
 	 * @param int $limit
@@ -63,7 +79,6 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	protected function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
 		}
@@ -71,7 +86,7 @@ class SimpleSuggester implements SuggesterEngine {
 			throw new InvalidArgumentException( '$minProbability must be float!' );
 		}
 		if ( !$propertyIds ) {
-			return array();
+			return $this->initialSuggestions;
 		}
 
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );

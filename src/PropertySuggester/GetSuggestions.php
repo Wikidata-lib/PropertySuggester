@@ -4,16 +4,15 @@ namespace PropertySuggester;
 
 use ApiBase;
 use ApiMain;
+use ApiResult;
 use DerivativeRequest;
-use ProfileSection;
 use PropertySuggester\Suggesters\SimpleSuggester;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use Wikibase\DataModel\Entity\Property;
-use Wikibase\Lib\Store\EntityLookup;
+use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\Lib\Store\EntityTitleLookup;
 use Wikibase\Repo\WikibaseRepo;
 use Wikibase\TermIndex;
-use Wikibase\Utils;
 
 /**
  * API module to get property suggestions.
@@ -31,6 +30,11 @@ class GetSuggestions extends ApiBase {
 	 * @var EntityTitleLookup
 	 */
 	private $entityTitleLookup;
+
+	/**
+	 * @var string[]
+	 */
+	private $languageCodes;
 
 	/**
 	 * @var SuggesterEngine
@@ -52,15 +56,20 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterDeprecatedIds;
 		global $wgPropertySuggesterMinProbability;
 		global $wgPropertySuggesterClassifyingPropertyIds;
+		global $wgPropertySuggesterInitialSuggestions;
 
-		$store = WikibaseRepo::getDefaultInstance()->getStore();
+		$wikibaseRepo = WikibaseRepo::getDefaultInstance();
+		$store = $wikibaseRepo->getStore();
+
 		$this->termIndex = $store->getTermIndex();
 		$this->entityLookup = $store->getEntityLookup();
-		$this->entityTitleLookup = WikibaseRepo::getDefaultInstance()->getEntityTitleLookup();
+		$this->entityTitleLookup = $wikibaseRepo->getEntityTitleLookup();
+		$this->languageCodes = $wikibaseRepo->getTermsLanguages()->getLanguages();
 
 		$this->suggester = new SimpleSuggester( wfGetLB() );
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 		$this->suggester->setClassifyingPropertyIds( $wgPropertySuggesterClassifyingPropertyIds );
+		$this->suggester->setInitialSuggestions( $wgPropertySuggesterInitialSuggestions );
 
 		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
 	}
@@ -69,21 +78,46 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::execute()
 	 */
 	public function execute() {
-		$profiler = new ProfileSection( __METHOD__ );
 		$extracted = $this->extractRequestParams();
 		$params = $this->paramsParser->parseAndValidate( $extracted );
 
-		$suggestionGenerator = new SuggestionGenerator( $this->entityLookup, $this->termIndex, $this->suggester );
+		$suggestionGenerator = new SuggestionGenerator(
+			$this->entityLookup,
+			$this->termIndex,
+			$this->suggester
+		);
 
 		if ( $params->entity !== null ) {
-			$suggestions = $suggestionGenerator->generateSuggestionsByItem( $params->entity, $params->suggesterLimit, $params->minProbability, $params->context );
+			$suggestions = $suggestionGenerator->generateSuggestionsByItem(
+				$params->entity,
+				$params->suggesterLimit,
+				$params->minProbability,
+				$params->context
+			);
 		} else {
-			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList( $params->properties, $params->suggesterLimit, $params->minProbability, $params->context );
+			$suggestions = $suggestionGenerator->generateSuggestionsByPropertyList(
+				$params->properties,
+				$params->suggesterLimit,
+				$params->minProbability,
+				$params->context
+			);
 		}
-		$suggestions = $suggestionGenerator->filterSuggestions( $suggestions, $params->search, $params->language, $params->resultSize );
 
-		// Build result Array
-		$resultBuilder = new ResultBuilder( $this->getResult(), $this->termIndex, $this->entityTitleLookup, $params->search );
+		$suggestions = $suggestionGenerator->filterSuggestions(
+			$suggestions,
+			$params->search,
+			$params->language,
+			$params->resultSize
+		);
+
+		// Build result array
+		$resultBuilder = new ResultBuilder(
+			$this->getResult(),
+			$this->termIndex,
+			$this->entityTitleLookup,
+			$params->search
+		);
+
 		$entries = $resultBuilder->createResultArray( $suggestions, $params->language, $params->search );
 
 		// merge with search result if possible and necessary
@@ -94,7 +128,7 @@ class GetSuggestions extends ApiBase {
 
 		// Define Result
 		$slicedEntries = array_slice( $entries, $params->continue, $params->limit );
-		$this->getResult()->setIndexedTagName( $slicedEntries, 'search' );
+		ApiResult::setIndexedTagName( $slicedEntries, 'search' );
 		$this->getResult()->addValue( null, 'search', $slicedEntries );
 
 		$this->getResult()->addValue( null, 'success', 1 );
@@ -112,7 +146,6 @@ class GetSuggestions extends ApiBase {
 	 * @return array
 	 */
 	private function querySearchApi( $resultSize, $search, $language ) {
-		$profiler = new ProfileSection( __METHOD__ );
 		$searchEntitiesParameters = new DerivativeRequest(
 			$this->getRequest(),
 			array(
@@ -124,11 +157,20 @@ class GetSuggestions extends ApiBase {
 				'type' => Property::ENTITY_TYPE
 			)
 		);
+
 		$api = new ApiMain( $searchEntitiesParameters );
 		$api->execute();
-		$apiResult = $api->getResultData();
-		$searchResult = $apiResult['search'];
-		return $searchResult;
+
+		$apiResult = $api->getResult()->getResultData(
+			null,
+			array(
+				'BC' => array(),
+				'Types' => array(),
+				'Strip' => 'all'
+			)
+		);
+
+		return $apiResult['search'];
 	}
 
 	/**
@@ -153,7 +195,7 @@ class GetSuggestions extends ApiBase {
 			),
 			'continue' => null,
 			'language' => array(
-				ApiBase::PARAM_TYPE => Utils::getLanguageCodes(),
+				ApiBase::PARAM_TYPE => $this->languageCodes,
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
 			),
 			'context' => array(
@@ -178,6 +220,7 @@ class GetSuggestions extends ApiBase {
 			'language' => 'language for result',
 			'limit' => 'Maximal number of results',
 			'context' => 'Either item, reference or qualifier',
+			'search' => 'Search for this text',
 			'continue' => 'Offset where to continue a search'
 		);
 	}

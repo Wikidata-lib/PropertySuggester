@@ -2,20 +2,19 @@
 
 namespace PropertySuggester\Suggesters;
 
-use LoadBalancerSingle;
 use InvalidArgumentException;
+use LoadBalancerSingle;
 use MediaWikiTestCase;
-use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
-use Wikibase\DataModel\Statement\Statement;
 
 /**
  * @covers PropertySuggester\Suggesters\SimpleSuggester
  * @covers PropertySuggester\Suggesters\SuggesterEngine
  * @covers PropertySuggester\Suggesters\Suggestion
+ *
  * @group PropertySuggester
  * @group API
  * @group Database
@@ -24,12 +23,19 @@ use Wikibase\DataModel\Statement\Statement;
 class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	/**
-	 * @var SuggesterEngine
+	 * @var SimpleSuggester
 	 */
 	protected $suggester;
 
 	private function row( $pid1, $qid1, $pid2, $count, $probability, $context ) {
-		return array( 'pid1' => $pid1, 'qid1' => $qid1, 'pid2' => $pid2, 'count' => $count, 'probability' => $probability, 'context' => $context );
+		return array(
+			'pid1' => $pid1,
+			'qid1' => $qid1,
+			'pid2' => $pid2,
+			'count' => $count,
+			'probability' => $probability,
+			'context' => $context
+		);
 	}
 
 	public function addDBData() {
@@ -47,7 +53,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		parent::setUp();
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
-		$lb = new LoadBalancerSingle( array("connection" => $this->db ) );
+		$lb = new LoadBalancerSingle( array( "connection" => $this->db ) );
 		$this->suggester = new SimpleSuggester( $lb );
 	}
 
@@ -68,11 +74,10 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testSuggestByItem() {
-		$item = Item::newEmpty();
-		$item->setId( new ItemId( 'Q42' ) );
-		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P1' ) ) ) );
-		$statement->setGuid( 'claim0' );
-		$item->addClaim( $statement );
+		$item = new Item( new ItemId( 'Q42' ) );
+		$snak = new PropertySomeValueSnak( new PropertyId( 'P1' ) );
+		$guid = 'claim0';
+		$item->getStatements()->addNewStatement( $snak, null, null, $guid );
 
 		$res = $this->suggester->suggestByItem( $item, 100, 0.0, 'item' );
 
@@ -87,13 +92,23 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0, 'item' );
 
-		$resultIds = array_map( function ( Suggestion $r ) { return $r->getPropertyId()->getNumericId(); }, $res );
-		$this->assertNotContains( 2 , $resultIds );
-		$this->assertContains( 3 , $resultIds );
+		$resultIds = array_map( function ( Suggestion $r ) {
+			return $r->getPropertyId()->getNumericId();
+		}, $res );
+		$this->assertNotContains( 2, $resultIds );
+		$this->assertContains( 3, $resultIds );
 	}
 
 	public function testEmptyResult() {
 		$this->assertEmpty( $this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' ) );
+	}
+
+	public function testInitialSuggestionsResult() {
+		$this->suggester->setInitialSuggestions( array( 42 ) );
+		$this->assertEquals(
+			array( new Suggestion( new PropertyId( "P42" ), 1.0 ) ),
+			$this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' )
+		);
 	}
 
 	/**

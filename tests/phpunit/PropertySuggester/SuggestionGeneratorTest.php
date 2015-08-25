@@ -3,20 +3,21 @@
 namespace PropertySuggester;
 
 use MediaWikiTestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
-use Wikibase\DataModel\Claim\Claim;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
 use Wikibase\DataModel\Entity\ItemId;
-use Wikibase\DataModel\Statement\Statement;
-use Wikibase\Lib\Store\EntityLookup;
 use Wikibase\TermIndex;
 use InvalidArgumentException;
+use Wikibase\TermIndexEntry;
 
 /**
  * @covers PropertySuggester\SuggestionGenerator
+ * 
  * @group PropertySuggester
  * @group API
  * @group medium
@@ -29,7 +30,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	protected $suggestionGenerator;
 
 	/**
-	 * @var SuggesterEngine
+	 * @var SuggesterEngine|PHPUnit_Framework_MockObject_MockObject
 	 */
 	protected $suggester;
 
@@ -39,18 +40,22 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	protected $lookup;
 
 	/**
-	 * @var TermIndex
+	 * @var TermIndex|PHPUnit_Framework_MockObject_MockObject
 	 */
 	protected $termIndex;
 
 	public function setUp() {
 		parent::setUp();
 
-		$this->lookup = $this->getMock( 'Wikibase\Lib\Store\EntityLookup' );
+		$this->lookup = $this->getMock( 'Wikibase\DataModel\Services\Lookup\EntityLookup' );
 		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
 		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
 
-		$this->suggestionGenerator = new SuggestionGenerator( $this->lookup, $this->termIndex, $this->suggester );
+		$this->suggestionGenerator = new SuggestionGenerator(
+			$this->lookup,
+			$this->termIndex,
+			$this->suggester
+		);
 	}
 
 	public function testFilterSuggestions() {
@@ -70,18 +75,41 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$resultSize = 2;
 
 		$this->termIndex->expects( $this->any() )
-			->method( 'getMatchingIDs' )
-			->will( $this->returnValue( array( $p7, $p10, $p15, $p12 ) ) );
+			->method( 'getTopMatchingTerms' )
+			->will( $this->returnValue(
+				$this->getTermIndexEntryArrayWithIds( array( $p7, $p10, $p15, $p12 ) )
+			) );
 
 		$result = $this->suggestionGenerator->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
 
 		$this->assertEquals( array( $suggestions[0], $suggestions[2] ), $result );
 	}
 
+	/**
+	 * @param PropertyId[] $ids
+	 *
+	 * @return TermIndexEntry[]
+	 */
+	private function getTermIndexEntryArrayWithIds( $ids ) {
+		$termIndexEntries = array();
+		foreach ( $ids as $id ) {
+			$termIndexEntries[] = new TermIndexEntry( array(
+				'entityId' => $id->getNumericId(),
+				'entityType' => $id->getEntityType(),
+			) );
+		}
+		return $termIndexEntries;
+	}
+
 	public function testFilterSuggestionsWithoutSearch() {
 		$resultSize = 2;
 
-		$result = $this->suggestionGenerator->filterSuggestions( array( 1, 2, 3, 4 ), '', 'en', $resultSize );
+		$result = $this->suggestionGenerator->filterSuggestions(
+			array( 1, 2, 3, 4 ),
+			'',
+			'en',
+			$resultSize
+		);
 
 		$this->assertEquals( array( 1, 2 ), $result );
 	}
@@ -97,19 +125,22 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			->with( $this->equalTo( $properties ) )
 			->will( $this->returnValue( array( 'foo' ) ) );
 
-		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList( array( 'P12', 'p13', 'P14' ) , 100, 0.0, 'item' );
+		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList(
+			array( 'P12', 'p13', 'P14' ),
+			100,
+			0.0,
+			'item'
+		);
 		$this->assertEquals( $result1, array( 'foo' ) );
 
 	}
 
 	public function testGenerateSuggestionsWithItem() {
-		$item = Item::newEmpty();
-		$item->setId( new ItemId( 'Q42' ) );
-		$statement = new Statement( new Claim( new PropertySomeValueSnak( new PropertyId( 'P12' ) ) ) );
-		$statement->setGuid( 'claim0' ); // otherwise "InvalidArgumentException: Can't add a Claim without a GUID."
-		$item->addClaim( $statement );
-
 		$itemId = new ItemId( 'Q42' );
+		$item = new Item( $itemId );
+		$snak = new PropertySomeValueSnak( new PropertyId( 'P12' ) );
+		$guid = 'claim0';
+		$item->getStatements()->addNewStatement( $snak, null, null, $guid );
 
 		$this->lookup->expects( $this->once() )
 			->method( 'getEntity' )

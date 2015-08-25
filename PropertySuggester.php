@@ -9,7 +9,7 @@ if ( defined( 'PropertySuggester_VERSION' ) ) {
 	return;
 }
 
-define( 'PropertySuggester_VERSION', '2.0.4' );
+define( 'PropertySuggester_VERSION', '2.4.0' );
 
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
@@ -61,5 +61,10 @@ $wgPropertySuggesterClassifyingPropertyIds = array(
 	31 // instance of
 );
 
+global $wgPropertySuggesterInitialSuggestions;
+$wgPropertySuggesterInitialSuggestions = array(
+	31, // instance of
+	279 // subclass of
+);
 global $wgPropertySuggesterMinProbability;
 $wgPropertySuggesterMinProbability = 0.05;

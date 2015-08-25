@@ -41,8 +41,37 @@ generate this data from a wikidata dump.
 
 * $wgPropertySuggesterMinProbability - a float that sets a minimum threshold for suggestions (default 0.05)
 * $wgPropertySuggesterDeprecatedIds - a list of ints that blacklist suggestions
+* $wgPropertySuggesterInitialSuggestions - a list of ints that will be suggested when no statements exist
 
 ## Release notes
+
+### 2.4.0 (2015-08-12)
+* Require DataModelServices ~1.1
+* Use EntityLookup interface from DataModelServices to replace removed WikibaseLib interface
+
+### 2.3.1 (2015-07-13)
+* Fix use of WikibaseApiTestCase due to namespace change
+
+### 2.3.0 (2015-06-26)
+* Replace use of Wikibase\TermIndex::getMatchingIDs with Wikibase\TermIndex::getTopMatchingTerms.
+* EntitySelector no longer passes "type" parameter to wbsgetsuggestions which avoids an "Unrecognized parameter" warning.
+
+### 2.2.1 (2015-06-18)
+* Replace use of Wikibase\Term with Wikibase\TermIndexEntry, per change in Wikibase.
+
+### 2.2.0 (2015-04-29)
+* Adjust api code for core api changes (this requires a newer mediawiki core)
+* Replace deprecated Item::addClaim
+
+### 2.1.0 (2015-04-02)
+* Suggest initial properties for items and properties with no statements yet.
+
+### 2.0.6 (2015-02-20)
+* No longer use Wikibase\Utils as it was renamed
+* Remove obvious function-level profiling
+
+### 2.0.5 (2015-01-29)
+* Fix TermIndex method call in ResultBuilder
 
 ### 2.0.4 (2015-01-13)
 * Adjust to changes in ValueView 0.10.0.

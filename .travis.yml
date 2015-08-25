@@ -12,9 +12,9 @@ matrix:
     - env: DBTYPE=mysql
       php: 5.6
     - env: DBTYPE=sqlite
-      php: hhvm-nightly
+      php: hhvm
     - env: DBTYPE=mysql
-      php: hhvm-nightly
+      php: hhvm
 
 before_script:
   - bash ./build/travis/before_script.sh
