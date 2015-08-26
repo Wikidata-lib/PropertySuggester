@@ -163,13 +163,12 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param int $a
-	 * @param int $b
+	 * @param int|string $propertyId
+	 * @param int|string $itemId
 	 * @return string
 	 */
-	private function buildTupleCondition( $pid, $qid ){
-		$tuple = '(pid1 = '. ( int )$pid .' AND qid1 = '. ( int )$qid .')';
-		return $tuple;
+	private function buildTupleCondition( $propertyId, $itemId ) {
+		return '(pid1 = '. (int)$propertyId .' AND qid1 = '. (int)$itemId .')';
 	}
 
 	/**
