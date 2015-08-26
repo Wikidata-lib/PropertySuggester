@@ -113,9 +113,14 @@ class ResultBuilder {
 					break;
 			}
 		}
-		if ( !isset($entry['label'] ) ) {
+
+		if ( !isset( $entry['label'] ) ) {
 			$entry['label'] = $id->getSerialization();
+		} elseif ( preg_match( $this->searchPattern, $entry['label'] ) ) {
+			// No aliases needed in the output when the label already is a successful match.
+			unset( $entry['aliases'] );
 		}
+
 		return $entry;
 	}
 
@@ -141,6 +146,11 @@ class ResultBuilder {
 	 * @param TermIndexEntry $term
 	 */
 	private function checkAndSetAlias( array &$entry, TermIndexEntry $term ) {
+		// Do not add more than one matching alias to the "aliases" field.
+		if ( !empty( $entry['aliases'] ) ) {
+			return;
+		}
+
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
 				$entry['aliases'] = array();

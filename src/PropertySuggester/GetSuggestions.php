@@ -154,6 +154,7 @@ class GetSuggestions extends ApiBase {
 				'search' => $search,
 				'action' => 'wbsearchentities',
 				'language' => $language,
+				'uselang' => $language,
 				'type' => Property::ENTITY_TYPE
 			)
 		);
