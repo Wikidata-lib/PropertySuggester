@@ -45,6 +45,12 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.4.1 (2015-08-27)
+* Added explicit dependency on Wikibase DataModel.
+* `wbsgetsuggestions` API never returns more than one `aliases` entry per match.
+* `wbsgetsuggestions` does not return `aliases` when the label already is a successful match.
+* `wbsearchentities` is explicitely called with the `uselang` option set.
+
 ### 2.4.0 (2015-08-12)
 * Require DataModelServices ~1.1
 * Use EntityLookup interface from DataModelServices to replace removed WikibaseLib interface
