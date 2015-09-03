@@ -18,7 +18,7 @@ use Wikibase\Lib\Store\EntityTitleLookup;
 class ResultBuilder {
 
 	/**
-	 * @var $EntityTitleLookup
+	 * @var EntityTitleLookup
 	 */
 	private $entityTitleLookup;
 
@@ -94,13 +94,14 @@ class ResultBuilder {
 		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
 		$entry['rating'] = $suggestion->getProbability();
 
+		/** @var TermIndexEntry[] $matchingTerms */
 		if ( isset( $clusteredTerms[$id->getSerialization()] ) ) {
 			$matchingTerms = $clusteredTerms[$id->getSerialization()];
 		} else {
 			$matchingTerms = array();
 		}
+
 		foreach ( $matchingTerms as $term ) {
-			/** @var $term TermIndexEntry */
 			switch ( $term->getType() ) {
 				case TermIndexEntry::TYPE_LABEL:
 					$entry['label'] = $term->getText();
