@@ -47,7 +47,7 @@ generate this data from a wikidata dump.
 
 ### 2.4.2 (2015-09-03)
 
-* Use Wikibase DataModel Services ~2.0
+* Defined compatibility with Wikibase DataModel Services ~2.0
 
 ### 2.4.1 (2015-08-27)
 * Added explicit dependency on Wikibase DataModel.
