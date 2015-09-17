@@ -45,6 +45,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.4.3 (2015-09-17)
+
+* Defined compatibility with Wikibase DataModel Services ~3.0
+
 ### 2.4.2 (2015-09-03)
 
 * Defined compatibility with Wikibase DataModel Services ~2.0
