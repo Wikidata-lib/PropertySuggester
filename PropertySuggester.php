@@ -46,7 +46,12 @@ $remoteExtPathParts = explode(
 
 $wgResourceModules['ext.PropertySuggester.EntitySelector'] = array(
 	'scripts'       => array( 'modules/ext.PropertySuggester.EntitySelector.js' ),
-	'dependencies'  => array( 'jquery.wikibase.entityselector' ),
+	'dependencies'  => array(
+		'jquery.wikibase.entityselector',
+		'jquery.wikibase.entityview',
+		'jquery.wikibase.referenceview',
+		'jquery.wikibase.statementview',
+	),
 	'localBasePath' => __DIR__,
 	'remoteExtPath' => $remoteExtPathParts[1],
 );
