@@ -1,9 +1,9 @@
 {
-    "@metadata": {
-        "authors": [
-            "Christian Dullweber",
-            "Katie Filbert"
-        ]
-    },
-    "propertysuggester-desc": "Suggests properties when adding Wikibase statements."
+	"@metadata": {
+		"authors": [
+			"Christian Dullweber",
+			"Katie Filbert"
+		]
+	},
+	"propertysuggester-desc": "Suggests properties when adding Wikibase statements."
 }
