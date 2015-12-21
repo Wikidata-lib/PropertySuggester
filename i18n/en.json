@@ -1,9 +1,23 @@
 {
-	"@metadata": {
-		"authors": [
-			"Christian Dullweber",
-			"Katie Filbert"
-		]
-	},
-	"propertysuggester-desc": "Suggests properties when adding Wikibase statements."
+    "@metadata": {
+        "authors": [
+            "Christian Dullweber",
+            "Katie Filbert"
+        ]
+    },
+    "propertysuggester-desc": "Suggests properties when adding Wikibase statements.",
+    "apihelp-wbsgetsuggestions-description": "API module for getting suggestions of additional properties to add to a Wikibase entity. The API module is primarily intended for use by the suggester widget when users are editing Wikibase entities.",
+    "apihelp-wbsgetsuggestions-example-1": "Get suggestions for entity Q4",
+    "apihelp-wbsgetsuggestions-example-2": "Get suggestions for entity Q4 from rank 10 to 15",
+    "apihelp-wbsgetsuggestions-example-3": "Get suggestions for the property combination P21 and P31",
+    "apihelp-wbsgetsuggestions-example-4": "Get suggestions for the qualifier that are used with P21",
+    "apihelp-wbsgetsuggestions-example-5": "Get suggestions for the references that are used with P21",
+    "apihelp-wbsgetsuggestions-param-context": "Either item, reference or qualifier.",
+    "apihelp-wbsgetsuggestions-param-continue": "Offset where to continue a search.",
+    "apihelp-wbsgetsuggestions-param-entity": "Suggest properties for the given entity, based on existing list of properties that the entity has.",
+    "apihelp-wbsgetsuggestions-param-language": "Language for result.",
+    "apihelp-wbsgetsuggestions-param-limit": "Maximum number of results.",
+    "apihelp-wbsgetsuggestions-param-properties": "Suggest additional properties for the given list of properties.",
+    "apihelp-wbsgetsuggestions-param-search": "Search for this text.",
+    "apihelp-wbsgetsuggestions-param-size": "Specify number of suggestions to be returned."
 }

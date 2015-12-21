@@ -1,8 +1,23 @@
 {
     "@metadata": {
         "authors": [
-            "Christian Dullweber"
+            "Christian Dullweber",
+            "Katie Filbert"
         ]
     },
-    "propertysuggester-desc": "{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}"
+    "propertysuggester-desc": "{{desc|name=PropertySuggester|url=http://www.mediawiki.org/wiki/Extension:PropertySuggester}}",
+    "apihelp-wbsgetsuggestions-description": "{{doc-apihelp-description|wbsgetsuggestions}}",
+    "apihelp-wbsgetsuggestions-example-1": "{{doc-apihelp-example|wbsgetsuggestions}}",
+    "apihelp-wbsgetsuggestions-example-2": "{{doc-apihelp-example|wbsgetsuggestions}}",
+    "apihelp-wbsgetsuggestions-example-3": "{{doc-apihelp-example|wbsgetsuggestions}}",
+    "apihelp-wbsgetsuggestions-example-4": "{{doc-apihelp-example|wbsgetsuggestions}}",
+    "apihelp-wbsgetsuggestions-example-5": "{{doc-apihelp-example|wbsgetsuggestions}}",
+    "apihelp-wbsgetsuggestions-param-context": "{{doc-apihelp-param|wbgetsuggestions|context}}",
+    "apihelp-wbsgetsuggestions-param-continue": "{{doc-apihelp-param|wbgetsuggestions|continue}}",
+    "apihelp-wbsgetsuggestions-param-entity": "{{doc-apihelp-param|wbgetsuggestions|entity}}",
+    "apihelp-wbsgetsuggestions-param-language": "{{doc-apihelp-param|wbgetsuggestions|language}}",
+    "apihelp-wbsgetsuggestions-param-limit": "{{doc-apihelp-param|wbgetsuggestions|limit}}",
+    "apihelp-wbsgetsuggestions-param-properties": "{{doc-apihelp-param|wbgetsuggestions|properties}}",
+    "apihelp-wbsgetsuggestions-param-search": "{{doc-apihelp-param|wbgetsuggestions|search}}",
+    "apihelp-wbsgetsuggestions-param-size": "{{doc-apihelp-param|wbgetsuggestions|size}}"
 }

@@ -136,16 +136,8 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 		$this->assertNotEmpty( $this->getSuggestions->getAllowedParams() );
 	}
 
-	public function testGetParamDescription() {
-		$this->assertNotEmpty( $this->getSuggestions->getParamDescription() );
-	}
-
-	public function testGetDescription() {
-		$this->assertNotEmpty( $this->getSuggestions->getDescription() );
-	}
-
-	public function testGetExamples() {
-		$this->assertNotEmpty( $this->getSuggestions->getExamples() );
+	public function testGetExamplesMessages() {
+		$this->assertNotEmpty( $this->getSuggestions->getExamplesMessages() );
 	}
 
 }
