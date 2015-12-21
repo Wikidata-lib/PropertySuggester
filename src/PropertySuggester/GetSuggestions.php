@@ -211,45 +211,20 @@ class GetSuggestions extends ApiBase {
 	}
 
 	/**
-	 * @see ApiBase::getParamDescription()
+	 * @see ApiBase::getExamplesMessages()
 	 */
-	public function getParamDescription() {
+	public function getExamplesMessages() {
 		return array(
-			'entity' => 'Suggest attributes for given entity',
-			'properties' => 'Identifier for the site on which the corresponding page resides',
-			'size' => 'Specify number of suggestions to be returned',
-			'language' => 'language for result',
-			'limit' => 'Maximal number of results',
-			'context' => 'Either item, reference or qualifier',
-			'search' => 'Search for this text',
-			'continue' => 'Offset where to continue a search'
-		);
-	}
-
-	/**
-	 * @see ApiBase::getDescription()
-	 */
-	public function getDescription() {
-		return array(
-			'API module to get property suggestions (e.g. when editing data entities)'
-		);
-	}
-
-	/**
-	 * @see ApiBase::getExamples()
-	 */
-	public function getExamples() {
-		return array(
-			'api.php?action=wbsgetsuggestions&entity=Q4'
-			=> 'Get suggestions for entity 4',
-			'api.php?action=wbsgetsuggestions&entity=Q4&continue=10&limit=5'
-			=> 'Get suggestions for entity 4 from rank 10 to 15',
-			'api.php?action=wbsgetsuggestions&properties=P31|P21'
-			=> 'Get suggestions for the property combination P21 and P31',
-			'api.php?action=wbsgetsuggestions&properties=P21&context=qualifier'
-			=> 'Get suggestions for the qualifier that are used with P21',
-			'api.php?action=wbsgetsuggestions&properties=P21&context=reference'
-			=> 'Get suggestions for the references that are used with P21'
+			'action=wbsgetsuggestions&entity=Q4'
+			=> 'apihelp-wbsgetsuggestions-example-1',
+			'action=wbsgetsuggestions&entity=Q4&continue=10&limit=5'
+			=> 'apihelp-wbsgetsuggestions-example-2',
+			'action=wbsgetsuggestions&properties=P31|P21'
+			=> 'apihelp-wbsgetsuggestions-example-3',
+			'action=wbsgetsuggestions&properties=P21&context=qualifier'
+			=> 'apihelp-wbsgetsuggestions-example-4',
+			'action=wbsgetsuggestions&properties=P21&context=reference'
+			=> 'apihelp-wbsgetsuggestions-example-5'
 		);
 	}
 
