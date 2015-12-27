@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.4.5 (2015-12-27)
+* Add i18n to the `wbsgetsuggestions` api module. This makes MediaWiki's `ApiDocumentationTest` pass.
+
 ### 2.4.4 (2015-10-14)
 * Fixed ResourceLoader dependencies of the `jquery.wikibase.entityselector` module.
 
