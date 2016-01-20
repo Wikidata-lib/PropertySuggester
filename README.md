@@ -119,9 +119,9 @@ Adjust to new version of DataModel-JavaScript
 ### 1.1.1 (2014-08-27)
 * Update namespace of EntityTitleLookup, per change in Wikibase.
 
-### 1.1 (2014-07-25)
+### 1.1.0 (2014-07-25)
 * Suggest properties for qualifiers and references based on the property of the mainsnak
 
-### 1.0 (2014-07-01)
+### 1.0.0 (2014-07-01)
 
 * Provide Property-Suggestions based on correlations to other properties in the item
