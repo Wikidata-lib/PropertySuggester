@@ -3,14 +3,12 @@ language: php
 matrix:
   fast_finish: true
   include:
-    - env: DBTYPE=mysql
-      php: 5.3
-    - env: DBTYPE=sqlite
-      php: 5.4
     - env: DBTYPE=sqlite
       php: 5.5
     - env: DBTYPE=mysql
       php: 5.6
+    - env: DBTYPE=sqlite
+      php: 7.0
     - env: DBTYPE=sqlite
       php: hhvm
     - env: DBTYPE=mysql
