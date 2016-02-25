@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 2.4.6 (2016-02-25)
+* Defined compatibility with Wikibase DataModel ~5.0
+
 ### 2.4.5 (2015-12-27)
 * Add i18n to the `wbsgetsuggestions` api module. This makes MediaWiki's `ApiDocumentationTest` pass.
 
