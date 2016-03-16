@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.0.1 (2016-03-14)
+* Defined compatibility with Wikibase DataModel ~6.0
+
 ### 3.0.0 (2016-02-25)
 * Now requires PHP 5.5.0 or higher
 * Defined compatibility with Wikibase DataModel ~5.0
