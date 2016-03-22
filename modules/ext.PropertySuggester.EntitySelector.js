@@ -5,7 +5,7 @@
  * @see ui.suggester._request
  */
 
-( function( $, util, mw ) {
+( function( $ ) {
 	'use strict';
 
 	var Item = $.wikibase.entityselector.Item;
@@ -165,4 +165,4 @@
 		Item: Item
 	} );
 
-}( jQuery, util, mediaWiki ) );
+}( jQuery ) );
