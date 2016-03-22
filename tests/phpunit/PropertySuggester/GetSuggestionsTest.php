@@ -31,8 +31,8 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 	/** @var GetSuggestions */
 	public $getSuggestions;
 
-	public function setup() {
-		parent::setup();
+	protected function setUp() {
+		parent::setUp();
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
 
