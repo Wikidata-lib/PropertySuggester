@@ -4,6 +4,7 @@ namespace PropertySuggester;
 
 use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
+use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
@@ -46,22 +47,23 @@ class SuggestionGenerator {
 	}
 
 	/**
-	 * @param string $itemIdString - An item id
+	 * @param string $itemIdString
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @param string $context
 	 * @throws \InvalidArgumentException
 	 * @return array
 	 */
-
 	public function generateSuggestionsByItem( $itemIdString, $limit, $minProbability, $context ) {
-		$id = new  ItemId( $itemIdString );
-		$item = $this->entityLookup->getEntity( $id );
-		if( $item == null ){
-			throw new InvalidArgumentException( 'Item ' . $id . ' could not be found' );
+		$itemId = new ItemId( $itemIdString );
+		/** @var Item $item */
+		$item = $this->entityLookup->getEntity( $itemId );
+
+		if ( $item === null ) {
+			throw new InvalidArgumentException( 'Item ' . $itemIdString . ' could not be found' );
 		}
-		$suggestions = $this->suggester->suggestByItem( $item, $limit, $minProbability, $context );
-		return $suggestions;
+
+		return $this->suggester->suggestByItem( $item, $limit, $minProbability, $context );
 	}
 
 	/**
