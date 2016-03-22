@@ -35,7 +35,7 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	protected $suggester;
 
 	/**
-	 * @var EntityLookup
+	 * @var EntityLookup|PHPUnit_Framework_MockObject_MockObject
 	 */
 	protected $lookup;
 
@@ -47,9 +47,9 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->lookup = $this->getMock( 'Wikibase\DataModel\Services\Lookup\EntityLookup' );
-		$this->termIndex = $this->getMock( 'Wikibase\TermIndex' );
-		$this->suggester = $this->getMock( 'PropertySuggester\Suggesters\SuggesterEngine' );
+		$this->lookup = $this->getMock( EntityLookup::class );
+		$this->termIndex = $this->getMock( TermIndex::class );
+		$this->suggester = $this->getMock( SuggesterEngine::class );
 
 		$this->suggestionGenerator = new SuggestionGenerator(
 			$this->lookup,
@@ -132,7 +132,6 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 			'item'
 		);
 		$this->assertEquals( $result1, array( 'foo' ) );
-
 	}
 
 	public function testGenerateSuggestionsWithItem() {

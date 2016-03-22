@@ -8,7 +8,6 @@ use PropertySuggester\UpdateTable\Importer\BasicImporter;
 use PropertySuggester\UpdateTable\ImportContext;
 use UnexpectedValueException;
 
-
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 require_once $basePath . '/maintenance/Maintenance.php';
 
@@ -113,5 +112,5 @@ class UpdateTable extends Maintenance {
 
 }
 
-$maintClass = 'PropertySuggester\Maintenance\UpdateTable';
+$maintClass = UpdateTable::class;
 require_once RUN_MAINTENANCE_IF_MAIN;

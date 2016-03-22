@@ -4,6 +4,8 @@ namespace PropertySuggester;
 
 use ApiResult;
 use MediaWikiTestCase;
+use Wikibase\Lib\Store\EntityTitleLookup;
+use Wikibase\TermIndex;
 
 /**
  * @covers PropertySuggester\ResultBuilder
@@ -22,8 +24,8 @@ class ResultBuilderTest extends MediaWikiTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$entityTitleLookup = $this->getMock( 'Wikibase\Lib\Store\EntityTitleLookup' );
-		$termIndex = $this->getMock( 'Wikibase\TermIndex' );
+		$entityTitleLookup = $this->getMock( EntityTitleLookup::class );
+		$termIndex = $this->getMock( TermIndex::class );
 		$result = new ApiResult( false ); // $maxSize, no limit
 
 		$this->resultBuilder = new ResultBuilder( $result, $termIndex, $entityTitleLookup, '' );
