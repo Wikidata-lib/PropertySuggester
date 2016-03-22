@@ -4,8 +4,11 @@ namespace PropertySuggester\Suggesters;
 
 use LoadBalancer;
 use InvalidArgumentException;
+use LogicException;
+use Wikibase\DataModel\Entity\EntityIdValue;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Snak\PropertyValueSnak;
 use ResultWrapper;
 
 /**
@@ -22,7 +25,7 @@ class SimpleSuggester implements SuggesterEngine {
 	private $deprecatedPropertyIds = array();
 
 	/**
-	 * @var int[]
+	 * @var array Numeric property ids as keys, values are meaningless.
 	 */
 	private $classifyingPropertyIds = array();
 
@@ -128,7 +131,10 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability, $context ) {
-		$numericIds = array_map( array( $this, 'getNumericIdFromPropertyId' ), $propertyIds );
+		$numericIds = array_map( function( PropertyId $propertyId ) {
+			return $propertyId->getNumericId();
+		}, $propertyIds );
+
 		return $this->getSuggestions( $numericIds, array(), $limit, $minProbability, $context );
 	}
 
@@ -139,26 +145,35 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @param string $context
+	 * @throws LogicException
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$statements = $item->getStatements()->toArray();
 		$ids = array();
 		$idTuples = array();
-		foreach ( $statements as $statement ) {
-			$numericPropertyId = $this->getNumericIdFromPropertyId( $statement->getMainSnak()->getPropertyId() );
+
+		foreach ( $item->getStatements()->toArray() as $statement ) {
+			$mainSnak = $statement->getMainSnak();
+			$numericPropertyId = $mainSnak->getPropertyId()->getNumericId();
 			$ids[] = $numericPropertyId;
+
 			if ( !isset( $this->classifyingPropertyIds[$numericPropertyId] ) ) {
 				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, '0' );
-			}
-			else {
-				if ( $statement->getMainSnak()->getType() === "value" ) {
-					$dataValue = $statement->getMainSnak()->getDataValue();
-					$numericEntityId = ( int )substr( $dataValue->getEntityId()->getSerialization(), 1 );
-					$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericEntityId );
+			} elseif ( $mainSnak instanceof PropertyValueSnak ) {
+				$dataValue = $mainSnak->getDataValue();
+
+				if ( !( $dataValue instanceof EntityIdValue ) ) {
+					throw new LogicException(
+						"Property $numericPropertyId in wgPropertySuggesterClassifyingPropertyIds"
+						. ' does not have value type wikibase-entityid'
+					);
 				}
+
+				$numericEntityId = $dataValue->getEntityId()->getNumericId();
+				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericEntityId );
 			}
 		}
+
 		return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
 	}
 
@@ -186,10 +201,6 @@ class SimpleSuggester implements SuggesterEngine {
 			$resultArray[] = $suggestion;
 		}
 		return $resultArray;
-	}
-
-	private function getNumericIdFromPropertyId( PropertyId $propertyId ) {
-		return $propertyId->getNumericId();
 	}
 
 }
