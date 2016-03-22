@@ -44,7 +44,7 @@ class UpdateTable extends Maintenance {
 
 		$tableName = 'wbs_propertypairs';
 
-		wfWaitForSlaves();
+		wfGetLBFactory()->waitForReplication();
 		$lb = wfGetLB();
 
 		$this->clearTable( $lb, $tableName );
@@ -102,7 +102,7 @@ class UpdateTable extends Maintenance {
 		} else {
 			do {
 				$db->commit( __METHOD__, 'flush' );
-				wfWaitForSlaves();
+				wfGetLBFactory()->waitForReplication();
 				$this->output( "Deleting a batch\n" );
 				$table = $db->tableName( $tableName );
 				$db->query( "DELETE FROM $table LIMIT $this->mBatchSize" );

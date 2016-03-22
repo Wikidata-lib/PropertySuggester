@@ -56,7 +56,7 @@ class BasicImporter implements Importer {
 
 			if ( $data == false || ++$i % $batchSize == 0 ) {
 				$db->commit( __METHOD__, 'flush' );
-				wfWaitForSlaves();
+				wfGetLBFactory()->waitForReplication();
 				$db->insert( $importContext->getTargetTableName(), $accumulator );
 				if ( ! $importContext->isQuiet() ) {
 					print "$i rows inserted\n";
