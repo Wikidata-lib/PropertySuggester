@@ -163,8 +163,8 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param int $a
-	 * @param int $b
+	 * @param int $pid
+	 * @param int $qid
 	 * @return string
 	 */
 	private function buildTupleCondition( $pid, $qid ){
