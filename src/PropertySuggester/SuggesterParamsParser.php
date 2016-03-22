@@ -22,7 +22,7 @@ class SuggesterParamsParser {
 	private $defaultMinProbability;
 
 	/**
-	 * @param int $defaultSuggestionSearchLimit
+	 * @param int $defaultSuggestionLimit
 	 * @param float $defaultMinProbability
 	 */
 	public function __construct( $defaultSuggestionLimit, $defaultMinProbability ) {
