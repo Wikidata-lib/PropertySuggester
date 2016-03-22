@@ -2,6 +2,8 @@
 
 namespace PropertySuggester;
 
+use ApiMain;
+use UsageException;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\Repo\WikibaseRepo;
@@ -36,7 +38,7 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
 
-		$apiMain = $this->getMockBuilder( 'ApiMain' )
+		$apiMain = $this->getMockBuilder( ApiMain::class )
 			->disableOriginalConstructor()
 			->getMockForAbstractClass();
 		$this->getSuggestions = new GetSuggestions( $apiMain, 'wbgetsuggestion' );
@@ -128,8 +130,8 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 			'context' => 'delete all the things!'
 		);
 
-		$this->setExpectedException( 'UsageException' );
-		$res = $this->doApiRequest( $params );
+		$this->setExpectedException( UsageException::class );
+		$this->doApiRequest( $params );
 	}
 
 	public function testGetAllowedParams() {
