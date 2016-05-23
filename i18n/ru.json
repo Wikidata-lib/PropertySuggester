@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Alexandr Efremov"
+		]
+	},
+	"propertysuggester-desc": "Выводит предложения свойств при добавлении утверждений Викибазы.",
+	"apihelp-wbsgetsuggestions-description": "Модуль API для получения предложений дополнительных свойств, которые можно было бы добавить к сущности Викибазы. Модуль API предназначен в первую очередь для того, чтобы его мог использовать виджет предложений, когда пользователи редактируют сущности Викибазы.",
+	"apihelp-wbsgetsuggestions-example-1": "Получить предложения для сущности Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Получить предложения для сущности Q4 от 10 до 15 ранга",
+	"apihelp-wbsgetsuggestions-example-3": "Получить предложения для комбинации свойств P21 и P31",
+	"apihelp-wbsgetsuggestions-example-4": "Получить предложения для уточнения, что используются с P21",
+	"apihelp-wbsgetsuggestions-example-5": "Получить предложения для ссылок на источники, используемые P21",
+	"apihelp-wbsgetsuggestions-param-context": "Элемент, ссылка на источник, или уточнения.",
+	"apihelp-wbsgetsuggestions-param-continue": "Смещение, с которого продолжить поиск.",
+	"apihelp-wbsgetsuggestions-param-entity": "Предложить свойства для заданной сущности на основе имеющегося списка свойств, которые имеет эта сущность.",
+	"apihelp-wbsgetsuggestions-param-language": "Язык результата.",
+	"apihelp-wbsgetsuggestions-param-limit": "Максимальное количество результатов.",
+	"apihelp-wbsgetsuggestions-param-properties": "Предложить дополнительные свойства для заданного списка свойств.",
+	"apihelp-wbsgetsuggestions-param-search": "Искать этот текст.",
+	"apihelp-wbsgetsuggestions-param-size": "Указать количество предложений, которые надо вывести."
+}

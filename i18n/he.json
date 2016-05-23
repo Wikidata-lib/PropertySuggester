@@ -1,0 +1,14 @@
+{
+	"@metadata": {
+		"authors": [
+			"Amire80",
+			"Guycn2"
+		]
+	},
+	"apihelp-wbsgetsuggestions-example-3": "קבלת הצעות עבור השילוב של המאפיינים P21 ו־P31",
+	"apihelp-wbsgetsuggestions-param-language": "השפה של התוצאה.",
+	"apihelp-wbsgetsuggestions-param-limit": "מספר התוצאות המרבי.",
+	"apihelp-wbsgetsuggestions-param-properties": "לציין מאפיינים נוספים עבור רשימת המאפיינים הנתונה.",
+	"apihelp-wbsgetsuggestions-param-search": "לחפש את הטקסט הזה.",
+	"apihelp-wbsgetsuggestions-param-size": "ציינו את מספר ההצעות שיוצגו."
+}

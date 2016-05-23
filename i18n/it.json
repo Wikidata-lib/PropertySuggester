@@ -1,0 +1,16 @@
+{
+	"@metadata": {
+		"authors": [
+			"Beta16"
+		]
+	},
+	"apihelp-wbsgetsuggestions-example-1": "Ottieni suggerimenti per l'entità Q4",
+	"apihelp-wbsgetsuggestions-example-3": "Ottieni suggerimenti per la combinazione di proprietà P21 e P31",
+	"apihelp-wbsgetsuggestions-example-4": "Ottieni suggerimenti per i qualificatori che vengono utilizzati con P21",
+	"apihelp-wbsgetsuggestions-example-5": "Ottieni suggerimenti per i riferimenti che vengono utilizzati con P21",
+	"apihelp-wbsgetsuggestions-param-language": "Lingua per il risultato.",
+	"apihelp-wbsgetsuggestions-param-limit": "Numero massimo di risultati.",
+	"apihelp-wbsgetsuggestions-param-properties": "Suggerisci ulteriori proprietà per l'elenco delle proprietà indicate",
+	"apihelp-wbsgetsuggestions-param-search": "Ricerca di questo testo.",
+	"apihelp-wbsgetsuggestions-param-size": "Specifica il numero di suggerimenti da restituire."
+}

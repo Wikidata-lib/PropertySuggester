@@ -1,0 +1,24 @@
+{
+	"@metadata": {
+		"authors": [
+			"Gomoko",
+			"Verdy p",
+			"Wladek92"
+		]
+	},
+	"propertysuggester-desc": "Suggère des propriétés lors de l’ajout d’instructions Wikibase.",
+	"apihelp-wbsgetsuggestions-description": "Module de l’API pour obtenir des suggestions de propriétés supplémentaires à ajouter à une entité de Wikibase. Le module de l’API est tout d’abord conçu pour une utilisation par le widget de suggestion quand les utilisateurs modifient les entités de Wikibase.",
+	"apihelp-wbsgetsuggestions-example-1": "Obtenir des suggestions pour l’entité Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Obtenir des suggestions pour l’entité Q4 du rang 10 à 15",
+	"apihelp-wbsgetsuggestions-example-3": "Obtenir des suggestions pour la combinaison des propriétés P21 et P31",
+	"apihelp-wbsgetsuggestions-example-4": "Obtenir des suggestions pour le qualificatif qui sont utilisés avec P21",
+	"apihelp-wbsgetsuggestions-example-5": "Obtenir des suggestions pour les références qui sont utilisées avec P21",
+	"apihelp-wbsgetsuggestions-param-context": "Soit un élément, une référence ou un qualificatif.",
+	"apihelp-wbsgetsuggestions-param-continue": "Décalage à partir duquel continuer une recherche.",
+	"apihelp-wbsgetsuggestions-param-entity": "Suggérer des propriétés pour l’entité donnée, basées sur la liste existante des propriétés que l’entité a déjà.",
+	"apihelp-wbsgetsuggestions-param-language": "Langue pour le résultat.",
+	"apihelp-wbsgetsuggestions-param-limit": "Nombre maximum de résultats.",
+	"apihelp-wbsgetsuggestions-param-properties": "Proposer des propriétés supplémentaires pour la liste donnée des propriétés.",
+	"apihelp-wbsgetsuggestions-param-search": "Rechercher ce texte.",
+	"apihelp-wbsgetsuggestions-param-size": "Spécifier le nombre de suggestions devant être retournées."
+}

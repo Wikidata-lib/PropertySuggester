@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Bjankuloski06"
+		]
+	},
+	"propertysuggester-desc": "Предлага својства кога се ставаат искази во Викибазата",
+	"apihelp-wbsgetsuggestions-description": "Приложнички модул за добивање на предлози за дополниителни својства што би се додале кон единица на Викибазата. Наменет е претежно за употреба во алатката Предлагач кога корисниците уредуваат единици на Викибазата.",
+	"apihelp-wbsgetsuggestions-example-1": "Дај предлози за единицата Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Дај предлози за единицата Q4 од ранг 10 до 15",
+	"apihelp-wbsgetsuggestions-example-3": "Дај предлози за комбинацијата на својства P21 и P31",
+	"apihelp-wbsgetsuggestions-example-4": "Дај предлози за определницата што се користат со P21",
+	"apihelp-wbsgetsuggestions-example-5": "Дај предлози за наводи што се користат со P21",
+	"apihelp-wbsgetsuggestions-param-context": "Предмет, навод или определница.",
+	"apihelp-wbsgetsuggestions-param-continue": "Од каде да се продолжи со пребарувањето",
+	"apihelp-wbsgetsuggestions-param-entity": "Предложи својства за дадена единица, на основа на постоечки список на својства што ги има единицата.",
+	"apihelp-wbsgetsuggestions-param-language": "Јазик за исходот.",
+	"apihelp-wbsgetsuggestions-param-limit": "Макс. број на резултати.",
+	"apihelp-wbsgetsuggestions-param-properties": "Предложи дополнителни својства за дадениот список на својства.",
+	"apihelp-wbsgetsuggestions-param-search": "Пребарај го текстов.",
+	"apihelp-wbsgetsuggestions-param-size": "Укажете колку предлози да се дадат."
+}

@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Liuxinyu970226"
+		]
+	},
+	"propertysuggester-desc": "当添加Wikibase声明时建议属性。",
+	"apihelp-wbsgetsuggestions-description": "用于获取添加至Wikibase实体的额外属性建议的API模块。API模块主要在用户编辑Wikibase实体时，由建议器小部件使用。",
+	"apihelp-wbsgetsuggestions-example-1": "获取用于实体Q4的建议",
+	"apihelp-wbsgetsuggestions-example-2": "获取实体Q4从第10名到第15名之间的建议",
+	"apihelp-wbsgetsuggestions-example-3": "为属性组合P21和P31提供建议",
+	"apihelp-wbsgetsuggestions-example-4": "获取用于与P21一起使用的限定符的建议",
+	"apihelp-wbsgetsuggestions-example-5": "获取用于与P21一起使用的参考文献的建议",
+	"apihelp-wbsgetsuggestions-param-context": "项、参考文献或限定符之一。",
+	"apihelp-wbsgetsuggestions-param-continue": "继续搜索的抵消。",
+	"apihelp-wbsgetsuggestions-param-entity": "为指定实体建议属性，基于实体现有的属性列表。",
+	"apihelp-wbsgetsuggestions-param-language": "用于结果的语言。",
+	"apihelp-wbsgetsuggestions-param-limit": "结果的最大值。",
+	"apihelp-wbsgetsuggestions-param-properties": "为提供的属性列表建议额外属性。",
+	"apihelp-wbsgetsuggestions-param-search": "搜索此文本。",
+	"apihelp-wbsgetsuggestions-param-size": "指定要返回的建议数量。"
+}

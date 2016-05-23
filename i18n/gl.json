@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Elisardojm"
+		]
+	},
+	"propertysuggester-desc": "Suxire propiedades cando se engaden declaracións de Wikibase.",
+	"apihelp-wbsgetsuggestions-description": "Módulo API para obter suxestións de propiedades adicionais para engadir a unha entidade de Wikibase. O módulo API está destinado principalmente para o seu uso polo widget de suxestións cando os usuarios están modificando entidades de Wikibase.",
+	"apihelp-wbsgetsuggestions-example-1": "Obter suxestións para a entidade Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Obter suxestión para a entidade Q4 do rango 10 ó 15",
+	"apihelp-wbsgetsuggestions-example-3": "Obter suxestións para a combinación das propiedades P21 e P31",
+	"apihelp-wbsgetsuggestions-example-4": "Obter suxestións para os cualificadores que son usados con P21",
+	"apihelp-wbsgetsuggestions-example-5": "Obter suxestións para as referencias que se usan con P21",
+	"apihelp-wbsgetsuggestions-param-context": "Calquera elemento, referencia ou cualificador.",
+	"apihelp-wbsgetsuggestions-param-continue": "Desprazamento desde onde continuar unha busca.",
+	"apihelp-wbsgetsuggestions-param-entity": "Suxerir propiedades para a entidade indicada, baseadas na lista de existende de propiedades que xa ten a entidade.",
+	"apihelp-wbsgetsuggestions-param-language": "Idioma para o resultado.",
+	"apihelp-wbsgetsuggestions-param-limit": "Número máximo de resultados.",
+	"apihelp-wbsgetsuggestions-param-properties": "Suxerir propiedades adicionais para a lista dada de propiedades.",
+	"apihelp-wbsgetsuggestions-param-search": "Buscar este texto.",
+	"apihelp-wbsgetsuggestions-param-size": "Indicar o número de suxestión a devolver."
+}

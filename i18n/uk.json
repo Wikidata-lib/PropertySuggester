@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Piramidion"
+		]
+	},
+	"propertysuggester-desc": "Виводить пропозиції властивостей при додаванні тверджень Вікібази.",
+	"apihelp-wbsgetsuggestions-description": "Модуль API для отримання пропозицій додаткових властивостей, які можна було б додати до сутності Вікібази. Модуль API призначений в першу чергу для того, аби його міг використовувати віджет пропозицій, коли користувачі редагують сутності Вікібази.",
+	"apihelp-wbsgetsuggestions-example-1": "Отримати пропозиції для сутності Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Отримати пропозиції для сутності Q4 від 10 до 15 рангу",
+	"apihelp-wbsgetsuggestions-example-3": "Отримати пропозиції для комбінації властивостей P21 та P31",
+	"apihelp-wbsgetsuggestions-example-4": "Отримати пропозиції для уточнення, що використовуються з P21",
+	"apihelp-wbsgetsuggestions-example-5": "Отримати пропозиції для посилань на джерела, що використовуються з P21",
+	"apihelp-wbsgetsuggestions-param-context": "Елемент, посилання на джерело, або уточнення.",
+	"apihelp-wbsgetsuggestions-param-continue": "Зміщення, з якого продовжити пошук.",
+	"apihelp-wbsgetsuggestions-param-entity": "Запропонувати властивості для заданої сутності на основі наявного списку властивостей, які має ця сутність.",
+	"apihelp-wbsgetsuggestions-param-language": "Мова результату.",
+	"apihelp-wbsgetsuggestions-param-limit": "Максимальна кількість результатів.",
+	"apihelp-wbsgetsuggestions-param-properties": "Запропонувати додаткові властивості для заданого списку властивостей.",
+	"apihelp-wbsgetsuggestions-param-search": "Шукати цей текст.",
+	"apihelp-wbsgetsuggestions-param-size": "Вказати кількість пропозицій, які треба вивести."
+}

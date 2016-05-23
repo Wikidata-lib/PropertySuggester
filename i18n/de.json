@@ -1,0 +1,18 @@
+{
+	"@metadata": {
+		"authors": [
+			"Metalhead64"
+		]
+	},
+	"propertysuggester-desc": "Schlägt Eigenschaften beim Hinzufügen von Wikibase-Aussagen vor.",
+	"apihelp-wbsgetsuggestions-example-1": "Ruft Vorschläge für das Objekt Q4 ab",
+	"apihelp-wbsgetsuggestions-example-2": "Ruft Vorschläge für das Objekt Q4 von Rang 10 bis 15 ab",
+	"apihelp-wbsgetsuggestions-example-4": "Ruft Vorschläge für den Qualifikator ab, die mit P21 verwendet werden.",
+	"apihelp-wbsgetsuggestions-example-5": "Ruft Vorschläge für die Einzelnachweise ab, die mit P21 verwendet werden.",
+	"apihelp-wbsgetsuggestions-param-context": "Entweder Objekt, Einzelnachweis oder Qualifikator.",
+	"apihelp-wbsgetsuggestions-param-continue": "Versatz, wo eine Suche fortgeführt werden soll.",
+	"apihelp-wbsgetsuggestions-param-language": "Sprache für das Ergebnis.",
+	"apihelp-wbsgetsuggestions-param-limit": "Maximale Anzahl der Ergebnisse.",
+	"apihelp-wbsgetsuggestions-param-search": "Sucht nach diesem Text.",
+	"apihelp-wbsgetsuggestions-param-size": "Gibt die Anzahl der zurückzugebenden Vorschläge an."
+}
