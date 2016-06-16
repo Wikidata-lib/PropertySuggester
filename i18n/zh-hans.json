@@ -12,7 +12,7 @@
 	"apihelp-wbsgetsuggestions-example-4": "获取用于与P21一起使用的限定符的建议",
 	"apihelp-wbsgetsuggestions-example-5": "获取用于与P21一起使用的参考文献的建议",
 	"apihelp-wbsgetsuggestions-param-context": "项、参考文献或限定符之一。",
-	"apihelp-wbsgetsuggestions-param-continue": "继续搜索的抵消。",
+	"apihelp-wbsgetsuggestions-param-continue": "继续搜索的偏移。",
 	"apihelp-wbsgetsuggestions-param-entity": "为指定实体建议属性，基于实体现有的属性列表。",
 	"apihelp-wbsgetsuggestions-param-language": "用于结果的语言。",
 	"apihelp-wbsgetsuggestions-param-limit": "结果的最大值。",

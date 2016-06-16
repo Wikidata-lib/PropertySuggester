@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Rachmat.Wahidi"
+		]
+	},
+	"propertysuggester-desc": "Sarankan atribut ketika menambahkan pernyataan Wikibase.",
+	"apihelp-wbsgetsuggestions-description": "Modul API untuk mendapatkan saran atribut tambahan untuk menambahkan ke entitas Wikibase. Modul API itu pada awalnya ditujukan untuk digunakan oleh gawit saran ketika pengguna menyunting entitas Wikibase.",
+	"apihelp-wbsgetsuggestions-example-1": "Dapatkan saranan untuk entitas Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Dapatkan saran untuk entitas Q4 dari peringkat 10 ke 15",
+	"apihelp-wbsgetsuggestions-example-3": "Dapatkan saran untuk kombinasi atribut P21 dan P31",
+	"apihelp-wbsgetsuggestions-example-4": "Dapatkan saran untuk penjelas yang digunakan dengan P21",
+	"apihelp-wbsgetsuggestions-example-5": "Dapatkan saran untuk referensi yang digunakan dengan P21",
+	"apihelp-wbsgetsuggestions-param-context": "Butir, referensi atau penjelas.",
+	"apihelp-wbsgetsuggestions-param-continue": "Ofset di mana pencarian akan dilanjutkan.",
+	"apihelp-wbsgetsuggestions-param-entity": "Sarankan atribut untuk entitas yang diberikan, menurut daftar yang ada dari atribut yang dimiliki entitas.",
+	"apihelp-wbsgetsuggestions-param-language": "Bahasa untuk hasil.",
+	"apihelp-wbsgetsuggestions-param-limit": "Jumlah hasil maksimal.",
+	"apihelp-wbsgetsuggestions-param-properties": "Sarankan atribut tambahan untuk daftar atribut yang diberikan.",
+	"apihelp-wbsgetsuggestions-param-search": "Cari untuk teks ini.",
+	"apihelp-wbsgetsuggestions-param-size": "Tentukan jumlah saran yang harus dihasilkan."
+}
