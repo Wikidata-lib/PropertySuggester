@@ -45,6 +45,10 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.0.2 (2016-06-20)
+* Adapt entity type for namespaces
+* Minor cleanups
+
 ### 3.0.1 (2016-03-14)
 * Defined compatibility with Wikibase DataModel ~6.0
 
