@@ -10,7 +10,7 @@
     "apihelp-wbsgetsuggestions-example-1": "Get suggestions for entity Q4",
     "apihelp-wbsgetsuggestions-example-2": "Get suggestions for entity Q4 from rank 10 to 15",
     "apihelp-wbsgetsuggestions-example-3": "Get suggestions for the property combination P21 and P31",
-    "apihelp-wbsgetsuggestions-example-4": "Get suggestions for the qualifier that are used with P21",
+    "apihelp-wbsgetsuggestions-example-4": "Get suggestions for the qualifiers that are used with P21",
     "apihelp-wbsgetsuggestions-example-5": "Get suggestions for the references that are used with P21",
     "apihelp-wbsgetsuggestions-param-context": "Either item, reference or qualifier.",
     "apihelp-wbsgetsuggestions-param-continue": "Offset where to continue a search.",
