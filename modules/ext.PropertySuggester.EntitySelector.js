@@ -34,7 +34,7 @@
 			self.element.on( 'focus', focusHandler );
 		},
 
-		_oldGetData: $.wikibase.entityselector.prototype._getData,
+		_oldGetSearchApiParameters: $.wikibase.entityselector.prototype._getSearchApiParameters,
 
 		/**
 		 *
@@ -45,7 +45,7 @@
 			var self = this;
 
 			if( !self._useSuggester() ) {
-				return self._oldGetData( term )
+				return self._oldGetSearchApiParameters( term )
 			} else {
 				var data = {
 					action: 'wbsgetsuggestions',
