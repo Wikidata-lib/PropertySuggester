@@ -41,7 +41,7 @@
 		 * @param {string} term
 		 * @return {Object}
 		 */
-		_getData: function( term ) {
+		_getSearchApiParameters: function( term ) {
 			var self = this;
 
 			if( !self._useSuggester() ) {
