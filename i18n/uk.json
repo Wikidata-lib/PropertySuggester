@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Piramidion"
+			"Piramidion",
+			"Ата"
 		]
 	},
 	"propertysuggester-desc": "Виводить пропозиції властивостей при додаванні тверджень Вікібази.",
@@ -9,7 +10,7 @@
 	"apihelp-wbsgetsuggestions-example-1": "Отримати пропозиції для сутності Q4",
 	"apihelp-wbsgetsuggestions-example-2": "Отримати пропозиції для сутності Q4 від 10 до 15 рангу",
 	"apihelp-wbsgetsuggestions-example-3": "Отримати пропозиції для комбінації властивостей P21 та P31",
-	"apihelp-wbsgetsuggestions-example-4": "Отримати пропозиції для уточнення, що використовуються з P21",
+	"apihelp-wbsgetsuggestions-example-4": "Отримати пропозиції для уточнень, що використовуються з P21",
 	"apihelp-wbsgetsuggestions-example-5": "Отримати пропозиції для посилань на джерела, що використовуються з P21",
 	"apihelp-wbsgetsuggestions-param-context": "Елемент, посилання на джерело, або уточнення.",
 	"apihelp-wbsgetsuggestions-param-continue": "Зміщення, з якого продовжити пошук.",

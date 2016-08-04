@@ -7,7 +7,7 @@
 	"propertysuggester-desc": "Schlägt Eigenschaften beim Hinzufügen von Wikibase-Aussagen vor.",
 	"apihelp-wbsgetsuggestions-example-1": "Ruft Vorschläge für das Objekt Q4 ab",
 	"apihelp-wbsgetsuggestions-example-2": "Ruft Vorschläge für das Objekt Q4 von Rang 10 bis 15 ab",
-	"apihelp-wbsgetsuggestions-example-4": "Ruft Vorschläge für den Qualifikator ab, die mit P21 verwendet werden.",
+	"apihelp-wbsgetsuggestions-example-4": "Ruft Vorschläge für die Qualifikatoren ab, die mit P21 verwendet werden.",
 	"apihelp-wbsgetsuggestions-example-5": "Ruft Vorschläge für die Einzelnachweise ab, die mit P21 verwendet werden.",
 	"apihelp-wbsgetsuggestions-param-context": "Entweder Objekt, Einzelnachweis oder Qualifikator.",
 	"apihelp-wbsgetsuggestions-param-continue": "Versatz, wo eine Suche fortgeführt werden soll.",

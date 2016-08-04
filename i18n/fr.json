@@ -11,7 +11,7 @@
 	"apihelp-wbsgetsuggestions-example-1": "Obtenir des suggestions pour l’entité Q4",
 	"apihelp-wbsgetsuggestions-example-2": "Obtenir des suggestions pour l’entité Q4 du rang 10 à 15",
 	"apihelp-wbsgetsuggestions-example-3": "Obtenir des suggestions pour la combinaison des propriétés P21 et P31",
-	"apihelp-wbsgetsuggestions-example-4": "Obtenir des suggestions pour le qualificatif qui sont utilisés avec P21",
+	"apihelp-wbsgetsuggestions-example-4": "Obtenir des suggestions pour les qualificatifs qui sont utilisés avec P21",
 	"apihelp-wbsgetsuggestions-example-5": "Obtenir des suggestions pour les références qui sont utilisées avec P21",
 	"apihelp-wbsgetsuggestions-param-context": "Soit un élément, une référence ou un qualificatif.",
 	"apihelp-wbsgetsuggestions-param-continue": "Décalage à partir duquel continuer une recherche.",
