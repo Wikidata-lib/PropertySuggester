@@ -59,7 +59,7 @@
 		 */
 		_getSearchApiParameters: function( term ) {
 			if ( !this._useSuggester() ) {
-				return this._oldGetSearchApiParameters( term )
+				return this._oldGetSearchApiParameters( term );
 			} else {
 				var data = {
 					action: 'wbsgetsuggestions',
@@ -142,7 +142,7 @@
 			} else if ( this._isQualifier() ) {
 				return 'qualifier';
 			} else if ( this._isReference() ) {
-				return 'reference'
+				return 'reference';
 			} else {
 				return null;
 			}
