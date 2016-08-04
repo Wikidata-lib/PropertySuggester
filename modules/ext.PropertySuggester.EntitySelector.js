@@ -16,36 +16,50 @@
 	 */
 	$.widget( 'wikibase.entityselector', $.wikibase.entityselector, {
 
+		/**
+		 * @property {Function}
+		 * @private
+		 */
 		_oldCreate: $.wikibase.entityselector.prototype._create,
 
+		/**
+		 * @inheritdoc
+		 * @protected
+		 */
 		_create: function() {
 			var self = this;
 
-			self._oldCreate.apply( self, arguments );
+			this._oldCreate.apply( this, arguments );
 
 			var focusHandler = function( event ) {
-				if( self._useSuggester() && self.element.val() === ''
-					&& !self.options.menu.element.is( ":visible" ) ) {
+				if ( self._useSuggester()
+					&& self.element.val() === ''
+					&& !self.options.menu.element.is( ':visible' )
+				) {
 					self.options.minTermLength = 0;
 					self._cache = {}; // is done in the entityselector on eachchange too
 					self.search();
 				}
 			};
-			self.element.on( 'focus', focusHandler );
+
+			this.element.on( 'focus', focusHandler );
 		},
 
+		/**
+		 * @property {Function}
+		 * @private
+		 */
 		_oldGetSearchApiParameters: $.wikibase.entityselector.prototype._getSearchApiParameters,
 
 		/**
-		 *
+		 * @inheritdoc
+		 * @protected
 		 * @param {string} term
 		 * @return {Object}
 		 */
 		_getSearchApiParameters: function( term ) {
-			var self = this;
-
-			if( !self._useSuggester() ) {
-				return self._oldGetSearchApiParameters( term )
+			if ( !this._useSuggester() ) {
+				return this._oldGetSearchApiParameters( term )
 			} else {
 				var data = {
 					action: 'wbsgetsuggestions',
@@ -57,72 +71,77 @@
 						? this._cache.nextSuggestionOffset
 						: 0
 				};
-				if( data.context == 'item' ) {
-					data.entity = self._getEntity().getId();
+
+				if ( data.context === 'item' ) {
+					data.entity = this._getEntity().getId();
 				} else {
-					data.properties = self._getPropertyId();
+					data.properties = this._getPropertyId();
 				}
+
 				return data;
 			}
 		},
 
 		/**
+		 * @private
 		 * @return {boolean}
 		 */
 		_useSuggester: function() {
 			var entity = this._getEntity();
-			return this.options.type === 'property' && entity !== null && entity.getType() === 'item';
+
+			return this.options.type === 'property' && entity && entity.getType() === 'item';
 		},
 
 		/**
 		 * Get the entity from the surrounding entityview or return null
+		 * @private
 		 * @return {wikibase.Entity|null}
 		 */
 		_getEntity: function() {
 			try {
 				var $entityView = this.element.closest( ':wikibase-entityview' );
-			} catch( e ) {
+			} catch ( ex ) {
 				return null;
 			}
-			var entity = $entityView.length > 0 ? $entityView.data( 'entityview' ).option( 'value' ) : null;
-			if( entity ) {
-				return entity;
-			} else {
-				return null;
-			}
+
+			return $entityView.length > 0
+				? $entityView.data( 'entityview' ).option( 'value' )
+				: null;
 		},
 
 		/**
 		 * Returns the property id for the enclosing statementview or null if no property is selected yet.
 		 *
+		 * @private
 		 * @return {string|null}
 		 */
 		_getPropertyId: function() {
 			try {
 				var $statementview = this.element.closest( ':wikibase-statementview' );
-			} catch( e ) {
+			} catch ( ex ) {
 				return null;
 			}
-			var statement = $statementview.length > 0 ? $statementview.data( 'statementview' ).option( 'value' ) : null;
-			if( statement ) {
-				return statement.getClaim().getMainSnak().getPropertyId();
-			} else {
-				return null;
-			}
+
+			var statement = $statementview.length > 0
+				? $statementview.data( 'statementview' ).option( 'value' )
+				: null;
+
+			return statement ? statement.getClaim().getMainSnak().getPropertyId() : null;
 		},
 
 		/**
 		 * Returns either 'item', 'qualifier', 'reference' or null depending on the context of the entityselector.
 		 * 'item' is returned in case that the selector is for a new property in an item.
 		 *
-		 * @return {string}
+		 * @private
+		 * @return {string|null}
 		 */
 		_getPropertyContext: function() {
-			if( this._isInNewStatementView() ) {
+			if ( this._isInNewStatementView() ) {
 				return 'item';
-			} else if( this._isQualifier() ) {
+			} else if ( this._isQualifier() ) {
 				return 'qualifier';
-			} else if( this._isReference() ) {
+			} else if ( this._isReference() ) {
 				return 'reference'
 			} else {
 				return null;
@@ -130,35 +149,42 @@
 		},
 
 		/**
+		 * @private
 		 * @return {boolean}
 		 */
 		_isQualifier: function() {
-			var $statementview = this.element.closest( ':wikibase-statementview' );
-			var statementview = $statementview.data( 'statementview' );
-			if( !statementview ) {
+			var $statementview = this.element.closest( ':wikibase-statementview' ),
+				statementview = $statementview.data( 'statementview' );
+
+			if ( !statementview ) {
 				return false;
 			}
+
 			return this.element.closest( statementview.$qualifiers ).length > 0;
 		},
 
 		/**
+		 * @private
 		 * @return {boolean}
 		 */
 		_isReference: function() {
 			var $referenceview = this.element.closest( ':wikibase-referenceview' );
+
 			return $referenceview.length > 0;
 		},
 
 		/**
 		 * detect if this is a new statement view.
+		 * @private
 		 * @return {boolean}
 		 */
 		_isInNewStatementView: function() {
-			var $statementview = this.element.closest( ':wikibase-statementview' );
-			var value = ( $statementview.length > 0 )
-				? $statementview.data( 'statementview' ).option( 'value' )
-				: null;
-			return value === null;
+			var $statementview = this.element.closest( ':wikibase-statementview' ),
+				value = $statementview.length > 0
+					? $statementview.data( 'statementview' ).option( 'value' )
+					: null;
+
+			return !value;
 		}
 	} );
 
