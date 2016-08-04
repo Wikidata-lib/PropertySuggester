@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.1.2 (2016-08-04)
+* Follow up fix for entity suggester, update cache management in EntitySuggester.
+
 ### 3.1.1 (2016-08-03)
 * Follow up fix for entity suggester, update method call in EntitySuggester.
 

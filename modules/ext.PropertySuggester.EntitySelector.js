@@ -52,9 +52,10 @@
 					search: term,
 					context: this._getPropertyContext(),
 					format: 'json',
-					language: self.options.language,
-					'continue': self._cache[term] && self._cache[term].nextSuggestionOffset
-						? self._cache[term].nextSuggestionOffset : 0
+					language: this.options.language,
+					'continue': this._cache.term === term && this._cache.nextSuggestionOffset
+						? this._cache.nextSuggestionOffset
+						: 0
 				};
 				if( data.context == 'item' ) {
 					data.entity = self._getEntity().getId();
