@@ -39,24 +39,6 @@ final class PropertySuggesterHooks {
 	}
 
 	/**
-	 * @param $files
-	 * @return bool
-	 */
-	public static function onUnitTestsList( &$files ) {
-		// @codeCoverageIgnoreStart
-		$directoryIterator = new RecursiveDirectoryIterator( __DIR__ . '/tests/phpunit/' );
-
-		/* @var SplFileInfo $fileInfo */
-		foreach ( new RecursiveIteratorIterator( $directoryIterator ) as $fileInfo ) {
-			if ( substr( $fileInfo->getFilename(), -8 ) === 'Test.php' ) {
-				$files[] = $fileInfo->getPathname();
-			}
-		}
-		return true;
-		// @codeCoverageIgnoreEnd
-	}
-
-	/**
 	 * @param DatabaseUpdater $updater
 	 * @return bool
 	 */
