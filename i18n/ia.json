@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"McDutchie"
+		]
+	},
+	"propertysuggester-desc": "Suggere proprietates quando se adde declarationes Wikibase.",
+	"apihelp-wbsgetsuggestions-description": "Modulo API pro obtener suggestiones de proprietates supplementari a adder a un entitate Wikibase. Le modulo API es concipite pro uso per le widget suggestor quando usatores modifica entitates Wikibase.",
+	"apihelp-wbsgetsuggestions-example-1": "Obtener suggestiones pro entitate Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Obtener suggestiones pro entitate Q4 ab rango 10 a 15",
+	"apihelp-wbsgetsuggestions-example-3": "Obtener suggestiones pro le combination de proprietates P21 e P31",
+	"apihelp-wbsgetsuggestions-example-4": "Obtener suggestiones pro le qualificatores que es usate pro P21",
+	"apihelp-wbsgetsuggestions-example-5": "Obtener suggestiones pro le referentias que es usate con P21",
+	"apihelp-wbsgetsuggestions-param-context": "Elemento, referentia o qualificator.",
+	"apihelp-wbsgetsuggestions-param-continue": "Position ubi continuar un recerca.",
+	"apihelp-wbsgetsuggestions-param-entity": "Suggerer proprietates pro le entitate date, a base del lista existente de proprietates que le entitate ha.",
+	"apihelp-wbsgetsuggestions-param-language": "Lingua pro resultato.",
+	"apihelp-wbsgetsuggestions-param-limit": "Numero maxime de resultatos.",
+	"apihelp-wbsgetsuggestions-param-properties": "Suggerer proprietates supplementari pro le lista date de proprietates.",
+	"apihelp-wbsgetsuggestions-param-search": "Cercar iste texto.",
+	"apihelp-wbsgetsuggestions-param-size": "Specificar le numero de suggestiones a retornar."
+}
