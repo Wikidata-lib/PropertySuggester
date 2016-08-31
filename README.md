@@ -45,7 +45,7 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
-### 3.1.3 (dev)
+### 3.1.3 (2016-08-31)
 * Only get suggestions once when the property input field is initially focused.
 
 ### 3.1.2 (2016-08-04)
