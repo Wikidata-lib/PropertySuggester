@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.1.3 (dev)
+* Only get suggestions once when the property input field is initially focused.
+
 ### 3.1.2 (2016-08-04)
 * Follow up fix for entity suggester, update cache management in EntitySuggester.
 

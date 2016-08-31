@@ -42,7 +42,10 @@
 				}
 			};
 
-			this.element.on( 'focus', focusHandler );
+			// Search for suggestions once the field is initially focused.
+			// We only need to do this once, afterwards the old suggestions
+			// will re-appear on focus anyway.
+			this.element.one( 'focus', focusHandler );
 		},
 
 		/**
