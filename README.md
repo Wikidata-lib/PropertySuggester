@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.1.4 (dev)
+* Handle MediaWiki's `OutputPage::getTitle` returning `null`.
+
 ### 3.1.3 (2016-08-31)
 * Only get suggestions once when the property input field is initially focused.
 

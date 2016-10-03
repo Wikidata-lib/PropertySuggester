@@ -30,7 +30,7 @@ final class PropertySuggesterHooks {
 			);
 		}
 
-		if ( $out->getTitle()->getNamespace() !== $itemNamespace ) {
+		if ( $out->getTitle() === null || $out->getTitle()->getNamespace() !== $itemNamespace ) {
 			return true;
 		}
 
