@@ -45,7 +45,7 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
-### 3.1.4 (dev)
+### 3.1.4 (2016-10-03)
 * Handle MediaWiki's `OutputPage::getTitle` returning `null`.
 
 ### 3.1.3 (2016-08-31)
