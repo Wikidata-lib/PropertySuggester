@@ -34,7 +34,7 @@ class PropertySuggesterHooksTest extends MediaWikiTestCase {
 	/**
 	 * @dataProvider onBeforePageDisplay_resourceLoaderModuleNotAddedProvider
 	 */
-	public function testOnBeforePageDisplay_resourceLoaderModuleNotAdded( Title $title ) {
+	public function testOnBeforePageDisplay_resourceLoaderModuleNotAdded( Title $title = null ) {
 		$context = $this->getContext( $title );
 		$output = $context->getOutput();
 		$skin = $context->getSkin();
@@ -45,11 +45,10 @@ class PropertySuggesterHooksTest extends MediaWikiTestCase {
 	}
 
 	public function onBeforePageDisplay_resourceLoaderModuleNotAddedProvider() {
-		$title = $this->getTitleForId( new PropertyId( 'P1' ) );
-
 		return [
 			[ $this->getTitleForId( new PropertyId( 'P1' ) ) ],
-			[ Title::makeTitle( NS_HELP, 'Contents' ) ]
+			[ Title::makeTitle( NS_HELP, 'Contents' ) ],
+			[ null ]
 		];
 	}
 
@@ -58,7 +57,7 @@ class PropertySuggesterHooksTest extends MediaWikiTestCase {
 		return $entityContentFactory->getTitleForId( $entityId );
 	}
 
-	private function getContext( Title $title ) {
+	private function getContext( Title $title = null ) {
 		$context = RequestContext::getMain();
 		$context->setTitle( $title );
 
