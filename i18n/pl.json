@@ -1,0 +1,15 @@
+{
+	"@metadata": {
+		"authors": [
+			"Chrumps",
+			"XnIcRaM"
+		]
+	},
+	"propertysuggester-desc": "Proponuje właściwości podczas dodawania deklaracji Wikibase.",
+	"apihelp-wbsgetsuggestions-param-context": "Element, przypis lub kwalifikator.",
+	"apihelp-wbsgetsuggestions-param-continue": "Przesunięcie od którego kontynuować wyszukiwanie",
+	"apihelp-wbsgetsuggestions-param-language": "Język rezultatu",
+	"apihelp-wbsgetsuggestions-param-limit": "Maksymalna liczba wyników.",
+	"apihelp-wbsgetsuggestions-param-search": "Szukaj w tym tekście.",
+	"apihelp-wbsgetsuggestions-param-size": "Określ liczbę propozycji, które będą zwrócone."
+}
