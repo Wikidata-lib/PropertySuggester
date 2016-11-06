@@ -5,10 +5,12 @@ namespace PropertySuggester\Suggesters;
 use InvalidArgumentException;
 use LoadBalancerSingle;
 use MediaWikiTestCase;
+use Wikibase\DataModel\Entity\EntityIdValue;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
+use Wikibase\DataModel\Snak\PropertyValueSnak;
 
 /**
  * @covers PropertySuggester\Suggesters\SimpleSuggester
@@ -46,6 +48,10 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		$rows[] = $this->row( 2, 0, 4, 200, 0.2, 'item' );
 		$rows[] = $this->row( 3, 0, 1, 100, 0.5, 'item' );
 
+		// Classifying pairs
+		$rows[] = $this->row( 5, 12, 7, 100, 0.3, 'item' );
+		$rows[] = $this->row( 6, 0, 8, 100, 0.4, 'item' );
+
 		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
 
@@ -59,7 +65,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 	public function testDatabaseHasRows() {
 		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2' ) );
-		$this->assertEquals( 5, $res->numRows() );
+		$this->assertEquals( 7, $res->numRows() );
 	}
 
 	public function testSuggestByPropertyIds() {
@@ -83,6 +89,44 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 
 		$this->assertEquals( new PropertyId( 'p2' ), $res[0]->getPropertyId() );
 		$this->assertEquals( new PropertyId( 'p3' ), $res[1]->getPropertyId() );
+	}
+
+	private function getClassifyingIdTestItem() {
+		$item = new Item();
+		$snak = new PropertyValueSnak( new PropertyId( 'P5' ), new EntityIdValue( new ItemId( 'Q12' ) ) );
+		$guid = 'claim0';
+		$item->getStatements()->addNewStatement( $snak, null, null, $guid );
+		$snak = new PropertySomeValueSnak( new PropertyId( 'P6' ) );
+		$guid = 'claim1';
+		$item->getStatements()->addNewStatement( $snak, null, null, $guid );
+
+		return $item;
+	}
+
+	public function testSuggestByItem_classifyingIds() {
+		$item = $this->getClassifyingIdTestItem();
+
+		$suggester = clone $this->suggester;
+		$suggester->setClassifyingPropertyIds( [ 5 ] );
+		$res = $suggester->suggestByItem( $item, 100, 0.0, 'item' );
+
+		$this->assertEquals( new PropertyId( 'P8' ), $res[0]->getPropertyId() );
+		$this->assertEquals( new PropertyId( 'P7' ), $res[1]->getPropertyId() );
+	}
+
+	public function testSuggestByItem_classifyingIdsWithWeight() {
+		$item = $this->getClassifyingIdTestItem();
+
+		$suggester = clone $this->suggester;
+		$suggester->setClassifyingPropertyIds( [ 5 ] );
+		$suggester->setClassifyingConditionWeight( 0.75 );
+		$res = $suggester->suggestByItem( $item, 100, 0.0, 'item' );
+
+		// Due to the boosted weight of classifying ids, P7 is first now
+		$this->assertEquals( new PropertyId( 'P7' ), $res[0]->getPropertyId() );
+		$this->assertEquals( 0.3 * 0.75, $res[0]->getProbability(), 'P7 probability', 0.001 );
+		$this->assertEquals( new PropertyId( 'P8' ), $res[1]->getPropertyId() );
+		$this->assertEquals( 0.4 * 0.25, $res[1]->getProbability(), 'P8 probability', 0.001 );
 	}
 
 	public function testDeprecatedProperties() {

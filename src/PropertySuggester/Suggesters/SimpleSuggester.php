@@ -36,6 +36,11 @@ class SimpleSuggester implements SuggesterEngine {
 	private $initialSuggestions = array();
 
 	/**
+	 * @var float
+	 */
+	private $classifyingConditionWeight = 0.5;
+
+	/**
 	 * @var LoadBalancer
 	 */
 	private $lb;
@@ -74,7 +79,13 @@ class SimpleSuggester implements SuggesterEngine {
 	}
 
 	/**
-	 * @param int[] $propertyIds
+	 * @param float $classifyingConditionWeight
+	 */
+	public function setClassifyingConditionWeight( $classifyingConditionWeight ) {
+		$this->classifyingConditionWeight = $classifyingConditionWeight;
+	}
+
+	/**
 	 * @param array[] $idTuples Array of ( int property ID, int item ID ) tuples
 	 * @param int $limit
 	 * @param float $minProbability
@@ -82,36 +93,47 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	private function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
+	private function getSuggestions( array $idTuples, $limit, $minProbability, $context ) {
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
 		}
 		if ( !is_float( $minProbability ) ) {
 			throw new InvalidArgumentException( '$minProbability must be float!' );
 		}
-		if ( !$propertyIds ) {
+
+		if ( !$idTuples ) {
 			return $this->initialSuggestions;
 		}
 
+		$propertyIds = array_map( function( array $tuple ) {
+			return $tuple[0];
+		}, $idTuples );
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
 		$count = count( $propertyIds );
 
 		$dbr = $this->lb->getConnection( DB_REPLICA );
 
 		$tupleConditions = [];
+		$hasClassifyingPropertyIds = false;
+
 		foreach ( $idTuples as $tuple ) {
 			$tupleConditions[] = $this->buildTupleCondition( $tuple[0], $tuple[1] );
+			$hasClassifyingPropertyIds = $hasClassifyingPropertyIds || $tuple[1] > 0;
 		}
 
-		if ( empty( $tupleConditions ) ) {
-			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
+		if ( $hasClassifyingPropertyIds && abs( $this->classifyingConditionWeight - 0.5 ) > 1e-8 ) {
+			// Use a weighted SELECT, if we have at least one classifying relation
+			// and classifyingConditionWeight is not 0.5.
+			$propSelect = $this->getWeightedPropSelect( $dbr->getType(), $count );
+		} else {
+			$propSelect = "sum(probability)/$count";
 		}
-		else{
-			$condition = $dbr->makeList( $tupleConditions, LIST_OR );
-		}
+
+		$condition = $dbr->makeList( $tupleConditions, LIST_OR );
+
 		$res = $dbr->select(
 			'wbs_propertypairs',
-			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
+			array( 'pid' => 'pid2', 'prob' => $propSelect ),
 			array( $condition,
 				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
 				   'context' => $context ),
@@ -121,11 +143,36 @@ class SimpleSuggester implements SuggesterEngine {
 				'ORDER BY' => 'prob DESC',
 				'LIMIT'    => $limit,
 				'HAVING'   => 'prob > ' . floatval( $minProbability )
-				)
-			);
+			)
+		);
+
 		$this->lb->reuseConnection( $dbr );
 
 		return $this->buildResult( $res );
+	}
+
+	/**
+	 * @param string $dbType
+	 * @param int $count
+	 * @return string
+	 */
+	private function getWeightedPropSelect( $dbType, $count ) {
+		// The sum of the weights needs to be 2.
+		$weightNonClassifying = floatval( ( 1 - $this->classifyingConditionWeight ) * 2 );
+		$weightClassifying = floatval( $this->classifyingConditionWeight * 2 );
+
+		if ( $dbType === 'mysql' ) {
+			$propSelect = 'SUM(if(qid1 = 0, probability * ' . $weightNonClassifying .
+				', probability * ' . $weightClassifying . '))/' . (int)$count;
+		} elseif ( $dbType === 'sqlite' ) {
+			$propSelect = 'SUM(CASE WHEN qid1 = 0 THEN probability * ' . $weightNonClassifying .
+				' ELSE probability * ' . $weightClassifying . ' END)/' . (int)$count;
+		} else {
+			// We can only be sure this works on MySQL and SQLite right now.
+			$propSelect = 'SUM(probability)/' . (int)$count;
+		}
+
+		return $propSelect;
 	}
 
 	/**
@@ -138,11 +185,11 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByPropertyIds( array $propertyIds, $limit, $minProbability, $context ) {
-		$numericIds = array_map( function( PropertyId $propertyId ) {
-			return $propertyId->getNumericId();
+		$idTuples = array_map( function( PropertyId $propertyId ) {
+			return [ $propertyId->getNumericId(), 0 ];
 		}, $propertyIds );
 
-		return $this->getSuggestions( $numericIds, array(), $limit, $minProbability, $context );
+		return $this->getSuggestions( $idTuples, $limit, $minProbability, $context );
 	}
 
 	/**
@@ -156,13 +203,11 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$ids = array();
-		$idTuples = array();
+		$idTuples = [];
 
 		foreach ( $item->getStatements()->toArray() as $statement ) {
 			$mainSnak = $statement->getMainSnak();
 			$numericPropertyId = $mainSnak->getPropertyId()->getNumericId();
-			$ids[] = $numericPropertyId;
 
 			if ( !isset( $this->classifyingPropertyIds[$numericPropertyId] ) ) {
 				$idTuples[] = [ $numericPropertyId, 0 ];
@@ -191,7 +236,7 @@ class SimpleSuggester implements SuggesterEngine {
 			}
 		}
 
-		return $this->getSuggestions( $ids, $idTuples, $limit, $minProbability, $context );
+		return $this->getSuggestions( $idTuples, $limit, $minProbability, $context );
 	}
 
 	/**

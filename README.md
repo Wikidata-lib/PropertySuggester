@@ -42,8 +42,14 @@ generate this data from a wikidata dump.
 * $wgPropertySuggesterMinProbability - a float that sets a minimum threshold for suggestions (default 0.05)
 * $wgPropertySuggesterDeprecatedIds - a list of ints that blacklist suggestions
 * $wgPropertySuggesterInitialSuggestions - a list of ints that will be suggested when no statements exist
+* $wgPropertySuggesterClassifyingConditionWeight - a float between 0 and 1 that determines the weight that's given to classifying property ids relative to non classifying ones (default 0.5)
 
 ## Release notes
+
+### 4.0.0 (dev)
+* Allow changing the weight given to classifying conditions via the
+  `$wgPropertySuggesterClassifyingConditionWeight` setting. This only applies to the `item` context
+  if there is at least one classifying statement.
 
 ### 3.1.7 (2017-03-27)
 * Added compatibility with Wikibase DataModel 7.x

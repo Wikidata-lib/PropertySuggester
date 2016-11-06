@@ -57,6 +57,7 @@ class GetSuggestions extends ApiBase {
 		global $wgPropertySuggesterMinProbability;
 		global $wgPropertySuggesterClassifyingPropertyIds;
 		global $wgPropertySuggesterInitialSuggestions;
+		global $wgPropertySuggesterClassifyingConditionWeight;
 
 		$wikibaseRepo = WikibaseRepo::getDefaultInstance();
 		$store = $wikibaseRepo->getStore();
@@ -70,6 +71,7 @@ class GetSuggestions extends ApiBase {
 		$this->suggester->setDeprecatedPropertyIds( $wgPropertySuggesterDeprecatedIds );
 		$this->suggester->setClassifyingPropertyIds( $wgPropertySuggesterClassifyingPropertyIds );
 		$this->suggester->setInitialSuggestions( $wgPropertySuggesterInitialSuggestions );
+		$this->suggester->setClassifyingConditionWeight( $wgPropertySuggesterClassifyingConditionWeight );
 
 		$this->paramsParser = new SuggesterParamsParser( 500, $wgPropertySuggesterMinProbability );
 	}
