@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Chrumps",
-			"XnIcRaM"
+			"XnIcRaM",
+			"Lebiega"
 		]
 	},
 	"propertysuggester-desc": "Proponuje właściwości podczas dodawania deklaracji Wikibase.",
@@ -10,6 +11,7 @@
 	"apihelp-wbsgetsuggestions-param-continue": "Przesunięcie od którego kontynuować wyszukiwanie",
 	"apihelp-wbsgetsuggestions-param-language": "Język rezultatu",
 	"apihelp-wbsgetsuggestions-param-limit": "Maksymalna liczba wyników.",
+	"apihelp-wbsgetsuggestions-param-properties": "Zaproponuj dodatkowe właściwości do danej listy właściwości.",
 	"apihelp-wbsgetsuggestions-param-search": "Szukaj w tym tekście.",
 	"apihelp-wbsgetsuggestions-param-size": "Określ liczbę propozycji, które będą zwrócone."
 }
