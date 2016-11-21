@@ -2,7 +2,7 @@
 
 namespace PropertySuggester\UpdateTable\Importer;
 
-use DatabaseBase;
+use Database;
 use UnexpectedValueException;
 use PropertySuggester\UpdateTable\ImportContext;
 
@@ -38,11 +38,11 @@ class BasicImporter implements Importer {
 
 	/**
 	 * @param $fileHandle
-	 * @param DatabaseBase $db
+	 * @param Database $db
 	 * @param ImportContext $importContext
 	 * @throws UnexpectedValueException
 	 */
-	private function doImport( $fileHandle, DatabaseBase $db, ImportContext $importContext ) {
+	private function doImport( $fileHandle, Database $db, ImportContext $importContext ) {
 		$accumulator = array();
 		$batchSize = $importContext->getBatchSize();
 		$i = 0;
