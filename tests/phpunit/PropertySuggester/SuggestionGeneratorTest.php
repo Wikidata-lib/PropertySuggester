@@ -59,11 +59,11 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	}
 
 	public function testFilterSuggestions() {
-		$p7 = PropertyId::newFromNumber( 7 );
-		$p10 = PropertyId::newFromNumber( 10 );
-		$p12 = PropertyId::newFromNumber( 12 );
-		$p15 = PropertyId::newFromNumber( 15 );
-		$p23 = PropertyId::newFromNumber( 23 );
+		$p7 = new PropertyId( 'P7' );
+		$p10 = new PropertyId( 'P10' );
+		$p12 = new PropertyId( 'P12' );
+		$p15 = new PropertyId( 'P15' );
+		$p23 = new PropertyId( 'P23' );
 
 		$suggestions = array(
 			new Suggestion( $p12, 0.9 ), // this will stay at pos 0
