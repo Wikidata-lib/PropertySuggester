@@ -102,7 +102,7 @@ class ResultBuilder {
 		}
 
 		foreach ( $matchingTerms as $term ) {
-			switch ( $term->getType() ) {
+			switch ( $term->getTermType() ) {
 				case TermIndexEntry::TYPE_LABEL:
 					$entry['label'] = $term->getText();
 					break;

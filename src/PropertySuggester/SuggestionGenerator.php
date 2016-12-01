@@ -2,6 +2,7 @@
 
 namespace PropertySuggester;
 
+use InvalidArgumentException;
 use PropertySuggester\Suggesters\SuggesterEngine;
 use PropertySuggester\Suggesters\Suggestion;
 use Wikibase\DataModel\Entity\Item;
@@ -9,9 +10,9 @@ use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Services\Lookup\EntityLookup;
+use Wikibase\Lib\Store\TermIndexSearchCriteria;
 use Wikibase\TermIndex;
 use Wikibase\TermIndexEntry;
-use InvalidArgumentException;
 
 /**
  * API module helper to generate property suggestions.
@@ -122,7 +123,7 @@ class SuggestionGenerator {
 	private function getMatchingIDs( $search, $language ) {
 		$termIndexEntries = $this->termIndex->getTopMatchingTerms(
 			array(
-				new TermIndexEntry( array(
+				new TermIndexSearchCriteria( array(
 					'termLanguage' => $language,
 					'termText' => $search
 				) )
