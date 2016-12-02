@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.1.5 (2016-12-02)
+* Adapted entity suggester for changes in Wikibase.
+
 ### 3.1.4 (2016-10-03)
 * Handle MediaWiki's `OutputPage::getTitle` returning `null`.
 
