@@ -7,7 +7,12 @@ use UsageException;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\Property;
 use Wikibase\Repo\WikibaseRepo;
-use Wikibase\Test\Repo\Api\WikibaseApiTestCase;
+use Wikibase\Repo\Tests\Api\WikibaseApiTestCase;
+
+// FIXME: Remove this temporary workaround after the Wikibase class was moved.
+if ( !class_exists( WikibaseApiTestCase::class ) ) {
+	class_alias( \Wikibase\Test\Repo\Api\WikibaseApiTestCase::class, WikibaseApiTestCase::class );
+}
 
 /**
  * @covers PropertySuggester\GetSuggestions
