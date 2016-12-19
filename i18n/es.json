@@ -2,7 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"AlvaroMolina",
-			"Macofe"
+			"Macofe",
+			"Dgstranz"
 		]
 	},
 	"propertysuggester-desc": "Sugiere propiedades cuando se añaden declaraciones de Wikibase.",
@@ -10,7 +11,7 @@
 	"apihelp-wbsgetsuggestions-example-1": "Obtener sugerencias para la entidad Q4",
 	"apihelp-wbsgetsuggestions-example-2": "Obtener sugerencias para la entidad Q4 en el intervalo 10 a 15",
 	"apihelp-wbsgetsuggestions-example-3": "Obtener sugerencias para la combinación de propiedades P21 y P31",
-	"apihelp-wbsgetsuggestions-example-4": "Obtener sugerencias para la clasificación que se utilizan con P21",
+	"apihelp-wbsgetsuggestions-example-4": "Obtener sugerencias para los calificadores empleados con P21",
 	"apihelp-wbsgetsuggestions-example-5": "Obtener sugerencias para las referencias que se utilizan con P21",
 	"apihelp-wbsgetsuggestions-param-context": "Cualquiera de los elementos, de referencia o de clasificación.",
 	"apihelp-wbsgetsuggestions-param-continue": "Desplazamiento desde donde continuar una búsqueda.",
