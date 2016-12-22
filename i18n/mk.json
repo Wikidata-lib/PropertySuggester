@@ -15,7 +15,7 @@
 	"apihelp-wbsgetsuggestions-param-continue": "Од каде да се продолжи со пребарувањето",
 	"apihelp-wbsgetsuggestions-param-entity": "Предложи својства за дадена единица, на основа на постоечки список на својства што ги има единицата.",
 	"apihelp-wbsgetsuggestions-param-language": "Јазик за исходот.",
-	"apihelp-wbsgetsuggestions-param-limit": "Макс. број на резултати.",
+	"apihelp-wbsgetsuggestions-param-limit": "Највеќе ставки во исходот.",
 	"apihelp-wbsgetsuggestions-param-properties": "Предложи дополнителни својства за дадениот список на својства.",
 	"apihelp-wbsgetsuggestions-param-search": "Пребарај го текстов.",
 	"apihelp-wbsgetsuggestions-param-size": "Укажете колку предлози да се дадат."
