@@ -9,7 +9,7 @@
 	"apihelp-wbsgetsuggestions-example-1": "Дај предлози за единицата Q4",
 	"apihelp-wbsgetsuggestions-example-2": "Дај предлози за единицата Q4 од ранг 10 до 15",
 	"apihelp-wbsgetsuggestions-example-3": "Дај предлози за комбинацијата на својства P21 и P31",
-	"apihelp-wbsgetsuggestions-example-4": "Дај предлози за определницата што се користат со P21",
+	"apihelp-wbsgetsuggestions-example-4": "Дај предлози за определниците што се користат со P21",
 	"apihelp-wbsgetsuggestions-example-5": "Дај предлози за наводи што се користат со P21",
 	"apihelp-wbsgetsuggestions-param-context": "Предмет, навод или определница.",
 	"apihelp-wbsgetsuggestions-param-continue": "Од каде да се продолжи со пребарувањето",
