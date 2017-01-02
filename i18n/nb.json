@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Jon Harald Søby"
+		]
+	},
+	"propertysuggester-desc": "Foreslår egenskaper når Wikibase-påstander legges til.",
+	"apihelp-wbsgetsuggestions-description": "API-modul for å få forslag for andre egenskaper som kan legges til i en Wikibase-entitet. API-modulen er primært tenkt å brukes med forslagsverktøyet når brukere redigerer Wikibase-entiteter.",
+	"apihelp-wbsgetsuggestions-example-1": "Hent forslag for entitet Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Hent forslag for entitet Q4 fra rang 10 til 15",
+	"apihelp-wbsgetsuggestions-example-3": "Hent forslag for egenskapskombinasjonen P21 og P31",
+	"apihelp-wbsgetsuggestions-example-4": "Hent forslag for kvalifikatorene som brukes med P21",
+	"apihelp-wbsgetsuggestions-example-5": "Hent forslag for referansene som brukes med P21",
+	"apihelp-wbsgetsuggestions-param-context": "Enten element, referanse eller kvalifikator.",
+	"apihelp-wbsgetsuggestions-param-continue": "Offset for hvor søket skal fortsettes.",
+	"apihelp-wbsgetsuggestions-param-entity": "Foreslå egenskaper for den gitte entiteten basert på en liste over eksisterende egenskaper entiteten har.",
+	"apihelp-wbsgetsuggestions-param-language": "Språk for resultatet.",
+	"apihelp-wbsgetsuggestions-param-limit": "Maksimalt antall resultater.",
+	"apihelp-wbsgetsuggestions-param-properties": "Foreslå ekstra egenskaper for den gitte listen egenskaper.",
+	"apihelp-wbsgetsuggestions-param-search": "Søk etter denne teksten.",
+	"apihelp-wbsgetsuggestions-param-size": "Spesifiser antall forslag som skal returneres."
+}
