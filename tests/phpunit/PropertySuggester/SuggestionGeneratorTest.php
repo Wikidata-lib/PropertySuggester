@@ -27,22 +27,22 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	/**
 	 * @var SuggestionGenerator
 	 */
-	protected $suggestionGenerator;
+	private $suggestionGenerator;
 
 	/**
 	 * @var SuggesterEngine|PHPUnit_Framework_MockObject_MockObject
 	 */
-	protected $suggester;
+	private $suggester;
 
 	/**
 	 * @var EntityLookup|PHPUnit_Framework_MockObject_MockObject
 	 */
-	protected $lookup;
+	private $lookup;
 
 	/**
 	 * @var TermIndex|PHPUnit_Framework_MockObject_MockObject
 	 */
-	protected $termIndex;
+	private $termIndex;
 
 	public function setUp() {
 		parent::setUp();

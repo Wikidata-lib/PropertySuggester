@@ -25,7 +25,7 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	/**
 	 * @var SimpleSuggester
 	 */
-	protected $suggester;
+	private $suggester;
 
 	private function row( $pid1, $qid1, $pid2, $count, $probability, $context ) {
 		return array(

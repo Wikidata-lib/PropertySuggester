@@ -81,7 +81,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @throws InvalidArgumentException
 	 * @return Suggestion[]
 	 */
-	protected function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
+	private function getSuggestions( array $propertyIds, array $idTuples, $limit, $minProbability, $context ) {
 		if ( !is_int( $limit ) ) {
 			throw new InvalidArgumentException( '$limit must be int!' );
 		}
@@ -193,7 +193,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param ResultWrapper $res
 	 * @return Suggestion[]
 	 */
-	protected function buildResult( ResultWrapper $res ) {
+	private function buildResult( ResultWrapper $res ) {
 		$resultArray = array();
 		foreach ( $res as $row ) {
 			$pid = PropertyId::newFromNumber( ( int )$row->pid );

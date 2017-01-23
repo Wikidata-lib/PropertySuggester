@@ -19,12 +19,12 @@ class UpdateTableTest extends MediaWikiTestCase {
 	/**
 	 * @var string
 	 */
-	protected $testfilename;
+	private $testfilename;
 
 	/**
 	 * @var string[]
 	 */
-	protected $rowHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
+	private $rowHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
 
 	public function setUp() {
 		parent::setUp();

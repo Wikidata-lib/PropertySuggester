@@ -18,11 +18,11 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	/**
 	 * @var SuggesterParamsParser
 	 */
-	protected $paramsParser;
+	private $paramsParser;
 
-	protected $defaultSuggesterResultSize = 100;
-	protected $defaultMinProbability = 0.01;
-    protected $defaultParams = array(
+	private $defaultSuggesterResultSize = 100;
+	private $defaultMinProbability = 0.01;
+	private $defaultParams = array(
 		'entity' => null,
 		'properties' => null,
 		'continue' => 10,
@@ -31,7 +31,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		'search' => '',
 		'context' => 'item',
 	);
-    
+
 	public function setUp() {
 		parent::setUp();
 		$this->paramsParser = new SuggesterParamsParser(

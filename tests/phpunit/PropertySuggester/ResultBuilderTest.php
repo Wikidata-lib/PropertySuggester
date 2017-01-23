@@ -19,7 +19,7 @@ class ResultBuilderTest extends MediaWikiTestCase {
 	/**
 	 * @var ResultBuilder
 	 */
-	protected $resultBuilder;
+	private $resultBuilder;
 
 	public function setUp() {
 		parent::setUp();
