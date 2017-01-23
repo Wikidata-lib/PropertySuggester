@@ -17,7 +17,6 @@ use Wikibase\Repo\Tests\Api\WikibaseApiTestCase;
  * @group API
  * @group Wikibase
  * @group WikibaseAPI
- * @group WikibaseRepo
  * @group BreakingTheSlownessBarrier
  * @group Database
  * @group medium
