@@ -95,7 +95,7 @@ class SimpleSuggester implements SuggesterEngine {
 		$excludedIds = array_merge( $propertyIds, $this->deprecatedPropertyIds );
 		$count = count( $propertyIds );
 
-		$dbr = $this->lb->getConnection( DB_SLAVE );
+		$dbr = $this->lb->getConnection( DB_REPLICA );
 		if ( empty( $idTuples ) ){
 			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
 		}
