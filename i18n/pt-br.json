@@ -1,0 +1,15 @@
+{
+	"@metadata": {
+		"authors": [
+			"Eduardo Addad de Oliveira"
+		]
+	},
+	"propertysuggester-desc": "Sugere propriedades ao adicionar instruções do Wikibase.",
+	"apihelp-wbsgetsuggestions-example-1": "Obter sugestões para a entidade Q4",
+	"apihelp-wbsgetsuggestions-param-context": "Qualquer item, referência ou qualificador.",
+	"apihelp-wbsgetsuggestions-param-language": "Linguagem para o resultado.",
+	"apihelp-wbsgetsuggestions-param-limit": "Número máximo de resultados.",
+	"apihelp-wbsgetsuggestions-param-properties": "Sugira propriedades adicionais para a determinada lista de propriedades.",
+	"apihelp-wbsgetsuggestions-param-search": "Pesquisar este texto.",
+	"apihelp-wbsgetsuggestions-param-size": "Especificar o número de sugestões a serem retornadas."
+}
