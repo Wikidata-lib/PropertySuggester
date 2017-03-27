@@ -6,6 +6,7 @@ use LoadBalancer;
 use InvalidArgumentException;
 use LogicException;
 use Wikibase\DataModel\Entity\EntityIdValue;
+use Wikibase\DataModel\Entity\Int32EntityId;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertyValueSnak;
@@ -169,7 +170,15 @@ class SimpleSuggester implements SuggesterEngine {
 					);
 				}
 
-				$numericEntityId = $dataValue->getEntityId()->getNumericId();
+				$entityId = $dataValue->getEntityId();
+
+				if ( !( $entityId instanceof Int32EntityId ) ) {
+					throw new LogicException(
+						$entityId->getSerialization() . ' expected to be Int32EntityId'
+					);
+				}
+
+				$numericEntityId = $entityId->getNumericId();
 				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericEntityId );
 			}
 		}
