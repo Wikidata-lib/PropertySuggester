@@ -2,7 +2,6 @@
 
 namespace PropertySuggester\Suggesters;
 
-use LoadBalancer;
 use InvalidArgumentException;
 use LogicException;
 use Wikibase\DataModel\Entity\EntityIdValue;
@@ -10,7 +9,8 @@ use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertyValueSnak;
-use ResultWrapper;
+use Wikimedia\Rdbms\LoadBalancer;
+use Wikimedia\Rdbms\ResultWrapper;
 
 /**
  * a Suggester implementation that creates suggestion via MySQL

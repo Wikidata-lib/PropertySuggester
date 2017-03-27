@@ -2,7 +2,7 @@
 
 namespace PropertySuggester\UpdateTable;
 
-use LoadBalancer;
+use Wikimedia\Rdbms\LoadBalancer;
 
 /**
  * Context for importing data from a csv file to a db table using a Importer strategy
@@ -11,6 +11,7 @@ use LoadBalancer;
  * @licence GNU GPL v2+
  */
 class ImportContext {
+
 	/**
 	 * file system path to the CSV to load data from
 	 * @var string
