@@ -6,8 +6,8 @@ use LoadBalancer;
 use InvalidArgumentException;
 use LogicException;
 use Wikibase\DataModel\Entity\EntityIdValue;
-use Wikibase\DataModel\Entity\Int32EntityId;
 use Wikibase\DataModel\Entity\Item;
+use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertyValueSnak;
 use ResultWrapper;
@@ -172,14 +172,15 @@ class SimpleSuggester implements SuggesterEngine {
 
 				$entityId = $dataValue->getEntityId();
 
-				if ( !( $entityId instanceof Int32EntityId ) ) {
+				if ( !( $entityId instanceof ItemId ) ) {
 					throw new LogicException(
-						$entityId->getSerialization() . ' expected to be Int32EntityId'
+						"Property $numericPropertyId in wgPropertySuggesterClassifyingPropertyIds"
+						. ' does not have property type wikibase-item'
 					);
 				}
 
-				$numericEntityId = $entityId->getNumericId();
-				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericEntityId );
+				$numericItemId = $entityId->getNumericId();
+				$idTuples[] = $this->buildTupleCondition( $numericPropertyId, $numericItemId );
 			}
 		}
 
