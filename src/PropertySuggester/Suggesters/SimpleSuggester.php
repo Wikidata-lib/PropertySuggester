@@ -174,8 +174,9 @@ class SimpleSuggester implements SuggesterEngine {
 
 				if ( !( $entityId instanceof ItemId ) ) {
 					throw new LogicException(
-						"Property $numericPropertyId in wgPropertySuggesterClassifyingPropertyIds"
-						. ' does not have property type wikibase-item'
+						"PropertyValueSnak for $numericPropertyId, configured in " .
+						' wgPropertySuggesterClassifyingPropertyIds, has an unexpected value ' .
+						'and data type (not wikibase-item).'
 					);
 				}
 
