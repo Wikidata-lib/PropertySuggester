@@ -118,7 +118,7 @@ class GetSuggestions extends ApiBase {
 			$params->search
 		);
 
-		$entries = $resultBuilder->createResultArray( $suggestions, $params->language, $params->search );
+		$entries = $resultBuilder->createResultArray( $suggestions, $params->language );
 
 		// merge with search result if possible and necessary
 		if ( count( $entries ) < $params->resultSize && $params->search !== '' ) {

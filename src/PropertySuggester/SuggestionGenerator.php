@@ -52,8 +52,8 @@ class SuggestionGenerator {
 	 * @param int $limit
 	 * @param float $minProbability
 	 * @param string $context
-	 * @throws \InvalidArgumentException
-	 * @return array
+	 * @throws InvalidArgumentException
+	 * @return Suggestion[]
 	 */
 	public function generateSuggestionsByItem( $itemIdString, $limit, $minProbability, $context ) {
 		$itemId = new ItemId( $itemIdString );
