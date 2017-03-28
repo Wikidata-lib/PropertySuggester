@@ -45,6 +45,11 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.1.7 (2017-03-27)
+* Added compatibility with Wikibase DataModel 7.x
+* Raised minimal required Wikibase DataModel version to 6.1
+* Added safe guard to make sure `SimpleSuggester` does not index non-Items as Items
+
 ### 3.1.6 (2017-01-03)
 * Adapted entity suggester for changes in Wikibase.
 
