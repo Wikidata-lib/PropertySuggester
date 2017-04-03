@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Jopparn",
+			"WikiPhoenix"
+		]
+	},
+	"propertysuggester-desc": "Föreslå egenskaper när Wikibase-uttalanden läggs till.",
+	"apihelp-wbsgetsuggestions-example-1": "Hämta förslag för entitet Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Hämta förslag för entitet Q4 från rank 10 till 15",
+	"apihelp-wbsgetsuggestions-example-3": "Hämta förslag för egenskapskombinationen P21 och P31",
+	"apihelp-wbsgetsuggestions-example-4": "Hämta förslag för bestämningsorden som används med P21",
+	"apihelp-wbsgetsuggestions-example-5": "Hämta förslag för referenserna som används med P21",
+	"apihelp-wbsgetsuggestions-param-context": "Antingen objekt, referens eller bestämningsord.",
+	"apihelp-wbsgetsuggestions-param-continue": "Offset där en sökning ska fortsätta.",
+	"apihelp-wbsgetsuggestions-param-entity": "Föreslå egenskaper för angiven entitet, baserat på befintlig lista över egenskaper som entiteten har.",
+	"apihelp-wbsgetsuggestions-param-language": "Språk för resultat.",
+	"apihelp-wbsgetsuggestions-param-limit": "Maximalt antal resultat.",
+	"apihelp-wbsgetsuggestions-param-properties": "Föreslå ytterligare egenskaper för den angivna listan över egenskaper.",
+	"apihelp-wbsgetsuggestions-param-search": "Sök efter denna text.",
+	"apihelp-wbsgetsuggestions-param-size": "Ange antalet förslag att returnera."
+}
