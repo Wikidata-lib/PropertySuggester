@@ -45,6 +45,9 @@ generate this data from a wikidata dump.
 
 ## Release notes
 
+### 3.2.0 (2017-04-24)
+* Converted extension to use MediaWiki extension registration.
+
 ### 3.1.7 (2017-03-27)
 * Added compatibility with Wikibase DataModel 7.x
 * Raised minimal required Wikibase DataModel version to 6.1
