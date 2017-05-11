@@ -1,0 +1,22 @@
+{
+	"@metadata": {
+		"authors": [
+			"Obsuser"
+		]
+	},
+	"propertysuggester-desc": "Сугестија својстава при додавању ставки Викибазе.",
+	"apihelp-wbsgetsuggestions-description": "API модул за добијање сугестија за додатна својства за додавање на ентитет Викибазе. API модул је примарно намењен за употребу справице за прављење сугестија када корисници уређују ентитете на Википодацима.",
+	"apihelp-wbsgetsuggestions-example-1": "Тражи сугестије за ентитет Q4",
+	"apihelp-wbsgetsuggestions-example-2": "Тражи сугестије за ентитет Q4 од ранга 10 до 15",
+	"apihelp-wbsgetsuggestions-example-3": "Тражи сугестије за комбинацију својстава P21 и P31",
+	"apihelp-wbsgetsuggestions-example-4": "Тражи сугестије за квалификаторе коришћене са P21",
+	"apihelp-wbsgetsuggestions-example-5": "Тражи сугестије за референце коришћене са P21",
+	"apihelp-wbsgetsuggestions-param-context": "Или ставка, или референца, или квалификатор.",
+	"apihelp-wbsgetsuggestions-param-continue": "Офсет за наставак претраге.",
+	"apihelp-wbsgetsuggestions-param-entity": "Сугериши својства за дати ентитет, на основу постојећег списка својстава које ентитет има.",
+	"apihelp-wbsgetsuggestions-param-language": "Језик за резултат.",
+	"apihelp-wbsgetsuggestions-param-limit": "Максимални број резултата.",
+	"apihelp-wbsgetsuggestions-param-properties": "Сугериши додатна својства за дати списак својстава.",
+	"apihelp-wbsgetsuggestions-param-search": "Претрага за овај текст.",
+	"apihelp-wbsgetsuggestions-param-size": "Одреди број сугестија које ће да буду враћене."
+}
