@@ -12,9 +12,9 @@ matrix:
     - env: DBTYPE=sqlite
       php: 7.0
     - env: DBTYPE=sqlite
-      php: hhvm-3.18
+      php: hhvm
     - env: DBTYPE=mysql
-      php: hhvm-3.18
+      php: hhvm
 
 before_script:
   - bash ./build/travis/before_script.sh
@@ -24,4 +24,3 @@ script:
 
 after_success:
   - bash ./build/travis/after_script.sh
-
