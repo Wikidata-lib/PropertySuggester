@@ -105,8 +105,7 @@ class SimpleSuggester implements SuggesterEngine {
 
 		if ( empty( $tupleConditions ) ) {
 			$condition = 'pid1 IN (' . $dbr->makeList( $propertyIds ) . ')';
-		}
-		else{
+		} else {
 			$condition = $dbr->makeList( $tupleConditions, LIST_OR );
 		}
 		$res = $dbr->select(
@@ -133,7 +132,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 *
 	 * @param PropertyId[] $propertyIds
 	 * @param int $limit
- 	 * @param float $minProbability
+	 * @param float $minProbability
 	 * @param string $context
 	 * @return Suggestion[]
 	 */
@@ -200,8 +199,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return string
 	 */
 	private function buildTupleCondition( $pid, $qid ) {
-		$tuple = '(pid1 = '. ( int )$pid .' AND qid1 = '. ( int )$qid .')';
-		return $tuple;
+		return '(pid1 = ' . (int)$pid . ' AND qid1 = ' . (int)$qid . ')';
 	}
 
 	/**
@@ -213,7 +211,7 @@ class SimpleSuggester implements SuggesterEngine {
 	private function buildResult( ResultWrapper $res ) {
 		$resultArray = array();
 		foreach ( $res as $row ) {
-			$pid = PropertyId::newFromNumber( ( int )$row->pid );
+			$pid = PropertyId::newFromNumber( $row->pid );
 			$suggestion = new Suggestion( $pid, $row->prob );
 			$resultArray[] = $suggestion;
 		}

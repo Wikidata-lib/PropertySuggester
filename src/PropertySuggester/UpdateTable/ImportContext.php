@@ -101,7 +101,6 @@ class ImportContext {
 		$this->csvFilePath = $fullPath;
 	}
 
-
 	/**
 	 * @return int
 	 */

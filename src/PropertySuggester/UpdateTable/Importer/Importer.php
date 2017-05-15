@@ -11,11 +11,12 @@ use PropertySuggester\UpdateTable\ImportContext;
  * @licence GNU GPL v2+
  */
 interface Importer {
+
 	/**
 	 * Run specific algorithm to import data to wbs_propertypairs db table from csv. Returns success
 	 * @param ImportContext $importContext
 	 * @return bool
 	 */
-	function importFromCsvFileToDb( ImportContext $importContext );
+	public function importFromCsvFileToDb( ImportContext $importContext );
 
 }

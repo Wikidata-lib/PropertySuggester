@@ -26,7 +26,7 @@ class Suggestion {
 	 * @param PropertyId $propertyId
 	 * @param float $probability
 	 */
-	function __construct( PropertyId $propertyId, $probability ) {
+	public function __construct( PropertyId $propertyId, $probability ) {
 		$this->propertyId = $propertyId;
 		$this->probability = $probability;
 	}

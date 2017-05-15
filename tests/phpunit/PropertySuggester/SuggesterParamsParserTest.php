@@ -42,10 +42,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 
 	public function testSuggesterParameters() {
 		$params = $this->paramsParser->parseAndValidate(
-			array_merge(
-				$this->defaultParams,
-				array( 'entity' => 'Q1', 'search' => '*')
-			)
+			array_merge( $this->defaultParams, [ 'entity' => 'Q1', 'search' => '*' ] )
 		);
 
 		$this->assertEquals( 'Q1', $params->entity );
@@ -53,7 +50,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		$this->assertEquals( 'en', $params->language );
 		$this->assertEquals( 10, $params->continue );
 		$this->assertEquals( 5, $params->limit );
-		$this->assertEquals( 5+10, $params->suggesterLimit );
+		$this->assertEquals( 5 + 10, $params->suggesterLimit );
 		$this->assertEquals( $this->defaultMinProbability, $params->minProbability );
 		$this->assertEquals( '', $params->search );
 		$this->assertEquals( 'item', $params->context );
@@ -61,7 +58,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 
 	public function testSuggesterWithSearchParameters() {
 		$params = $this->paramsParser->parseAndValidate(
-			array_merge( $this->defaultParams, array( 'properties' => array('P31'), 'search' => 'asd') )
+			array_merge( $this->defaultParams, [ 'properties' => [ 'P31' ], 'search' => 'asd' ] )
 		);
 
 		$this->assertEquals( null, $params->entity );

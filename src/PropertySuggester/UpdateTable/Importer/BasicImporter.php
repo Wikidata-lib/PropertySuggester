@@ -20,8 +20,7 @@ class BasicImporter implements Importer {
 	 * @param ImportContext $importContext
 	 * @return bool
 	 */
-	function importFromCsvFileToDb( ImportContext $importContext ) {
-
+	public function importFromCsvFileToDb( ImportContext $importContext ) {
 		if ( ( $fileHandle = fopen( $importContext->getCsvFilePath(), "r" ) ) == false ) {
 			return false;
 		}
@@ -48,7 +47,7 @@ class BasicImporter implements Importer {
 		$i = 0;
 		$header = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() ); //this is to get the csv-header
 		$expectedHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
-		if( $header != $expectedHeader ) {
+		if ( $header != $expectedHeader ) {
 			throw new UnexpectedValueException( "provided csv-file does not match the expected format:\n" . join( ',', $expectedHeader ) );
 		}
 		while ( true ) {

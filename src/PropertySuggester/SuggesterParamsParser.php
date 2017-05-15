@@ -42,7 +42,7 @@ class SuggesterParamsParser {
 		$result->entity = $params['entity'];
 		$result->properties = $params['properties'];
 
-		if ( !( $result->entity XOR $result->properties ) ) {
+		if ( !( $result->entity xor $result->properties ) ) {
 			throw new InvalidArgumentException( 'provide either entity-id parameter \'entity\' or a list of properties \'properties\'' );
 		}
 		if ( !( is_null( $params['continue'] ) || is_numeric( $params['continue'] ) ) ) {

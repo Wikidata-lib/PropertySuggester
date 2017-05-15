@@ -19,8 +19,9 @@ require_once $basePath . '/maintenance/Maintenance.php';
  */
 class UpdateTable extends Maintenance {
 
-	function __construct() {
+	public function __construct() {
 		parent::__construct();
+
 		$this->mDescription = "Read CSV Dump and refill probability table";
 		$this->addOption( 'file', 'CSV table to be loaded (relative path)', true, true );
 		$this->setBatchSize( 10000 );
@@ -29,7 +30,7 @@ class UpdateTable extends Maintenance {
 	/**
 	 * loads property pair occurrence probability table from given csv file
 	 */
-	function execute() {
+	public function execute() {
 		if ( substr( $this->getOption( 'file' ), 0, 2 ) === "--" ) {
 			$this->error( "The --file option requires a file as an argument.\n", true );
 		}
@@ -73,7 +74,7 @@ class UpdateTable extends Maintenance {
 	 * @param bool $quiet
 	 * @return ImportContext
 	 */
-	function createImportContext( LoadBalancer $lb, $tableName, $wholePath, $quiet ) {
+	private function createImportContext( LoadBalancer $lb, $tableName, $wholePath, $quiet ) {
 		$importContext = new ImportContext();
 		$importContext->setLb( $lb );
 		$importContext->setTargetTableName( $tableName );
@@ -91,6 +92,7 @@ class UpdateTable extends Maintenance {
 	 */
 	private function clearTable( LoadBalancer $lb, $tableName ) {
 		global $wgDBtype;
+
 		$db = $lb->getConnection( DB_MASTER );
 		if ( !$db->tableExists( $tableName ) ) {
 			$this->error( "$tableName table does not exist.\nExecuting core/maintenance/update.php may help.\n", true );
@@ -105,7 +107,7 @@ class UpdateTable extends Maintenance {
 				$this->output( "Deleting a batch\n" );
 				$table = $db->tableName( $tableName );
 				$db->query( "DELETE FROM $table LIMIT $this->mBatchSize" );
-			} while ($db->affectedRows() > 0);
+			} while ( $db->affectedRows() > 0 );
 		}
 		$lb->reuseConnection( $db );
 	}

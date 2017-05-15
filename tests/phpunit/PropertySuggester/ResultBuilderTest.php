@@ -32,20 +32,20 @@ class ResultBuilderTest extends MediaWikiTestCase {
 	}
 
 	public function testMergeWithTraditionalSearchResults() {
-		$suggesterResult = array(
-			array( 'id' =>  '8' ),
-			array( 'id' => '14' ),
-			array( 'id' => '20' )
-		);
+		$suggesterResult = [
+			[ 'id' => '8' ],
+			[ 'id' => '14' ],
+			[ 'id' => '20' ],
+		];
 
-		$searchResult = array(
-			array( 'id' =>  '7' ),
-			array( 'id' =>  '8' ),
-			array( 'id' => '13' ),
-			array( 'id' => '14' ),
-			array( 'id' => '15' ),
-			array( 'id' => '16' )
-		);
+		$searchResult = [
+			[ 'id' => '7' ],
+			[ 'id' => '8' ],
+			[ 'id' => '13' ],
+			[ 'id' => '14' ],
+			[ 'id' => '15' ],
+			[ 'id' => '16' ],
+		];
 
 		$mergedResult = $this->resultBuilder->mergeWithTraditionalSearchResults(
 			$suggesterResult,
@@ -53,13 +53,13 @@ class ResultBuilderTest extends MediaWikiTestCase {
 			5
 		);
 
-		$expected = array(
-			array( 'id' =>  '8' ),
-			array( 'id' => '14' ),
-			array( 'id' => '20' ),
-			array( 'id' =>  '7' ),
-			array( 'id' => '13' )
-		);
+		$expected = [
+			[ 'id' => '8' ],
+			[ 'id' => '14' ],
+			[ 'id' => '20' ],
+			[ 'id' => '7' ],
+			[ 'id' => '13' ],
+		];
 
 		$this->assertEquals( $mergedResult, $expected );
 	}

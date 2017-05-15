@@ -138,7 +138,6 @@ class GetSuggestions extends ApiBase {
 		$this->getResult()->addValue( 'searchinfo', 'search', $params->search );
 	}
 
-
 	/**
 	 * @param int $resultSize
 	 * @param string $search
