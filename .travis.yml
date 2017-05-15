@@ -1,5 +1,7 @@
 language: php
 
+dist: trusty
+
 matrix:
   fast_finish: true
   include:
@@ -10,9 +12,9 @@ matrix:
     - env: DBTYPE=sqlite
       php: 7.0
     - env: DBTYPE=sqlite
-      php: hhvm
+      php: hhvm-3.18
     - env: DBTYPE=mysql
-      php: hhvm
+      php: hhvm-3.18
 
 before_script:
   - bash ./build/travis/before_script.sh
