@@ -3,10 +3,10 @@
 namespace PropertySuggester\Maintenance;
 
 use Maintenance;
-use LoadBalancer;
 use PropertySuggester\UpdateTable\Importer\BasicImporter;
 use PropertySuggester\UpdateTable\ImportContext;
 use UnexpectedValueException;
+use Wikimedia\Rdbms\LoadBalancer;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 require_once $basePath . '/maintenance/Maintenance.php';

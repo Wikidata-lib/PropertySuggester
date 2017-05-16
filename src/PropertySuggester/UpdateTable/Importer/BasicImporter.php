@@ -2,9 +2,9 @@
 
 namespace PropertySuggester\UpdateTable\Importer;
 
-use Database;
 use UnexpectedValueException;
 use PropertySuggester\UpdateTable\ImportContext;
+use Wikimedia\Rdbms\Database;
 
 /**
  * A strategy, which imports entries from CSV file into DB table, used as fallback, when no special import commands

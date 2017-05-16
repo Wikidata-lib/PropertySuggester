@@ -3,12 +3,12 @@
 namespace PropertySuggester\Suggesters;
 
 use InvalidArgumentException;
-use LoadBalancerSingle;
 use MediaWikiTestCase;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
 use Wikibase\DataModel\Snak\PropertySomeValueSnak;
+use Wikimedia\Rdbms\LoadBalancerSingle;
 
 /**
  * @covers PropertySuggester\Suggesters\SimpleSuggester
