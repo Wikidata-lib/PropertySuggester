@@ -1,12 +1,17 @@
 {
 	"@metadata": {
 		"authors": [
-			"Eduardo Addad de Oliveira"
+			"Eduardo Addad de Oliveira",
+			"Trigonometria87"
 		]
 	},
 	"propertysuggester-desc": "Sugere propriedades ao adicionar instruções do Wikibase.",
 	"apihelp-wbsgetsuggestions-example-1": "Obter sugestões para a entidade Q4",
+	"apihelp-wbsgetsuggestions-example-3": "Obter sugestões para a combinação das propriedades P21 e P31",
+	"apihelp-wbsgetsuggestions-example-4": "Obter sugestões para os qualificadores que são usados com P21",
+	"apihelp-wbsgetsuggestions-example-5": "Obter sugestões para as referências que são usadas com P21",
 	"apihelp-wbsgetsuggestions-param-context": "Qualquer item, referência ou qualificador.",
+	"apihelp-wbsgetsuggestions-param-entity": "Sugerir propriedades para a entidade dada, baseado na lista existente de propriedades que a entidade tem.",
 	"apihelp-wbsgetsuggestions-param-language": "Linguagem para o resultado.",
 	"apihelp-wbsgetsuggestions-param-limit": "Número máximo de resultados.",
 	"apihelp-wbsgetsuggestions-param-properties": "Sugira propriedades adicionais para a determinada lista de propriedades.",

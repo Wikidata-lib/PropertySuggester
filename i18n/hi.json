@@ -1,0 +1,17 @@
+{
+	"@metadata": {
+		"authors": [
+			"चक्रपाणी"
+		]
+	},
+	"propertysuggester-desc": "विकिबेस बयान को जोड़ते समय गुणों का सुझाव",
+	"apihelp-wbsgetsuggestions-description": "विकिबेस इकाई में जोड़ने के लिए अतिरिक्त गुणों के सुझाव प्राप्त करने के लिए एपीआई मॉड्यूल। एपीआई मॉड्यूल मुख्यतः सुझावक विजेट द्वारा उपयोग के लिए प्रयुक्त है जब उपयोगकर्ता विकिबेस इकाइयों को संपादित कर रहे हों।",
+	"apihelp-wbsgetsuggestions-example-1": "एंटिटी Q4 के लिए सुझाव पाएं",
+	"apihelp-wbsgetsuggestions-example-2": "एंटिटी Q4 के लिए रैंक 10 से 15 से सुझाव पाएं",
+	"apihelp-wbsgetsuggestions-example-3": "P21 और P31 प्रॉपर्टी कॉम्बिनेशन के लिए सुझाव पायें",
+	"apihelp-wbsgetsuggestions-example-4": "उन क्वालीफायर के लिए सुझाव पायें जिनका प्रयोग P21 में किया गया है",
+	"apihelp-wbsgetsuggestions-param-context": "या तो आइटम, रिफरेन्स या क्वालीफायर",
+	"apihelp-wbsgetsuggestions-param-language": "परिणाम के लिए भाषा",
+	"apihelp-wbsgetsuggestions-param-limit": "अधिकतम परिणाम संख्या",
+	"apihelp-wbsgetsuggestions-param-search": "इस टेक्स्ट को खोजें"
+}
