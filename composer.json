@@ -5,7 +5,6 @@
 	"keywords": ["propertysuggester", "wikibase", "wikidata"],
 	"homepage": "https://github.com/Wikidata-lib/PropertySuggester",
 	"license": "GPL-2.0+",
-	"authors": [ ],
 	"support": {
 		"issues": "https://github.com/Wikidata-lib/PropertySuggester/issues"
 	},

@@ -43,8 +43,11 @@ final class PropertySuggesterHooks {
 	 * @return bool
 	 */
 	public static function onCreateSchema( DatabaseUpdater $updater ) {
-		$updater->addExtensionTable( 'wbs_propertypairs',
-			__DIR__ . '/sql/create_propertypairs.sql', true );
+		$updater->addExtensionTable(
+			'wbs_propertypairs',
+			__DIR__ . '/sql/create_propertypairs.sql'
+		);
+
 		return true;
 	}
 
