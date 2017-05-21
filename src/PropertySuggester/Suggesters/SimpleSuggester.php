@@ -23,17 +23,17 @@ class SimpleSuggester implements SuggesterEngine {
 	/**
 	 * @var int[]
 	 */
-	private $deprecatedPropertyIds = array();
+	private $deprecatedPropertyIds = [];
 
 	/**
 	 * @var array Numeric property ids as keys, values are meaningless.
 	 */
-	private $classifyingPropertyIds = array();
+	private $classifyingPropertyIds = [];
 
 	/**
 	 * @var Suggestion[]
 	 */
-	private $initialSuggestions = array();
+	private $initialSuggestions = [];
 
 	/**
 	 * @var LoadBalancer
@@ -65,7 +65,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @param int[] $initialSuggestionIds
 	 */
 	public function setInitialSuggestions( array $initialSuggestionIds ) {
-		$suggestions = array();
+		$suggestions = [];
 		foreach ( $initialSuggestionIds as $id ) {
 			$suggestions[] = new Suggestion( PropertyId::newFromNumber( $id ), 1.0 );
 		}
@@ -110,18 +110,23 @@ class SimpleSuggester implements SuggesterEngine {
 		}
 		$res = $dbr->select(
 			'wbs_propertypairs',
-			array( 'pid' => 'pid2', 'prob' => "sum(probability)/$count" ),
-			array( $condition,
-				   'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
-				   'context' => $context ),
+			[
+				'pid' => 'pid2',
+				'prob' => "sum(probability)/$count",
+			],
+			[
+				$condition,
+				'pid2 NOT IN (' . $dbr->makeList( $excludedIds ) . ')',
+				'context' => $context,
+			],
 			__METHOD__,
-			array(
+			[
 				'GROUP BY' => 'pid2',
 				'ORDER BY' => 'prob DESC',
 				'LIMIT'    => $limit,
 				'HAVING'   => 'prob > ' . floatval( $minProbability )
-				)
-			);
+			]
+		);
 		$this->lb->reuseConnection( $dbr );
 
 		return $this->buildResult( $res );
@@ -141,7 +146,7 @@ class SimpleSuggester implements SuggesterEngine {
 			return $propertyId->getNumericId();
 		}, $propertyIds );
 
-		return $this->getSuggestions( $numericIds, array(), $limit, $minProbability, $context );
+		return $this->getSuggestions( $numericIds, [], $limit, $minProbability, $context );
 	}
 
 	/**
@@ -155,8 +160,8 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	public function suggestByItem( Item $item, $limit, $minProbability, $context ) {
-		$ids = array();
-		$idTuples = array();
+		$ids = [];
+		$idTuples = [];
 
 		foreach ( $item->getStatements()->toArray() as $statement ) {
 			$mainSnak = $statement->getMainSnak();
@@ -209,7 +214,7 @@ class SimpleSuggester implements SuggesterEngine {
 	 * @return Suggestion[]
 	 */
 	private function buildResult( ResultWrapper $res ) {
-		$resultArray = array();
+		$resultArray = [];
 		foreach ( $res as $row ) {
 			$pid = PropertyId::newFromNumber( $row->pid );
 			$suggestion = new Suggestion( $pid, $row->prob );

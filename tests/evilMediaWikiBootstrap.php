@@ -22,7 +22,7 @@ require_once "$IP/includes/AutoLoader.php";
 require_once "$IP/includes/profiler/Profiler.php";
 
 # Start the profiler
-$wgProfiler = array();
+$wgProfiler = [];
 if ( file_exists( "$IP/StartProfiler.php" ) ) {
 	require "$IP/StartProfiler.php";
 }
@@ -39,7 +39,7 @@ foreach ( get_defined_vars() as $key => $var ) {
 }
 
 global $wgAutoloadClasses;
-$wgAutoloadClasses = array();
+$wgAutoloadClasses = [];
 
 if ( defined( 'MW_CONFIG_CALLBACK' ) ) {
 	# Use a callback function to configure MediaWiki

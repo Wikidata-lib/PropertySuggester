@@ -28,23 +28,24 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	private $suggester;
 
 	private function row( $pid1, $qid1, $pid2, $count, $probability, $context ) {
-		return array(
+		return [
 			'pid1' => $pid1,
 			'qid1' => $qid1,
 			'pid2' => $pid2,
 			'count' => $count,
 			'probability' => $probability,
 			'context' => $context
-		);
+		];
 	}
 
 	public function addDBData() {
-		$rows = array();
-		$rows[] = $this->row( 1, 0, 2, 100, 0.1, 'item' );
-		$rows[] = $this->row( 1, 0, 3, 50, 0.05, 'item' );
-		$rows[] = $this->row( 2, 0, 3, 100, 0.3, 'item' );
-		$rows[] = $this->row( 2, 0, 4, 200, 0.2, 'item' );
-		$rows[] = $this->row( 3, 0, 1, 100, 0.5, 'item' );
+		$rows = [
+			$this->row( 1, 0, 2, 100, 0.1, 'item' ),
+			$this->row( 1, 0, 3, 50, 0.05, 'item' ),
+			$this->row( 2, 0, 3, 100, 0.3, 'item' ),
+			$this->row( 2, 0, 4, 200, 0.2, 'item' ),
+			$this->row( 3, 0, 1, 100, 0.5, 'item' ),
+		];
 
 		$this->db->insert( 'wbs_propertypairs', $rows );
 	}
@@ -53,17 +54,17 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 		parent::setUp();
 
 		$this->tablesUsed[] = 'wbs_propertypairs';
-		$lb = new LoadBalancerSingle( array( "connection" => $this->db ) );
+		$lb = new LoadBalancerSingle( [ 'connection' => $this->db ] );
 		$this->suggester = new SimpleSuggester( $lb );
 	}
 
 	public function testDatabaseHasRows() {
-		$res = $this->db->select( 'wbs_propertypairs', array( 'pid1', 'pid2' ) );
+		$res = $this->db->select( 'wbs_propertypairs', [ 'pid1', 'pid2' ] );
 		$this->assertEquals( 5, $res->numRows() );
 	}
 
 	public function testSuggestByPropertyIds() {
-		$ids = array( new PropertyId( 'p1' ) );
+		$ids = [ new PropertyId( 'p1' ) ];
 
 		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0, 'item' );
 
@@ -86,9 +87,9 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testDeprecatedProperties() {
-		$ids = array( new PropertyId( 'p1' ) );
+		$ids = [ new PropertyId( 'p1' ) ];
 
-		$this->suggester->setDeprecatedPropertyIds( array( 2 ) );
+		$this->suggester->setDeprecatedPropertyIds( [ 2 ] );
 
 		$res = $this->suggester->suggestByPropertyIds( $ids, 100, 0.0, 'item' );
 
@@ -100,14 +101,14 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	}
 
 	public function testEmptyResult() {
-		$this->assertEmpty( $this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' ) );
+		$this->assertEmpty( $this->suggester->suggestByPropertyIds( [], 10, 0.01, 'item' ) );
 	}
 
 	public function testInitialSuggestionsResult() {
-		$this->suggester->setInitialSuggestions( array( 42 ) );
+		$this->suggester->setInitialSuggestions( [ 42 ] );
 		$this->assertEquals(
-			array( new Suggestion( new PropertyId( "P42" ), 1.0 ) ),
-			$this->suggester->suggestByPropertyIds( array(), 10, 0.01, 'item' )
+			[ new Suggestion( new PropertyId( 'P42' ), 1.0 ) ],
+			$this->suggester->suggestByPropertyIds( [], 10, 0.01, 'item' )
 		);
 	}
 
@@ -115,14 +116,14 @@ class SimpleSuggesterTest extends MediaWikiTestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testInvalidLimit() {
-		$this->suggester->suggestByPropertyIds( array(), '10', 0.01, 'item' );
+		$this->suggester->suggestByPropertyIds( [], '10', 0.01, 'item' );
 	}
 
 	/**
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testInvalidMinProbability() {
-		$this->suggester->suggestByPropertyIds( array(), 10, '0.01', 'item' );
+		$this->suggester->suggestByPropertyIds( [], 10, '0.01', 'item' );
 	}
 
 }

@@ -61,8 +61,8 @@ class ResultBuilder {
 	 * @return array[]
 	 */
 	public function createResultArray( array $suggestions, $language ) {
-		$entries = array();
-		$ids = array();
+		$entries = [];
+		$ids = [];
 		foreach ( $suggestions as $suggestion ) {
 			$id = $suggestion->getPropertyId();
 			$ids[] = $id;
@@ -71,7 +71,7 @@ class ResultBuilder {
 		$terms = $this->termIndex->getTermsOfEntities(
 			$ids,
 			null,
-			array( $language )
+			[ $language ]
 		);
 		$clusteredTerms = $this->clusterTerms( $terms );
 
@@ -89,16 +89,17 @@ class ResultBuilder {
 	 * @return array
 	 */
 	private function buildEntry( EntityId $id, array $clusteredTerms, Suggestion $suggestion ) {
-		$entry = array();
-		$entry['id'] = $id->getSerialization();
-		$entry['url'] = $this->entityTitleLookup->getTitleForId( $id )->getFullUrl();
-		$entry['rating'] = $suggestion->getProbability();
+		$entry = [
+			'id' => $id->getSerialization(),
+			'url' => $this->entityTitleLookup->getTitleForId( $id )->getFullUrl(),
+			'rating' => $suggestion->getProbability(),
+		];
 
 		/** @var TermIndexEntry[] $matchingTerms */
 		if ( isset( $clusteredTerms[$id->getSerialization()] ) ) {
 			$matchingTerms = $clusteredTerms[$id->getSerialization()];
 		} else {
-			$matchingTerms = array();
+			$matchingTerms = [];
 		}
 
 		foreach ( $matchingTerms as $term ) {
@@ -130,12 +131,12 @@ class ResultBuilder {
 	 * @return TermIndexEntry[][]
 	 */
 	private function clusterTerms( array $terms ) {
-		$clusteredTerms = array();
+		$clusteredTerms = [];
 
 		foreach ( $terms as $term ) {
 			$id = $term->getEntityId()->getSerialization();
 			if ( !isset( $clusteredTerms[$id] ) ) {
-				$clusteredTerms[$id] = array();
+				$clusteredTerms[$id] = [];
 			}
 			$clusteredTerms[$id][] = $term;
 		}
@@ -154,7 +155,7 @@ class ResultBuilder {
 
 		if ( preg_match( $this->searchPattern, $term->getText() ) ) {
 			if ( !isset( $entry['aliases'] ) ) {
-				$entry['aliases'] = array();
+				$entry['aliases'] = [];
 				ApiResult::setIndexedTagName( $entry['aliases'], 'alias' );
 			}
 			$entry['aliases'][] = $term->getText();
@@ -169,7 +170,7 @@ class ResultBuilder {
 	 */
 	public function mergeWithTraditionalSearchResults( array &$entries, array $searchResults, $resultSize ) {
 		// Avoid duplicates
-		$existingKeys = array();
+		$existingKeys = [];
 		foreach ( $entries as $entry ) {
 			$existingKeys[$entry['id']] = true;
 		}

@@ -75,7 +75,7 @@ class SuggestionGenerator {
 	 * @return Suggestion[]
 	 */
 	public function generateSuggestionsByPropertyList( array $propertyIdList, $limit, $minProbability, $context ) {
-		$propertyIds = array();
+		$propertyIds = [];
 		foreach ( $propertyIdList as $stringId ) {
 			$propertyIds[] = new PropertyId( $stringId );
 		}
@@ -97,12 +97,12 @@ class SuggestionGenerator {
 		}
 		$ids = $this->getMatchingIDs( $search, $language );
 
-		$id_set = array();
+		$id_set = [];
 		foreach ( $ids as $id ) {
 			$id_set[$id->getNumericId()] = true;
 		}
 
-		$matching_suggestions = array();
+		$matching_suggestions = [];
 		$count = 0;
 		foreach ( $suggestions as $suggestion ) {
 			if ( array_key_exists( $suggestion->getPropertyId()->getNumericId(), $id_set ) ) {
@@ -122,24 +122,24 @@ class SuggestionGenerator {
 	 */
 	private function getMatchingIDs( $search, $language ) {
 		$termIndexEntries = $this->termIndex->getTopMatchingTerms(
-			array(
-				new TermIndexSearchCriteria( array(
+			[
+				new TermIndexSearchCriteria( [
 					'termLanguage' => $language,
 					'termText' => $search
-				) )
-			),
-			array(
+				] )
+			],
+			[
 				TermIndexEntry::TYPE_LABEL,
 				TermIndexEntry::TYPE_ALIAS,
-			),
+			],
 			Property::ENTITY_TYPE,
-			array(
+			[
 				'caseSensitive' => false,
 				'prefixSearch' => true,
-			)
+			]
 		);
 
-		$ids = array();
+		$ids = [];
 		foreach ( $termIndexEntries as $entry ) {
 			$ids[] = $entry->getEntityId();
 		}

@@ -22,7 +22,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 
 	private $defaultSuggesterResultSize = 100;
 	private $defaultMinProbability = 0.01;
-	private $defaultParams = array(
+	private $defaultParams = [
 		'entity' => null,
 		'properties' => null,
 		'continue' => 10,
@@ -30,7 +30,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		'language' => 'en',
 		'search' => '',
 		'context' => 'item',
-	);
+	];
 
 	public function setUp() {
 		parent::setUp();
@@ -62,7 +62,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 		);
 
 		$this->assertEquals( null, $params->entity );
-		$this->assertEquals( array( 'P31' ), $params->properties );
+		$this->assertEquals( [ 'P31' ], $params->properties );
 		$this->assertEquals( 'en', $params->language );
 		$this->assertEquals( 10, $params->continue );
 		$this->assertEquals( 5, $params->limit );
@@ -77,7 +77,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	 */
 	public function testSuggestionWithoutEntityOrProperties() {
 		$this->paramsParser->parseAndValidate(
-			array( 'entity' => null, 'properties' => null )
+			[ 'entity' => null, 'properties' => null ]
 		);
 	}
 
@@ -86,7 +86,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	 */
 	public function testSuggestionWithEntityAndProperties() {
 		$this->paramsParser->parseAndValidate(
-			array( 'entity' => 'Q1', 'properties' => array( 'P31' ) )
+			[ 'entity' => 'Q1', 'properties' => [ 'P31' ] ]
 		);
 	}
 
@@ -95,7 +95,7 @@ class SuggesterParamsParserTest extends MediaWikiTestCase {
 	 */
 	public function testSuggestionWithNonNumericContinue() {
 		$this->paramsParser->parseAndValidate(
-			array( 'entity' => 'Q1', 'properties' => null, 'continue' => 'drop' )
+			[ 'entity' => 'Q1', 'properties' => null, 'continue' => 'drop' ]
 		);
 	}
 

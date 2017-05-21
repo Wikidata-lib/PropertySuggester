@@ -65,24 +65,24 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$p15 = new PropertyId( 'P15' );
 		$p23 = new PropertyId( 'P23' );
 
-		$suggestions = array(
+		$suggestions = [
 			new Suggestion( $p12, 0.9 ), // this will stay at pos 0
 			new Suggestion( $p23, 0.8 ), // this doesn't match
 			new Suggestion( $p7, 0.7 ), // this will go to pos 1
 			new Suggestion( $p15, 0.6 ) // this is outside of resultSize
-		);
+		];
 
 		$resultSize = 2;
 
 		$this->termIndex->expects( $this->any() )
 			->method( 'getTopMatchingTerms' )
 			->will( $this->returnValue(
-				$this->getTermIndexEntryArrayWithIds( array( $p7, $p10, $p15, $p12 ) )
+				$this->getTermIndexEntryArrayWithIds( [ $p7, $p10, $p15, $p12 ] )
 			) );
 
 		$result = $this->suggestionGenerator->filterSuggestions( $suggestions, 'foo', 'en', $resultSize );
 
-		$this->assertEquals( array( $suggestions[0], $suggestions[2] ), $result );
+		$this->assertEquals( [ $suggestions[0], $suggestions[2] ], $result );
 	}
 
 	/**
@@ -91,14 +91,14 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 	 * @return TermIndexEntry[]
 	 */
 	private function getTermIndexEntryArrayWithIds( $ids ) {
-		$termIndexEntries = array();
+		$termIndexEntries = [];
 		foreach ( $ids as $i => $id ) {
-			$termIndexEntries[] = new TermIndexEntry( array(
+			$termIndexEntries[] = new TermIndexEntry( [
 				'entityId' => $id,
 				'termLanguage' => 'en',
 				'termText' => "kitten$i",
 				'termType' => TermIndexEntry::TYPE_LABEL
-			) );
+			] );
 		}
 		return $termIndexEntries;
 	}
@@ -107,33 +107,34 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$resultSize = 2;
 
 		$result = $this->suggestionGenerator->filterSuggestions(
-			array( 1, 2, 3, 4 ),
+			[ 1, 2, 3, 4 ],
 			'',
 			'en',
 			$resultSize
 		);
 
-		$this->assertEquals( array( 1, 2 ), $result );
+		$this->assertEquals( [ 1, 2 ], $result );
 	}
 
 	public function testGenerateSuggestionsWithPropertyList() {
-		$properties = array();
-		$properties[] = new PropertyId( 'P12' );
-		$properties[] = new PropertyId( 'P13' );
-		$properties[] = new PropertyId( 'P14' );
+		$properties = [
+			new PropertyId( 'P12' ),
+			new PropertyId( 'P13' ),
+			new PropertyId( 'P14' ),
+		];
 
 		$this->suggester->expects( $this->any() )
 			->method( 'suggestByPropertyIds' )
 			->with( $this->equalTo( $properties ) )
-			->will( $this->returnValue( array( 'foo' ) ) );
+			->will( $this->returnValue( [ 'foo' ] ) );
 
 		$result1 = $this->suggestionGenerator->generateSuggestionsByPropertyList(
-			array( 'P12', 'p13', 'P14' ),
+			[ 'P12', 'p13', 'P14' ],
 			100,
 			0.0,
 			'item'
 		);
-		$this->assertEquals( $result1, array( 'foo' ) );
+		$this->assertEquals( $result1, [ 'foo' ] );
 	}
 
 	public function testGenerateSuggestionsWithItem() {
@@ -151,10 +152,10 @@ class SuggestionGeneratorTest extends MediaWikiTestCase {
 		$this->suggester->expects( $this->any() )
 			->method( 'suggestByItem' )
 			->with( $this->equalTo( $item ) )
-			->will( $this->returnValue( array( 'foo' ) ) );
+			->will( $this->returnValue( [ 'foo' ] ) );
 
 		$result3 = $this->suggestionGenerator->generateSuggestionsByItem( 'Q42', 100, 0.0, 'item' );
-		$this->assertEquals( $result3, array( 'foo' ) );
+		$this->assertEquals( $result3, [ 'foo' ] );
 	}
 
 	/**

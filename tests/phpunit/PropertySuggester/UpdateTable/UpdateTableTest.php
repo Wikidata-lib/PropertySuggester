@@ -24,7 +24,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 	/**
 	 * @var string[]
 	 */
-	private $rowHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
+	private $rowHeader = [ 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ];
 
 	public function setUp() {
 		parent::setUp();
@@ -34,30 +34,30 @@ class UpdateTableTest extends MediaWikiTestCase {
 	}
 
 	public function getRows() {
-		$rows1 = array(
-			array( 1, 0, 2, 100, 0.1, 'item' ),
-			array( 1, 0, 3, 50, 0.05, 'item' ),
-			array( 2, 0, 3, 100, 0.1, 'item' ),
-			array( 2, 0, 4, 200, 0.2, 'item' ),
-			array( 3, 0, 1, 123, 0.5, 'item' ),
-		);
+		$rows1 = [
+			[ 1, 0, 2, 100, 0.1, 'item' ],
+			[ 1, 0, 3, 50, 0.05, 'item' ],
+			[ 2, 0, 3, 100, 0.1, 'item' ],
+			[ 2, 0, 4, 200, 0.2, 'item' ],
+			[ 3, 0, 1, 123, 0.5, 'item' ],
+		];
 
-		$rows2 = array();
+		$rows2 = [];
 		for ( $i = 0; $i < 1100; $i++ ) {
-			$rows2[] = array( $i, 0, 2, 100, 0.1, 'item' );
+			$rows2[] = [ $i, 0, 2, 100, 0.1, 'item' ];
 		}
 
-		return array(
-			array( $rows1 ),
-			array( $rows2 ),
-		);
+		return [
+			[ $rows1 ],
+			[ $rows2 ],
+		];
 	}
 
 	/**
 	 * @dataProvider getRows
 	 */
 	public function testRewriteNativeStrategy( array $rows ) {
-		$args = array( 'file' => $this->testfilename, 'quiet' => true, 'use-loaddata' => true );
+		$args = [ 'file' => $this->testfilename, 'quiet' => true, 'use-loaddata' => true ];
 		$this->runScriptAndAssert( $args, $rows );
 	}
 
@@ -65,7 +65,7 @@ class UpdateTableTest extends MediaWikiTestCase {
 	 * @dataProvider getRows
 	 */
 	public function testRewriteWithSQLInserts( array $rows ) {
-		$args = array( 'file' => $this->testfilename, 'quiet' => true );
+		$args = [ 'file' => $this->testfilename, 'quiet' => true ];
 		$this->runScriptAndAssert( $args, $rows );
 	}
 
@@ -77,16 +77,16 @@ class UpdateTableTest extends MediaWikiTestCase {
 		if ( count( $rows ) < 100 ) {
 			$this->assertSelect(
 				'wbs_propertypairs',
-				array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ),
-				array(),
+				[ 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ],
+				[],
 				$rows
 			);
 		} else { // assertSelect is too slow to compare 1100 rows... just check the size
 			$this->assertSelect(
 				'wbs_propertypairs',
-				array( 'count' => 'count(*)' ),
-				array(),
-				array( array( count( $rows ) ) )
+				[ 'count' => 'count(*)' ],
+				[],
+				[ [ count( $rows ) ] ]
 			);
 		}
 	}

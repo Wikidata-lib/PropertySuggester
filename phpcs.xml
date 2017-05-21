@@ -2,7 +2,6 @@
 <ruleset name="WikibaseMediaInfo">
 	<rule ref="vendor/wikibase/wikibase-codesniffer/Wikibase">
 		<!-- FIXME: The following should all be fixed. -->
-		<exclude name="Generic.Arrays.DisallowLongArraySyntax" />
 		<exclude name="MediaWiki.ControlStructures.AssignmentInControlStructures" />
 		<exclude name="PSR1.Classes.ClassDeclaration" />
 	</rule>

@@ -42,11 +42,11 @@ class BasicImporter implements Importer {
 	 * @throws UnexpectedValueException
 	 */
 	private function doImport( $fileHandle, Database $db, ImportContext $importContext ) {
-		$accumulator = array();
+		$accumulator = [];
 		$batchSize = $importContext->getBatchSize();
 		$i = 0;
 		$header = fgetcsv( $fileHandle, 0, $importContext->getCsvDelimiter() ); //this is to get the csv-header
-		$expectedHeader = array( 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' );
+		$expectedHeader = [ 'pid1', 'qid1', 'pid2', 'count', 'probability', 'context' ];
 		if ( $header != $expectedHeader ) {
 			throw new UnexpectedValueException( "provided csv-file does not match the expected format:\n" . join( ',', $expectedHeader ) );
 		}
@@ -60,7 +60,7 @@ class BasicImporter implements Importer {
 				if ( ! $importContext->isQuiet() ) {
 					print "$i rows inserted\n";
 				}
-				$accumulator = array();
+				$accumulator = [];
 				if ( $data == false ) {
 					break;
 				}
@@ -68,8 +68,14 @@ class BasicImporter implements Importer {
 
 			$qid1 = is_numeric( $data[1] ) ? $data[1] : 0;
 
-			$accumulator[] = array( 'pid1' => $data[0], 'qid1' => $qid1, 'pid2' => $data[2], 'count' => $data[3],
-									'probability' => $data[4], 'context' => $data[5] );
+			$accumulator[] = [
+				'pid1' => $data[0],
+				'qid1' => $qid1,
+				'pid2' => $data[2],
+				'count' => $data[3],
+				'probability' => $data[4],
+				'context' => $data[5],
+			];
 		}
 	}
 

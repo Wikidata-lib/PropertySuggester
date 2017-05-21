@@ -63,10 +63,16 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 		$ip56 = (int)substr( $p56, 1 );
 		$ip72 = (int)substr( $p72, 1 );
 
-		$row = array( 'pid1' => $ip56, 'qid1' => 0, 'pid2' => $ip72, 'count' => 1,
-			'probability' => 0.3, 'context' => 'item' );
+		$row = [
+			'pid1' => $ip56,
+			'qid1' => 0,
+			'pid2' => $ip72,
+			'count' => 1,
+			'probability' => 0.3,
+			'context' => 'item',
+		];
 
-		$this->db->insert( 'wbs_propertypairs', array( $row ) );
+		$this->db->insert( 'wbs_propertypairs', [ $row ] );
 	}
 
 	public function testDatabaseHasRows() {
@@ -77,8 +83,8 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 
 		$res = $this->db->select(
 			'wbs_propertypairs',
-			array( 'pid1', 'pid2' ),
-			array( 'pid1' => $ip56, 'pid2' => $ip72 )
+			[ 'pid1', 'pid2' ],
+			[ 'pid1' => $ip56, 'pid2' => $ip72 ]
 		);
 		$this->assertEquals( 1, $res->numRows() );
 	}
@@ -87,12 +93,12 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 		$p56 = self::$idMap['%P56%'];
 		$p72 = self::$idMap['%P72%'];
 
-		$params = array(
+		$params = [
 			'action' => 'wbsgetsuggestions',
 			'properties' => $p56,
 			'search' => '*',
 			'context' => 'item'
-		);
+		];
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
 
@@ -106,13 +112,13 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 	public function testExecutionWithSearch() {
 		$p56 = self::$idMap['%P56%'];
 
-		$params = array(
+		$params = [
 			'action' => 'wbsgetsuggestions',
 			'properties' => $p56,
 			'search' => 'IdontExist',
 			'continue' => 0,
 			'context' => 'item'
-		);
+		];
 		$res = $this->doApiRequest( $params );
 		$result = $res[0];
 
@@ -123,11 +129,11 @@ class GetSuggestionsTest extends WikibaseApiTestCase {
 
 	public function testExecutionWithInvalidContext() {
 		$p56 = self::$idMap['%P56%'];
-		$params = array(
+		$params = [
 			'action' => 'wbsgetsuggestions',
 			'properties' => $p56,
 			'context' => 'delete all the things!'
-		);
+		];
 
 		$this->setExpectedException( ApiUsageException::class );
 		$this->doApiRequest( $params );

@@ -152,7 +152,7 @@ class GetSuggestions extends ApiBase {
 	private function querySearchApi( $resultSize, $search, $language ) {
 		$searchEntitiesParameters = new DerivativeRequest(
 			$this->getRequest(),
-			array(
+			[
 				'limit' => $resultSize + 1,
 				'continue' => 0,
 				'search' => $search,
@@ -160,7 +160,7 @@ class GetSuggestions extends ApiBase {
 				'language' => $language,
 				'uselang' => $language,
 				'type' => Property::ENTITY_TYPE
-			)
+			]
 		);
 
 		$api = new ApiMain( $searchEntitiesParameters );
@@ -168,11 +168,11 @@ class GetSuggestions extends ApiBase {
 
 		$apiResult = $api->getResult()->getResultData(
 			null,
-			array(
-				'BC' => array(),
-				'Types' => array(),
+			[
+				'BC' => [],
+				'Types' => [],
 				'Strip' => 'all'
-			)
+			]
 		);
 
 		return $apiResult['search'];
@@ -182,43 +182,43 @@ class GetSuggestions extends ApiBase {
 	 * @see ApiBase::getAllowedParams()
 	 */
 	public function getAllowedParams() {
-		return array(
-			'entity' => array(
+		return [
+			'entity' => [
 				ApiBase::PARAM_TYPE => 'string',
-			),
-			'properties' => array(
+			],
+			'properties' => [
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_ISMULTI => true
-			),
-			'limit' => array(
+			],
+			'limit' => [
 				ApiBase::PARAM_TYPE => 'limit',
 				ApiBase::PARAM_DFLT => 7,
 				ApiBase::PARAM_MAX => ApiBase::LIMIT_SML1,
 				ApiBase::PARAM_MAX2 => ApiBase::LIMIT_SML2,
 				ApiBase::PARAM_MIN => 0,
 				ApiBase::PARAM_RANGE_ENFORCE => true,
-			),
+			],
 			'continue' => null,
-			'language' => array(
+			'language' => [
 				ApiBase::PARAM_TYPE => $this->languageCodes,
 				ApiBase::PARAM_DFLT => $this->getContext()->getLanguage()->getCode(),
-			),
-			'context' => array(
-				ApiBase::PARAM_TYPE => array( 'item', 'qualifier', 'reference' ),
+			],
+			'context' => [
+				ApiBase::PARAM_TYPE => [ 'item', 'qualifier', 'reference' ],
 				ApiBase::PARAM_DFLT => 'item',
-			),
-			'search' => array(
+			],
+			'search' => [
 				ApiBase::PARAM_TYPE => 'string',
 				ApiBase::PARAM_DFLT => '',
-			)
-		);
+			],
+		];
 	}
 
 	/**
 	 * @see ApiBase::getExamplesMessages()
 	 */
 	public function getExamplesMessages() {
-		return array(
+		return [
 			'action=wbsgetsuggestions&entity=Q4'
 			=> 'apihelp-wbsgetsuggestions-example-1',
 			'action=wbsgetsuggestions&entity=Q4&continue=10&limit=5'
@@ -229,7 +229,7 @@ class GetSuggestions extends ApiBase {
 			=> 'apihelp-wbsgetsuggestions-example-4',
 			'action=wbsgetsuggestions&properties=P21&context=reference'
 			=> 'apihelp-wbsgetsuggestions-example-5'
-		);
+		];
 	}
 
 }
