@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Rachmat.Wahidi"
+			"Rachmat.Wahidi",
+			"Rachmat04"
 		]
 	},
 	"propertysuggester-desc": "Sarankan atribut ketika menambahkan pernyataan Wikibase.",
