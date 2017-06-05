@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"चक्रपाणी"
+			"चक्रपाणी",
+			"Sfic"
 		]
 	},
 	"propertysuggester-desc": "विकिबेस बयान को जोड़ते समय गुणों का सुझाव",
@@ -13,5 +14,6 @@
 	"apihelp-wbsgetsuggestions-param-context": "या तो आइटम, रिफरेन्स या क्वालीफायर",
 	"apihelp-wbsgetsuggestions-param-language": "परिणाम के लिए भाषा",
 	"apihelp-wbsgetsuggestions-param-limit": "अधिकतम परिणाम संख्या",
-	"apihelp-wbsgetsuggestions-param-search": "इस टेक्स्ट को खोजें"
+	"apihelp-wbsgetsuggestions-param-search": "इस टेक्स्ट को खोजें",
+	"apihelp-wbsgetsuggestions-param-size": "सुझाव दिखाने की संख्या दें।"
 }
